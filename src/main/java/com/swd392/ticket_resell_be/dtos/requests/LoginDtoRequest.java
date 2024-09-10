@@ -9,5 +9,11 @@ import java.io.Serializable;
 /**
  * DTO for {@link User}
  */
-public record LoginDtoRequest(@NotEmpty String username, @NotEmpty @Length(min = 8) String password) implements Serializable {
+public record LoginDtoRequest(
+        @NotEmpty(message = "USERNAME_EMPTY")
+        String username,
+        @NotEmpty(message = "PASSWORD_EMPTY")
+        @Length(min = 8, message = "PASSWORD_LENGTH")
+        String password
+) implements Serializable {
 }

@@ -2,7 +2,7 @@
 spring:
   application:
     name: ticket_resell_be
-#database configuration
+  #database configuration
   jpa:
     show-sql: true
     hibernate:

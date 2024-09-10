@@ -5,5 +5,5 @@ import com.swd392.ticket_resell_be.dtos.requests.LoginDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 
 public interface UserService {
-    ApiItemResponse<?> login(LoginDtoRequest loginDtoRequest) throws JOSEException;
+    ApiItemResponse<String> login(LoginDtoRequest loginDtoRequest) throws JOSEException;
 }

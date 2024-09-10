@@ -13,8 +13,6 @@ import com.swd392.ticket_resell_be.utils.TokenUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +20,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UserServiceImplement implements UserService {
-    @NonFinal
-    @Value("${JWT_SECRET_KEY}")
-    String secretKey;
 
     UserRepository userRepository;
+    TokenUtil tokenUtil;
+    ApiResponseBuilder apiResponseBuilder;
 
     @Override
-    public ApiItemResponse<?> login(LoginDtoRequest loginDtoRequest) throws JOSEException {
+    public ApiItemResponse<String> login(LoginDtoRequest loginDtoRequest) throws JOSEException {
         User user = userRepository.findByUsername(loginDtoRequest.username())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (!user.getPassword().equals(loginDtoRequest.password()))
             throw new AppException(ErrorCode.WRONG_PASSWORD);
-        return ApiResponseBuilder.buildResponse(TokenUtil.generateToken(user, secretKey), HttpStatus.OK);
+        return apiResponseBuilder.buildResponse(tokenUtil.generateToken(user), HttpStatus.OK);
     }
 }
