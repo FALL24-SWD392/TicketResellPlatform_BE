@@ -1,13 +1,13 @@
 package com.swd392.ticket_resell_be.dtos.requests;
 
-import com.swd392.ticket_resell_be.entities.User;
+import com.swd392.ticket_resell_be.entities.Member;
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Length;
 
 import java.io.Serializable;
 
 /**
- * DTO for {@link User}
+ * DTO for {@link Member}
  */
 public record LoginDtoRequest(
         @NotEmpty(message = "USERNAME_EMPTY")

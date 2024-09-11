@@ -1,7 +1,7 @@
 package com.swd392.ticket_resell_be.configs;
 
-import com.swd392.ticket_resell_be.entities.User;
-import com.swd392.ticket_resell_be.repositories.UserRepository;
+import com.swd392.ticket_resell_be.entities.Member;
+import com.swd392.ticket_resell_be.repositories.MemberRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,16 +9,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationInitConfig {
     @Bean
-    ApplicationRunner applicationRunner(UserRepository userRepository) {
+    ApplicationRunner applicationRunner(MemberRepository memberRepository) {
         return args -> {
-            if (userRepository.findByUsername("admin").isEmpty()) {
+            if (memberRepository.findByUsername("admin").isEmpty()) {
 
-                User user = User.builder()
+                Member member = Member.builder()
                         .username("admin")
                         .password("12345678")
                         .build();
 
-                userRepository.save(user);
+                memberRepository.save(member);
             }
         };
     }
