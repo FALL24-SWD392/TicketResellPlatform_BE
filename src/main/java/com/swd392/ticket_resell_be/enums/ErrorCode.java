@@ -19,6 +19,8 @@ public enum ErrorCode {
     USERNAME_EMPTY("Username cannot be empty", HttpStatus.BAD_REQUEST),
     PASSWORD_EMPTY("Password cannot be empty", HttpStatus.BAD_REQUEST),
     PASSWORD_LENGTH("Password must be at least 8 characters long", HttpStatus.BAD_REQUEST),
+    //Ticket's Error
+
     ;
     String message;
     HttpStatus status;

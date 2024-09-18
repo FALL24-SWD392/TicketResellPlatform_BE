@@ -13,20 +13,20 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "member")
-public class Member {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private UUID id;
 
     @NotEmpty
-    @Column(name = "username", nullable = false, unique = true, updatable = false)
+    @Column(name = "user_name", nullable = false, unique = true, updatable = false)
     private String username;
 
     @Length(min = 8)
     @NotEmpty
-    @Column(name = "password", nullable = false)
+    @Column(name = "user_password", nullable = false)
     private String password;
 
 }

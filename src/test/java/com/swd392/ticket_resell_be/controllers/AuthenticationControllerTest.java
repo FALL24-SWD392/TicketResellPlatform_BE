@@ -6,7 +6,7 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.exceptions.GlobalExceptionHandler;
-import com.swd392.ticket_resell_be.services.MemberService;
+import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,12 +31,12 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 @WebMvcTest(AuthenticationController.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-        MemberService.class,
+        UserService.class,
         ApiResponseBuilder.class,
 })
 class AuthenticationControllerTest {
     @MockBean
-    MemberService memberService;
+    UserService userService;
 
     @MockBean
     ApiResponseBuilder apiResponseBuilder;
@@ -48,7 +48,7 @@ class AuthenticationControllerTest {
 
     @BeforeEach
     void setUp() {
-        this.mockMvc = standaloneSetup(new AuthenticationController(memberService))
+        this.mockMvc = standaloneSetup(new AuthenticationController(userService))
                 .setControllerAdvice(new GlobalExceptionHandler(apiResponseBuilder))
                 .alwaysExpect(status().isOk())
                 .build();
@@ -63,7 +63,7 @@ class AuthenticationControllerTest {
                 .status(HttpStatus.OK)
                 .build();
         //when
-        when(memberService.login(loginDtoRequest)).thenReturn(apiItemResponse);
+        when(userService.login(loginDtoRequest)).thenReturn(apiItemResponse);
         //then
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -80,7 +80,7 @@ class AuthenticationControllerTest {
                 .message("User not found")
                 .build();
         //when
-        when(memberService.login(any())).thenThrow(new AppException(ErrorCode.USER_NOT_FOUND));
+        when(userService.login(any())).thenThrow(new AppException(ErrorCode.USER_NOT_FOUND));
         when(apiResponseBuilder.buildResponse(any(HttpStatus.class), anyString())).thenReturn(apiItemResponse);
         //then
         mockMvc.perform(post("/auth/login")
@@ -98,7 +98,7 @@ class AuthenticationControllerTest {
                 .message("Wrong password")
                 .build();
         //when
-        when(memberService.login(any())).thenThrow(new AppException(ErrorCode.WRONG_PASSWORD));
+        when(userService.login(any())).thenThrow(new AppException(ErrorCode.WRONG_PASSWORD));
         when(apiResponseBuilder.buildResponse(any(HttpStatus.class), anyString())).thenReturn(apiItemResponse);
         //then
         mockMvc.perform(post("/auth/login")

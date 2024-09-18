@@ -3,11 +3,11 @@ package com.swd392.ticket_resell_be.services;
 import com.nimbusds.jose.JOSEException;
 import com.swd392.ticket_resell_be.dtos.requests.LoginDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
-import com.swd392.ticket_resell_be.entities.Member;
+import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
-import com.swd392.ticket_resell_be.repositories.MemberRepository;
-import com.swd392.ticket_resell_be.services.impls.MemberServiceImplement;
+import com.swd392.ticket_resell_be.repositories.UserRepository;
+import com.swd392.ticket_resell_be.services.impls.UserServiceImplement;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.TokenUtil;
 import org.junit.jupiter.api.Test;
@@ -27,11 +27,11 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MemberServiceTest {
+class UserServiceTest {
     @InjectMocks
-    MemberServiceImplement memberServiceImplement;
+    UserServiceImplement memberServiceImplement;
     @Mock
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Mock
     TokenUtil tokenUtil;
     @Mock
@@ -40,7 +40,7 @@ class MemberServiceTest {
     @Test
     void testLogin_Success() throws JOSEException {
         //given
-        Member member = Member.builder()
+        User user = User.builder()
                 .id(UUID.randomUUID())
                 .username("test")
                 .password("12345678")
@@ -51,8 +51,8 @@ class MemberServiceTest {
                 .status(HttpStatus.OK)
                 .build();
         //when
-        when(memberRepository.findByUsername(anyString())).thenReturn(Optional.of(member));
-        when(tokenUtil.generateToken(member)).thenReturn("token");
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(tokenUtil.generateToken(user)).thenReturn("token");
         when(apiResponseBuilder.buildResponse(anyString(), any(HttpStatus.class))).thenReturn(apiItemResponse);
         ApiItemResponse<?> response = memberServiceImplement.login(loginDtoRequest);
         //then
@@ -65,7 +65,7 @@ class MemberServiceTest {
         //given
         LoginDtoRequest loginDtoRequest = new LoginDtoRequest("test", "12345678");
         //when
-        when(memberRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         //then
         assertThrows(AppException.class,
                 () -> memberServiceImplement.login(loginDtoRequest),
@@ -75,14 +75,14 @@ class MemberServiceTest {
     @Test
     void testLogin_WrongPassword() {
         //given
-        Member member = Member.builder()
+        User user = User.builder()
                 .id(UUID.randomUUID())
                 .username("test")
                 .password("12345678")
                 .build();
         LoginDtoRequest loginDtoRequest = new LoginDtoRequest("test", "12345679");
         //when
-        when(memberRepository.findByUsername(anyString())).thenReturn(Optional.of(member));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         //then
         assertThrows(AppException.class,
                 () -> memberServiceImplement.login(loginDtoRequest),
