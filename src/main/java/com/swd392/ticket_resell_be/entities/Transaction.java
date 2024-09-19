@@ -41,10 +41,11 @@ public class Transaction {
     @Column(name = "transaction_time")
     private OffsetDateTime transactionTime;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "subscription_id")
-    private Subscription subscription;
+    @JoinColumn(name = "package_id", nullable = false)
+    private Package aPackage;
+
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 

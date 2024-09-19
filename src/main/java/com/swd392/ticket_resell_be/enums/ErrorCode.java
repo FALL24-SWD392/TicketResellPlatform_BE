@@ -20,8 +20,15 @@ public enum ErrorCode {
     PASSWORD_EMPTY("Password cannot be empty", HttpStatus.BAD_REQUEST),
     PASSWORD_LENGTH("Password must be at least 8 characters long", HttpStatus.BAD_REQUEST),
     //Ticket's Error
-
-    ;
+    //Transaction's Error
+    INVALID_AMOUNT("Invalid amount provided", HttpStatus.BAD_REQUEST),
+    INVALID_SUBSCRIPTION("Invalid subscription provided", HttpStatus.BAD_REQUEST),
+    TRANSACTION_NOT_FOUND("Transaction not found", HttpStatus.NOT_FOUND),
+    //Package's Error
+    PACKAGE_NOT_FOUND("Package not found", HttpStatus.NOT_FOUND),
+    INVALID_PACKAGE("Invalid package", HttpStatus.BAD_REQUEST),
+    //Subscription's Error
+    SUBSCRIPTION_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),;
     String message;
     HttpStatus status;
 }

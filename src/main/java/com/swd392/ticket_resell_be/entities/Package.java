@@ -42,6 +42,9 @@ public class Package {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
+    @NotNull
+    @Column(name = "duration", nullable = false)
+    private Integer duration;
 /*
  TODO [Reverse Engineering] create field to map the 'status' column
  Available actions: Define target Java type | Uncomment as is | Remove column mapping
