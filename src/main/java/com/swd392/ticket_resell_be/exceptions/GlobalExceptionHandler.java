@@ -5,6 +5,7 @@ import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
     public <T> ResponseEntity<ApiItemResponse<T>> handleAppException(AppException e) {
         return ResponseEntity.ok(apiResponseBuilder
-                .buildResponse(e.getErrorCode().getStatus(), e.getErrorCode().getMessage()));
+                .buildResponse(null, e.getErrorCode().getStatus(), e.getErrorCode().getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -32,6 +33,13 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse(ErrorCode.UNDEFINED);
         return ResponseEntity.ok(apiResponseBuilder
-                .buildResponse(errorCode.getStatus(), errorCode.getMessage()));
+                .buildResponse(null, errorCode.getStatus(), errorCode.getMessage()));
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public <T> ResponseEntity<ApiItemResponse<T>> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        ErrorCode errorCode = ErrorCode.valueOf(e.getMessage());
+        return ResponseEntity.ok(apiResponseBuilder
+                .buildResponse(null, errorCode.getStatus(), errorCode.getMessage()));
     }
 }
