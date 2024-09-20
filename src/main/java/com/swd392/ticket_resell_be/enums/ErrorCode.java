@@ -14,11 +14,15 @@ public enum ErrorCode {
     UNDEFINED("Undefined error", HttpStatus.INTERNAL_SERVER_ERROR),
     //User errors
     USER_NOT_FOUND("User not found", HttpStatus.NOT_FOUND),
-    USER_ALREADY_EXISTS("User already exists", HttpStatus.CONFLICT),
     WRONG_PASSWORD("Wrong password", HttpStatus.BAD_REQUEST),
     USERNAME_EMPTY("Username cannot be empty", HttpStatus.BAD_REQUEST),
     PASSWORD_EMPTY("Password cannot be empty", HttpStatus.BAD_REQUEST),
     PASSWORD_LENGTH("Password must be at least 8 characters long", HttpStatus.BAD_REQUEST),
+    EMAIL_EMPTY("Email cannot be empty", HttpStatus.BAD_REQUEST),
+    EMAIL_INVALID("Invalid email", HttpStatus.BAD_REQUEST),
+    PASSWORD_NOT_MATCH("Password not match", HttpStatus.BAD_REQUEST),
+    USERNAME_ALREADY_EXISTS("Username already exists", HttpStatus.CONFLICT),
+    EMAIL_ALREADY_EXISTS("Email already exists", HttpStatus.CONFLICT),
     ;
     String message;
     HttpStatus status;
