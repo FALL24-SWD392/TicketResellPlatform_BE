@@ -11,6 +11,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
@@ -38,18 +39,17 @@ public class Package {
     @Column(name = "image_urls")
     @JdbcTypeCode(SqlTypes.JSON)
     private Map<String, Object> imageUrls;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
     @NotNull
     @Column(name = "duration", nullable = false)
     private Integer duration;
-/*
- TODO [Reverse Engineering] create field to map the 'status' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @ColumnDefault("'active'")
-    @Column(name = "status", columnDefinition = "package_status")
-    private Object status;
-*/
+
+    @NotNull
+    @Column(name = "status", nullable = false)
+    @ColumnDefault("true")
+    private boolean status;
+
 }

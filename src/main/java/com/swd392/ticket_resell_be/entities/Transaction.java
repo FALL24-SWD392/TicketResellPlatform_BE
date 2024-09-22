@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.entities;
 
+import com.swd392.ticket_resell_be.enums.TransactionStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -49,11 +50,8 @@ public class Transaction {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-/*
- TODO [Reverse Engineering] create field to map the 'status' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @ColumnDefault("'active'")
-    @Column(name = "status", columnDefinition = "transaction_status")
-    private Object status;
-*/
+    @Enumerated(EnumType.STRING) // Hoặc EnumType.ORDINAL nếu bạn muốn lưu trữ dưới dạng số
+    @Column(name = "status", columnDefinition = "transaction_status", nullable = false)
+    private TransactionStatus status = TransactionStatus.ACTIVE; // Mặc định là ACTIVE
+
 }

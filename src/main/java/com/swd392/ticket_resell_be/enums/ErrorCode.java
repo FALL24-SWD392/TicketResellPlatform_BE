@@ -28,7 +28,10 @@ public enum ErrorCode {
     PACKAGE_NOT_FOUND("Package not found", HttpStatus.NOT_FOUND),
     INVALID_PACKAGE("Invalid package", HttpStatus.BAD_REQUEST),
     //Subscription's Error
-    SUBSCRIPTION_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),;
+    SUBSCRIPTION_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),
+    INVALID_TRANSACTION("Transaction not found", HttpStatus.NOT_FOUND),
+    PAYMENT_FAILED("Payement failed", HttpStatus.BAD_REQUEST),
+    TRANSACTION_ALREADY_CONFIRMED("Transaction Already Confirmed", HttpStatus.OK);
     String message;
     HttpStatus status;
 }

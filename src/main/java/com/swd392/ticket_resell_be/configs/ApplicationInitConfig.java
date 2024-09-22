@@ -8,18 +8,18 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ApplicationInitConfig {
-//    @Bean
-//    ApplicationRunner applicationRunner(UserRepository userRepository) {
-//        return args -> {
-//            if (userRepository.findByUsername("admin").isEmpty()) {
-//
-//                User user = User.builder()
-//                        .username("admin")
-//                        .password("12345678")
-//                        .build();
-//
-//                userRepository.save(user);
-//            }
-//        };
-//    }
+    @Bean
+    ApplicationRunner applicationRunner(UserRepository userRepository) {
+        return args -> {
+            if (userRepository.findByUsername("admin").isEmpty()) {
+
+                User user = User.builder()
+                        .username("admin")
+                        .password("12345678")
+                        .build();
+
+                userRepository.save(user);
+            }
+        };
+    }
 }
