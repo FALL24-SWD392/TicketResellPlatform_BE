@@ -50,8 +50,7 @@ public class Transaction {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-    @Enumerated(EnumType.STRING) // Hoặc EnumType.ORDINAL nếu bạn muốn lưu trữ dưới dạng số
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "transaction_status", nullable = false)
-    private TransactionStatus status = TransactionStatus.ACTIVE; // Mặc định là ACTIVE
-
+    private TransactionStatus status = TransactionStatus.ACTIVE;
 }
