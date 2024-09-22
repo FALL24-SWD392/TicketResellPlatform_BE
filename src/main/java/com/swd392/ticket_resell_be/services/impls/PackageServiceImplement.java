@@ -112,8 +112,8 @@ public class PackageServiceImplement implements PackageService {
                 .amount(pkg.getPrice().intValue())
                 .description("Purchase Package")
                 .item(item)
-                .returnUrl("http://your_return_url") // Thay thế bằng URL của bạn
-                .cancelUrl("http://your_cancel_url") // Thay thế bằng URL của bạn
+                .returnUrl("http://your_return_url")
+                .cancelUrl("http://your_cancel_url")
                 .build();
         CheckoutResponseData checkoutData = payOS.createPaymentLink(paymentData);
         String checkoutUrl = checkoutData.getCheckoutUrl();
@@ -133,7 +133,6 @@ public class PackageServiceImplement implements PackageService {
     }
 
     public void confirmPayment(long orderCode) {
-        // Tìm giao dịch bằng mã đơn hàng
         Transaction transaction = (Transaction) transactionRepository.findTransactionsByDescription(String.valueOf(orderCode))
                 .orElseThrow(() -> new AppException(ErrorCode.TRANSACTION_NOT_FOUND));
         if (!TransactionStatus.PENDING.equals(transaction.getStatus())) {

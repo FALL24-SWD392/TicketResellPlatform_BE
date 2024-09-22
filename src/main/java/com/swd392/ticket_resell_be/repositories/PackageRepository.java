@@ -11,12 +11,8 @@ import java.util.UUID;
 
 @Repository
 public interface PackageRepository extends JpaRepository<Package, UUID> {
-
-    // Custom query to find a package by its ID (optional)
     @Query("SELECT p FROM Package p WHERE p.id = :packageId")
     Optional<Package> findById(UUID packageId);
-
-    // Custom query to find all packages (optional)
     @Query("SELECT p FROM Package p")
     List<Package> findAll();
 }

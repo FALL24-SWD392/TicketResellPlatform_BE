@@ -78,22 +78,16 @@ public class PackageController {
     @PostMapping("/purchase")
     public ResponseEntity<String> purchasePackage(@RequestBody PackagePurchaseRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Hoặc bất kỳ định danh nào khác của người dùng
-
-        // Lấy thông tin người dùng từ username
+        String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         try {
-            // Thực hiện quá trình mua gói và lấy checkoutUrl
             String checkoutUrl = packageService.purchasePackage(request.getPackageId(), user.getId());
-            // Trả về checkoutUrl
             return ResponseEntity.status(HttpStatus.CREATED).body(checkoutUrl);
         } catch (AppException appEx) {
-            // Xử lý các lỗi ứng dụng cụ thể
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(appEx.getMessage());
         } catch (Exception e) {
-            // Xử lý lỗi chung
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
     }

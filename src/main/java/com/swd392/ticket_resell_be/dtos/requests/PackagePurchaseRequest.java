@@ -8,5 +8,4 @@ import java.util.UUID;
 @Getter
 @Setter
 public class PackagePurchaseRequest {
-    private UUID packageId; // Package ID
-}
+    private UUID packageId; }
