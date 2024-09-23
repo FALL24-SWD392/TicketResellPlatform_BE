@@ -24,8 +24,18 @@ public enum ErrorCode {
     USERNAME_ALREADY_EXISTS("Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS("Email already exists", HttpStatus.CONFLICT),
     //Ticket's Error
-
-    ;
+    //Transaction's Error
+    INVALID_AMOUNT("Invalid amount provided", HttpStatus.BAD_REQUEST),
+    INVALID_SUBSCRIPTION("Invalid subscription provided", HttpStatus.BAD_REQUEST),
+    TRANSACTION_NOT_FOUND("Transaction not found", HttpStatus.NOT_FOUND),
+    //Package's Error
+    PACKAGE_NOT_FOUND("Package not found", HttpStatus.NOT_FOUND),
+    INVALID_PACKAGE("Invalid package", HttpStatus.BAD_REQUEST),
+    //Subscription's Error
+    SUBSCRIPTION_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),
+    INVALID_TRANSACTION("Transaction not found", HttpStatus.NOT_FOUND),
+    PAYMENT_FAILED("Payement failed", HttpStatus.BAD_REQUEST),
+    TRANSACTION_ALREADY_CONFIRMED("Transaction Already Confirmed", HttpStatus.OK);
     String message;
     HttpStatus status;
 }

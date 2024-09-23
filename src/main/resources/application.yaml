@@ -35,3 +35,9 @@ server:
   port: 8081
   servlet:
     context-path: /
+
+#payment configuration
+payos:
+  client-id: ${YOUR_CLIENT_ID}
+  api-key: ${YOUR_API_KEY}
+  checksum-key: ${YOUR_CHECKSUM_KEY}
