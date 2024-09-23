@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.entities;
 
-import com.swd392.ticket_resell_be.enums.TransactionStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -42,15 +41,18 @@ public class Transaction {
     @Column(name = "transaction_time")
     private OffsetDateTime transactionTime;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "package_id", nullable = false)
-    private Package aPackage;
-
+    @JoinColumn(name = "subscription_id")
+    private Subscription subscription;
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", columnDefinition = "transaction_status", nullable = false)
-    private TransactionStatus status = TransactionStatus.ACTIVE;
+/*
+ TODO [Reverse Engineering] create field to map the 'status' column
+ Available actions: Define target Java type | Uncomment as is | Remove column mapping
+    @ColumnDefault("'active'")
+    @Column(name = "status", columnDefinition = "transaction_status")
+    private Object status;
+*/
 }

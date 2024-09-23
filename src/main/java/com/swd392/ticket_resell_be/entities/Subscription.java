@@ -43,9 +43,6 @@ public class Subscription {
     @Column(name = "auto_renew")
     private Boolean autoRenew;
 
-    @Column(name = "is_active")
-    private boolean isActive = true;
-
 /*
  TODO [Reverse Engineering] create field to map the 'status' column
  Available actions: Define target Java type | Uncomment as is | Remove column mapping
