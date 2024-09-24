@@ -34,7 +34,7 @@ public class Package {
 
     @NotNull
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private Integer price;
 
     @Column(name = "image_urls")
     @JdbcTypeCode(SqlTypes.JSON)

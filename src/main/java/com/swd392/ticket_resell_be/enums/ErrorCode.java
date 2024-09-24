@@ -31,7 +31,9 @@ public enum ErrorCode {
     SUBSCRIPTION_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),
     INVALID_TRANSACTION("Transaction not found", HttpStatus.NOT_FOUND),
     PAYMENT_FAILED("Payement failed", HttpStatus.BAD_REQUEST),
-    TRANSACTION_ALREADY_CONFIRMED("Transaction Already Confirmed", HttpStatus.OK);
+    TRANSACTION_ALREADY_CONFIRMED("Transaction Already Confirmed", HttpStatus.OK),
+    INVALID_TRANSACTION_DATA("Invalid TransactionData", HttpStatus.BAD_REQUEST),
+    TRANSACTION_CREATION_FAILED("Transaction Creation Fail", HttpStatus.BAD_REQUEST);
     String message;
     HttpStatus status;
 }

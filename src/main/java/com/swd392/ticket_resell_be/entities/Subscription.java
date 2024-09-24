@@ -9,6 +9,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -34,23 +35,12 @@ public class Subscription {
     private Package packageField;
 
     @Column(name = "start_date")
-    private LocalDate startDate;
+    private Date startDate;
 
     @Column(name = "end_date")
-    private LocalDate endDate;
-
-    @ColumnDefault("false")
-    @Column(name = "auto_renew")
-    private Boolean autoRenew;
+    private Date endDate;
 
     @Column(name = "is_active")
     private boolean isActive = true;
 
-/*
- TODO [Reverse Engineering] create field to map the 'status' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @ColumnDefault("'active'")
-    @Column(name = "status", columnDefinition = "subscription_status")
-    private Object status;
-*/
 }

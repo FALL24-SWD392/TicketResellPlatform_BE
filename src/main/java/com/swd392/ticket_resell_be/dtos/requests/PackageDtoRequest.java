@@ -29,7 +29,7 @@ public class PackageDtoRequest {
         private Integer saleLimit;
 
         @NotNull
-        private BigDecimal price;
+        private Integer price;
 
         private Map<String, Object> imageUrls;
 

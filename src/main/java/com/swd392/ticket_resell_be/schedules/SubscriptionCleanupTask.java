@@ -11,18 +11,5 @@ import java.util.List;
 @Component
 public class SubscriptionCleanupTask {
 
-    private final SubscriptionRepository subscriptionRepository;
 
-    public SubscriptionCleanupTask(SubscriptionRepository subscriptionRepository) {
-        this.subscriptionRepository = subscriptionRepository;
-    }
-
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void cleanupExpiredSubscriptions() {
-        List<Subscription> expiredSubscriptions = subscriptionRepository.findByEndDateBeforeAndIsActive(LocalDate.now(), true);
-        for (Subscription subscription : expiredSubscriptions) {
-            subscription.setActive(false); // Hoặc bạn có thể xóa nó
-            subscriptionRepository.save(subscription); // Cập nhật trạng thái
-        }
-    }
 }

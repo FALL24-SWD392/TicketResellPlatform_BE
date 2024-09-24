@@ -8,7 +8,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    Optional<Transaction> findById(UUID transactionId);
-    List<Transaction> findAll();
-    Optional<Object> findTransactionsByDescription(String orderCode);
+    Optional<Transaction> findTransactionsByDescription(String orderCode);
 }

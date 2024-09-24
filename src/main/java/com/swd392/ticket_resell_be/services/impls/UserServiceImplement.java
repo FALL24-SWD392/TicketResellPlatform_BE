@@ -17,6 +17,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -34,4 +37,20 @@ public class UserServiceImplement implements UserService {
             throw new AppException(ErrorCode.WRONG_PASSWORD);
         return apiResponseBuilder.buildResponse(tokenUtil.generateToken(user), HttpStatus.OK);
     }
+
+    @Override
+    public Optional<User> getUserByName(String username) throws AppException {
+        try {
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isPresent()) {
+                return user;
+            } else {
+                throw new AppException(ErrorCode.USER_NOT_FOUND); // Throw an exception if the user is not found
+            }
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }
