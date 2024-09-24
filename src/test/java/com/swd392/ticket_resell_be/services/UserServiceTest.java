@@ -53,24 +53,23 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        admin = User.builder()
-                .id(UUID.randomUUID())
-                .username("admin")
-                .password("password")
-                .email("admin@gmail.com")
-                .role(Categorize.ADMIN)
-                .status(Categorize.ACTIVE)
-                .typeRegister(Categorize.SYSTEM)
-                .build();
-        member = User.builder()
-                .id(UUID.randomUUID())
-                .username("user")
-                .password("password")
-                .email("member@gmail.com")
-                .role(Categorize.MEMBER)
-                .status(Categorize.ACTIVE)
-                .typeRegister(Categorize.SYSTEM)
-                .build();
+        admin = new User();
+        admin.setId(UUID.randomUUID());
+        admin.setUsername("admin");
+        admin.setPassword("password");
+        admin.setEmail("admin@gmail.com");
+        admin.setRole(Categorize.ADMIN);
+        admin.setStatus(Categorize.ACTIVE);
+        admin.setTypeRegister(Categorize.SYSTEM);
+
+        member = new User();
+        member.setId(UUID.randomUUID());
+        member.setUsername("member");
+        member.setPassword("password");
+        member.setEmail("member@gmail.com");
+        member.setRole(Categorize.MEMBER);
+        member.setStatus(Categorize.ACTIVE);
+        member.setTypeRegister(Categorize.SYSTEM);
     }
 
     @Test

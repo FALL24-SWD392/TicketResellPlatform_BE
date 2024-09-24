@@ -8,9 +8,9 @@ public record ApiListResponse<T>(
         List<T> data,
         int size,
         int page,
-        int totalSize,
+        long totalSize,
         int totalPage,
-        String message,
-        HttpStatus status
+        HttpStatus status,
+        String message
 ) {
 }

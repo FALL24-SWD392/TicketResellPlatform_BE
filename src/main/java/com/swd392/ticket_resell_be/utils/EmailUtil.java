@@ -40,4 +40,23 @@ public class EmailUtil {
                 """.formatted(username, url);
         send(email, subject, content);
     }
+
+    @Async
+    public void sendResetPassword(String email, String username, String token) throws MessagingException {
+        String subject = "Reset your password";
+        String url = "http://localhost:8081/auth/reset-password?token=" + token;
+        String content = """
+                <div>
+                  Dear %s,<br>
+                  If you want to reset your password, please
+                  <a href="%s" target="_blank">Click here</a>
+                  <br><br>
+                  <div style="border-top:1px solid #eaeaea; padding-top:10px;">
+                    Best Regards,<br>
+                    Ticket Resell team<br>
+                  </div>
+                </div>
+                """.formatted(username, url);
+        send(email, subject, content);
+    }
 }

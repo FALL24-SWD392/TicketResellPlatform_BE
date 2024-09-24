@@ -23,8 +23,8 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH("Password not match", HttpStatus.BAD_REQUEST),
     USERNAME_ALREADY_EXISTS("Username already exists", HttpStatus.CONFLICT),
     EMAIL_ALREADY_EXISTS("Email already exists", HttpStatus.CONFLICT),
+    INVALID_TOKEN("Invalid token", HttpStatus.BAD_REQUEST),
     //Ticket's Error
-
     ;
     String message;
     HttpStatus status;

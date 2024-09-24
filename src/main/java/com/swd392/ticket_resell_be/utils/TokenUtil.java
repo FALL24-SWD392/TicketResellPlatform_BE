@@ -3,18 +3,20 @@ package com.swd392.ticket_resell_be.utils;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import com.swd392.ticket_resell_be.entities.BlacklistToken;
 import com.swd392.ticket_resell_be.entities.User;
-import lombok.RequiredArgsConstructor;
+import com.swd392.ticket_resell_be.enums.ErrorCode;
+import com.swd392.ticket_resell_be.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
-@RequiredArgsConstructor
 public class TokenUtil {
-    private final JwtDecoder jwtDecoder;
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
     @Value("${ACCESS_TOKEN_EXP}")
@@ -40,6 +42,7 @@ public class TokenUtil {
                 .issuer("swd392.com")
                 .issueTime(new Date(System.currentTimeMillis()))
                 .expirationTime(new Date(System.currentTimeMillis() + expTime))
+                .jwtID(UUID.randomUUID().toString())
                 .subject(user.getUsername())
                 .build();
         Payload payload = new Payload(claimsSet.toJSONObject());
@@ -50,6 +53,25 @@ public class TokenUtil {
     }
 
     public String getUsernameFromToken(String token) {
-        return jwtDecoder.decode(token).getClaim("sub");
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return signedJWT.getJWTClaimsSet().getSubject();
+        } catch (ParseException e) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    public BlacklistToken generateBlacklistToken(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            String id = signedJWT.getJWTClaimsSet().getJWTID();
+            Date expAt = signedJWT.getJWTClaimsSet().getExpirationTime();
+            BlacklistToken blacklistToken = new BlacklistToken();
+            blacklistToken.setId(UUID.fromString(id));
+            blacklistToken.setExpAt(expAt);
+            return blacklistToken;
+        } catch (ParseException e) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
     }
 }

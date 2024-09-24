@@ -5,6 +5,7 @@ public enum Categorize {
     INACTIVE,
     ACTIVE,
     BAN,
+    DELETED,
     //User's role
     MEMBER,
     STAFF,
@@ -12,6 +13,5 @@ public enum Categorize {
     //User's type register
     SYSTEM,
     GOOGLE,
-    ;
 
 }

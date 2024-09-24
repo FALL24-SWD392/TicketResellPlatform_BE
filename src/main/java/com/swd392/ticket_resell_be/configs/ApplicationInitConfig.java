@@ -21,14 +21,13 @@ public class ApplicationInitConfig {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
 
-                User user = User.builder()
-                        .username("admin")
-                        .password(passwordEncoder.encode("12345678"))
-                        .email("datnhse170330@fpt.edu.vn")
-                        .status(Categorize.ACTIVE)
-                        .role(Categorize.ADMIN)
-                        .typeRegister(Categorize.SYSTEM)
-                        .build();
+                User user = new User();
+                user.setUsername("admin");
+                user.setPassword(passwordEncoder.encode("12345678"));
+                user.setEmail("datnhse170330@fpt.edu.vn");
+                user.setStatus(Categorize.ACTIVE);
+                user.setRole(Categorize.ADMIN);
+                user.setTypeRegister(Categorize.SYSTEM);
 
                 userRepository.save(user);
             }
