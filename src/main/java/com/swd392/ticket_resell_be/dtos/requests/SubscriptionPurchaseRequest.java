@@ -7,5 +7,5 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class PackagePurchaseRequest {
-    private UUID packageId; }
+public class SubscriptionPurchaseRequest {
+    private UUID subscriptionId; }

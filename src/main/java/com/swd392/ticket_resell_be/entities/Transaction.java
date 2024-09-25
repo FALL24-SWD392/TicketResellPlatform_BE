@@ -9,50 +9,29 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.cglib.core.Local;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Transactions\"")
+@Table(name = "transactions")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "transaction_id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "seller_id", nullable = false)
     private User user;
-
-    @Size(max = 50)
-    @Column(name = "transaction_type", length = 50)
-    private String transactionType;
-
-    @NotNull
-    @Column(name = "amount", nullable = false, precision = 10, scale = 2)
-    private Integer amount;
-
-    @ColumnDefault("now()")
-    @Column(name = "transaction_time")
-    private Date transactionTime;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "package_id", nullable = false)
-    private Package aPackage;
-
-    @Column(name = "description", length = Integer.MAX_VALUE)
-    private String description;
+    @JoinColumn(name = "subscription_id", nullable = false)
+    private Subscription subscription;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "transaction_status", nullable = false)

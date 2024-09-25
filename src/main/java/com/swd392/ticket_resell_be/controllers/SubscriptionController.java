@@ -1,16 +1,16 @@
 package com.swd392.ticket_resell_be.controllers;
 
-import com.swd392.ticket_resell_be.dtos.requests.PackageDtoRequest;
+import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.VNPayOrderResponse;
-import com.swd392.ticket_resell_be.entities.Package;
+import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.Transaction;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.enums.TransactionStatus;
 import com.swd392.ticket_resell_be.exceptions.AppException;
-import com.swd392.ticket_resell_be.services.PackageService;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
+import com.swd392.ticket_resell_be.services.MembershipService;
 import com.swd392.ticket_resell_be.services.TransactionService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.services.impls.VNPayServiceImplement;
@@ -32,40 +32,40 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/packages")
-public class PackageController {
-     PackageService packageService;
-     VNPayServiceImplement vnPayService;
+@RequestMapping("/subscriptions")
+public class SubscriptionController {
      SubscriptionService subscriptionService;
+     VNPayServiceImplement vnPayService;
+     MembershipService membershipService;
      TransactionService transactionService;
      UserService userService;
 
     @PostMapping
-    public ResponseEntity<ApiItemResponse<Package>> createPackage(@RequestBody @Valid PackageDtoRequest packageDtoRequest) {
-        ApiItemResponse<Package> response = packageService.createPackage(packageDtoRequest);
+    public ResponseEntity<ApiItemResponse<Subscription>> createSubscription(@RequestBody @Valid SubscriptionDtoRequest subscriptionDtoRequest) {
+        ApiItemResponse<Subscription> response = subscriptionService.createSubscription(subscriptionDtoRequest);
         return ResponseEntity.ok(response); // Return OK for the creation response
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<ApiItemResponse<Package>>> getPackageById(@PathVariable("id") UUID packageId) {
-        Optional<ApiItemResponse<Package>> response = packageService.getPackageById(packageId);
+    public ResponseEntity<Optional<ApiItemResponse<Subscription>>> getSubscriptionById(@PathVariable("id") UUID packageId) {
+        Optional<ApiItemResponse<Subscription>> response = subscriptionService.getSubscriptionById(packageId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<ApiItemResponse<List<Package>>> getAllPackages() {
-        ApiItemResponse<List<Package>> response = packageService.getAllPackages();
+    public ResponseEntity<ApiItemResponse<List<Subscription>>> getAllSubscriptions() {
+        ApiItemResponse<List<Subscription>> response = subscriptionService.getAllSubscriptions();
         return ResponseEntity.ok(response);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiItemResponse<Package>> updatePackage(
+    public ResponseEntity<ApiItemResponse<Subscription>> updateSubscription(
             @PathVariable("id") UUID packageId,
-            @RequestBody @Valid PackageDtoRequest packageDtoRequest) {
+            @RequestBody @Valid SubscriptionDtoRequest subscriptionDtoRequest) {
 
         try {
-            ApiItemResponse<Package> response = packageService.updatePackage(packageId, packageDtoRequest);
+            ApiItemResponse<Subscription> response = subscriptionService.updateSubscription(packageId, subscriptionDtoRequest);
             return ResponseEntity.ok(response);
         } catch (AppException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -77,8 +77,8 @@ public class PackageController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiItemResponse<Void>> deletePackage(@PathVariable("id") UUID packageId) {
-        ApiItemResponse<Void> response = packageService.deletePackage(packageId);
+    public ResponseEntity<ApiItemResponse<Void>> deleteSubscription(@PathVariable("id") UUID packageId) {
+        ApiItemResponse<Void> response = subscriptionService.deleteSubscription(packageId);
         return ResponseEntity.ok(response);
     }
 
@@ -89,10 +89,10 @@ public class PackageController {
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Package pkg = packageService.getPackageById(packageId)
+        Subscription pkg = subscriptionService.getSubscriptionById(packageId)
                 .orElseThrow(() -> new AppException(ErrorCode.PACKAGE_NOT_FOUND)).data(); // Ensure the package exists
         int orderTotal = pkg.getPrice();
-        String orderInfo = "Thanh toán cho gói " + pkg.getPackageName(); // Example order description
+        String orderInfo = "Thanh toán cho gói " + pkg.getName(); // Example order description
         VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo);
         transactionService.savePendingTransaction(pkg, user, orderResponse.orderCode());
                 return "redirect:" + orderResponse.vnpayUrl();
@@ -124,7 +124,7 @@ public class PackageController {
                 Transaction transaction = transactionOpt.get();
                 transaction.setStatus(TransactionStatus.COMPLETED);
                 transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
-                subscriptionService.createSubscription(transaction.getUser(), transaction.getAPackage());
+                membershipService.create(transaction.getUser(), transaction.getSubscription());
 
                 // Success response
                 return ResponseEntity.ok("Thanh toán thành công!");

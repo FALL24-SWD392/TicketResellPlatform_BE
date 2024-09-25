@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,13 +17,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PackageDtoRequest {
+public class SubscriptionDtoRequest {
 
         private UUID id;
 
         @Size(max = 50)
         @NotEmpty
-        private String packageName;
+        private String subscriptionName;
 
         private Integer saleLimit;
 

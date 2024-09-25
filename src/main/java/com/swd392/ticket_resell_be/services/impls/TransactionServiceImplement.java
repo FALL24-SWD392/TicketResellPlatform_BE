@@ -1,6 +1,6 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-import com.swd392.ticket_resell_be.entities.Package;
+import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.Transaction;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
@@ -11,7 +11,6 @@ import com.swd392.ticket_resell_be.services.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +23,10 @@ public class TransactionServiceImplement implements TransactionService {
     private final TransactionRepository transactionRepository;
 
     @Override
-    public void savePendingTransaction(Package pkg, User user, String orderId) {
+    public void savePendingTransaction(Subscription pkg, User user, String orderId) {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID());
-        transaction.setAPackage(pkg);
+        transaction.setASubscription(pkg);
         transaction.setUser(user);
         transaction.setAmount(pkg.getPrice());
         transaction.setTransactionTime(new Date());
