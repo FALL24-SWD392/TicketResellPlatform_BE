@@ -43,6 +43,6 @@ public record UserDetailsResponse(String username, String password, Categorize s
 
     @Override
     public boolean isEnabled() {
-        return status == Categorize.ACTIVE;
+        return status == Categorize.VERIFIED;
     }
 }

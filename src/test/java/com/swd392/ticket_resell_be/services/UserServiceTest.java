@@ -59,7 +59,7 @@ class UserServiceTest {
         admin.setPassword("password");
         admin.setEmail("admin@gmail.com");
         admin.setRole(Categorize.ADMIN);
-        admin.setStatus(Categorize.ACTIVE);
+        admin.setStatus(Categorize.VERIFIED);
         admin.setTypeRegister(Categorize.SYSTEM);
 
         member = new User();
@@ -68,7 +68,7 @@ class UserServiceTest {
         member.setPassword("password");
         member.setEmail("member@gmail.com");
         member.setRole(Categorize.MEMBER);
-        member.setStatus(Categorize.ACTIVE);
+        member.setStatus(Categorize.VERIFIED);
         member.setTypeRegister(Categorize.SYSTEM);
     }
 
@@ -124,7 +124,7 @@ class UserServiceTest {
                         "member@gmail.com");
         ApiItemResponse<String> apiItemResponse = new ApiItemResponse<>("Please verify your email!",
                 HttpStatus.CREATED, null);
-        member.setStatus(Categorize.INACTIVE);
+        member.setStatus(Categorize.UNVERIFIED);
         //when
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
