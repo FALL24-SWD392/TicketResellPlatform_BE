@@ -1,5 +1,9 @@
 package com.swd392.ticket_resell_be.dtos.requests;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,24 +23,25 @@ import java.util.UUID;
 @Builder
 public class SubscriptionDtoRequest {
 
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        @Column(name = "id", nullable = false, updatable = false)
         private UUID id;
 
-        @Size(max = 50)
-        @NotEmpty
-        private String subscriptionName;
+        @Column(name = "name", nullable = false, length = 50)
+        private String name;
 
-        private Integer saleLimit;
+        @Column(name = "sale_limit", nullable = false)
+        private int saleLimit;
 
-        @NotNull
-        private Integer price;
+        @Column(name = "description", nullable = false)
+        private String description;
 
-        private Map<String, Object> imageUrls;
+        @Column(name = "point_required", nullable = false)
+        private int pointRequired;
 
-        @NotNull
-        private Integer duration;
+        @Column(name = "price", nullable = false, precision = 10, scale = 2)
+        private int price;
 
-        @Builder.Default
-        @NotNull
-        private boolean active = true;
 
 }

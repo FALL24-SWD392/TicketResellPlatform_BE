@@ -33,6 +33,10 @@ public class Transaction {
     @JoinColumn(name = "subscription_id", nullable = false)
     private Subscription subscription;
 
+
+    @Column(name = "order_id", nullable = false)
+    private String orderId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", columnDefinition = "transaction_status", nullable = false)
     private TransactionStatus status = TransactionStatus.ACTIVE;

@@ -2,6 +2,7 @@ package com.swd392.ticket_resell_be.controllers;
 
 import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
+import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.VNPayOrderResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.Transaction;
@@ -14,7 +15,6 @@ import com.swd392.ticket_resell_be.services.MembershipService;
 import com.swd392.ticket_resell_be.services.TransactionService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.services.impls.VNPayServiceImplement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,8 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,7 +41,7 @@ public class SubscriptionController {
     @PostMapping
     public ResponseEntity<ApiItemResponse<Subscription>> createSubscription(@RequestBody @Valid SubscriptionDtoRequest subscriptionDtoRequest) {
         ApiItemResponse<Subscription> response = subscriptionService.createSubscription(subscriptionDtoRequest);
-        return ResponseEntity.ok(response); // Return OK for the creation response
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -53,17 +51,17 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiItemResponse<List<Subscription>>> getAllSubscriptions() {
-        ApiItemResponse<List<Subscription>> response = subscriptionService.getAllSubscriptions();
+    public ResponseEntity<ApiListResponse<Subscription>> getAllSubscriptions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        ApiListResponse<Subscription> response = subscriptionService.getAllSubscriptions(page, size);
         return ResponseEntity.ok(response);
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiItemResponse<Subscription>> updateSubscription(
             @PathVariable("id") UUID packageId,
             @RequestBody @Valid SubscriptionDtoRequest subscriptionDtoRequest) {
-
         try {
             ApiItemResponse<Subscription> response = subscriptionService.updateSubscription(packageId, subscriptionDtoRequest);
             return ResponseEntity.ok(response);
@@ -82,22 +80,23 @@ public class SubscriptionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/submitOrder")
-    public String submitOrder(@RequestParam("packageId") UUID packageId, HttpServletRequest request) {
-        // Retrieve the authenticated user
+    @PostMapping("/purchase-subscription")
+    public String submitOrder(@RequestParam("packageId") UUID packageId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Subscription pkg = subscriptionService.getSubscriptionById(packageId)
-                .orElseThrow(() -> new AppException(ErrorCode.PACKAGE_NOT_FOUND)).data(); // Ensure the package exists
-        int orderTotal = pkg.getPrice();
-        String orderInfo = "Thanh toán cho gói " + pkg.getName(); // Example order description
+        Subscription subscription = subscriptionService.getSubscriptionById(packageId)
+                .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND)).data();
+        if (user.getReputation() < subscription.getPointRequired()) {
+            throw new AppException(ErrorCode.INSUFFICIENT_REPUTATION);
+        }
+        int orderTotal = subscription.getPrice();
+        String orderInfo = "Thanh toán cho gói " + subscription.getName();
         VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo);
-        transactionService.savePendingTransaction(pkg, user, orderResponse.orderCode());
-                return "redirect:" + orderResponse.vnpayUrl();
+        transactionService.savePendingTransaction(subscription, user, orderResponse.orderCode());
+        return orderResponse.vnpayUrl();
     }
-
 
 
     @GetMapping("/payment-callback")
@@ -116,27 +115,21 @@ public class SubscriptionController {
             @RequestParam("vnp_SecureHash") String vnpSecureHash) {
         try {
             if ("00".equalsIgnoreCase(responseCode) && "00".equalsIgnoreCase(transactionStatus)) {
-                Optional<Transaction> transactionOpt = transactionService.findTransactionByDescription(vnpTxnRef);
-                if (transactionOpt.isEmpty()) {
+                ApiItemResponse<Transaction> transactionResponse = transactionService.findTransactionByOrderId(vnpTxnRef);
+                if (transactionResponse.data() == null) { // Assuming data() returns null if no transaction found
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Transaction not found");
                 }
-
-                Transaction transaction = transactionOpt.get();
+                Transaction transaction = transactionResponse.data();
                 transaction.setStatus(TransactionStatus.COMPLETED);
                 transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
-                membershipService.create(transaction.getUser(), transaction.getSubscription());
-
-                // Success response
+                membershipService.createMembership(transaction.getUser(), transaction.getSubscription());
                 return ResponseEntity.ok("Thanh toán thành công!");
             } else {
-                // Payment failed
                 return ResponseEntity.badRequest().body("Thanh toán thất bại. Mã lỗi: " + responseCode);
             }
         } catch (AppException e) {
-            // Handle known exceptions
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            // Handle unexpected errors
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Đã xảy ra lỗi khi xử lý thanh toán. Vui lòng thử lại!");
         }

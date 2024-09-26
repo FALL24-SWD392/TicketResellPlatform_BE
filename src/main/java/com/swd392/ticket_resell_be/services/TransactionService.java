@@ -1,5 +1,7 @@
 package com.swd392.ticket_resell_be.services;
 
+import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
+import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.Transaction;
 import com.swd392.ticket_resell_be.entities.User;
@@ -12,9 +14,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface TransactionService {
-    void savePendingTransaction(Subscription pkg, User user, String orderId);
-    Transaction getTransactionById(UUID transactionId) throws AppException;
-    List<Transaction> getAllTransactions();
-    Optional<Transaction> findTransactionByDescription(String orderCode) throws AppException;
-    void updateTransactionStatus(UUID transactionId, TransactionStatus status) throws AppException;
+
+    ApiItemResponse<Transaction> savePendingTransaction(Subscription subscription, User user, String orderId);
+
+    ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException;
+
+
+    ApiListResponse<Transaction> getAllTransactions(int page, int size);
+
+    ApiItemResponse<Transaction> updateTransactionStatus(UUID transactionId, TransactionStatus status) throws AppException;
 }

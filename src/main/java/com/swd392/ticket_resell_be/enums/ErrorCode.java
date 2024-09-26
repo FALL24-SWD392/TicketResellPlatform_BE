@@ -21,19 +21,22 @@ public enum ErrorCode {
     PASSWORD_LENGTH("Password must be at least 8 characters long", HttpStatus.BAD_REQUEST),
     //Ticket's Error
     //Transaction's Error
-    INVALID_AMOUNT("Invalid amount provided", HttpStatus.BAD_REQUEST),
-    INVALID_SUBSCRIPTION("Invalid subscription provided", HttpStatus.BAD_REQUEST),
+    AMOUNT_INVALID("Invalid amount provided", HttpStatus.BAD_REQUEST),
+    SUBSCRIPTION_INVALID("Invalid subscription provided", HttpStatus.BAD_REQUEST),
     TRANSACTION_NOT_FOUND("Transaction not found", HttpStatus.NOT_FOUND),
+    TRANSACTION_CREATION_FAILED("Transaction Creation Fail", HttpStatus.BAD_REQUEST),
+    TRANSACTION_DATA_INVALID("Invalid Transaction Data", HttpStatus.BAD_REQUEST),
+
     //Subscription's Error
-    PACKAGE_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),
-    INVALID_PACKAGE("Invalid package", HttpStatus.BAD_REQUEST),
+    SUBSCRIPTION_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),
+    INVALID_SUBSCRIPTION("Invalid package", HttpStatus.BAD_REQUEST),
     //Membership's Error
-    SUBSCRIPTION_NOT_FOUND("Membership not found", HttpStatus.NOT_FOUND),
-    INVALID_TRANSACTION("Transaction not found", HttpStatus.NOT_FOUND),
-    PAYMENT_FAILED("Payement failed", HttpStatus.BAD_REQUEST),
-    TRANSACTION_ALREADY_CONFIRMED("Transaction Already Confirmed", HttpStatus.OK),
-    INVALID_TRANSACTION_DATA("Invalid TransactionData", HttpStatus.BAD_REQUEST),
-    TRANSACTION_CREATION_FAILED("Transaction Creation Fail", HttpStatus.BAD_REQUEST);
+    MEMBERSHIP_NOT_FOUND("Membership not found", HttpStatus.NOT_FOUND),
+    //Payment's Error
+    PAYMENT_FAILED("Payment failed", HttpStatus.BAD_REQUEST),
+
+    USER_SUBSCRIPTION_NOT_FOUND("User or Subscription not found", HttpStatus.NOT_FOUND),
+    INSUFFICIENT_REPUTATION("You do not have enough reputation points to purchase this subscription.", HttpStatus.BAD_REQUEST );
     String message;
     HttpStatus status;
 }

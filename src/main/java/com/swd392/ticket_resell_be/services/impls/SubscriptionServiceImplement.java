@@ -2,20 +2,19 @@ package com.swd392.ticket_resell_be.services.impls;
 
 import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
+import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
-import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.SubscriptionRepository;
-import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,50 +26,52 @@ public class SubscriptionServiceImplement implements SubscriptionService {
 
     SubscriptionRepository subscriptionRepository;
     ApiResponseBuilder apiResponseBuilder;
-    UserRepository userRepository;
-
 
     @Override
-    public ApiItemResponse<Subscription> createSubscription(SubscriptionDtoRequest pkgDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User createdByUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Subscription pkg = new Subscription();
-        pkg.setPackageName(pkgDto.getSubscriptionName());
-        pkg.setSaleLimit(pkgDto.getSaleLimit());
-        pkg.setPrice(pkgDto.getPrice());
-        pkg.setImageUrls(pkgDto.getImageUrls());
-        pkg.setCreatedBy(createdByUser);
-        pkg.setDuration(pkgDto.getDuration());
-        pkg.setStatus(pkgDto.isActive());
-        Subscription savedSubscription = subscriptionRepository.save(pkg);
+    public ApiItemResponse<Subscription> createSubscription(SubscriptionDtoRequest subscriptionDtoRequest) {
+        Subscription subscription = new Subscription();
+        subscription.setId(subscriptionDtoRequest.getId());
+        subscription.setName(subscriptionDtoRequest.getDescription());
+        subscription.setSaleLimit(subscriptionDtoRequest.getSaleLimit());
+        subscription.setPrice(subscriptionDtoRequest.getPrice());
+        subscription.setPointRequired(subscriptionDtoRequest.getPointRequired());
+        Subscription savedSubscription = subscriptionRepository.save(subscription);
         return apiResponseBuilder.buildResponse(savedSubscription, HttpStatus.CREATED, "Subscription created successfully");
     }
 
     @Override
     public Optional<ApiItemResponse<Subscription>> getSubscriptionById(UUID uuid) {
         Subscription pkg = subscriptionRepository.findById(uuid)
-                .orElseThrow(() -> new AppException(ErrorCode.PACKAGE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
         return Optional.ofNullable(apiResponseBuilder.buildResponse(pkg, HttpStatus.OK, "Subscription found"));
     }
 
     @Override
-    public ApiItemResponse<List<Subscription>> getAllSubscriptions() {
-        List<Subscription> subscriptions = subscriptionRepository.findAll();
-        return apiResponseBuilder.buildResponse(subscriptions, HttpStatus.OK, "All subscriptions retrieved");
+    public ApiListResponse<Subscription> getAllSubscriptions(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<Subscription> subscriptionPage = subscriptionRepository.findAll(pageable);
+        List<Subscription> subscriptions = subscriptionPage.getContent();
+        return ApiListResponse.<Subscription>builder()
+                .data(subscriptions)
+                .size(subscriptionPage.getSize())
+                .page(subscriptionPage.getNumber())
+                .totalSize((int) subscriptionPage.getTotalElements())
+                .totalPage(subscriptionPage.getTotalPages())
+                .message("All subscriptions retrieved")
+                .status(HttpStatus.OK)
+                .build();
     }
+
+
+
 
     @Override
     public ApiItemResponse<Subscription> updateSubscription(UUID uuid, SubscriptionDtoRequest pkgDto) {
         Subscription existingSubscription = subscriptionRepository.findById(uuid)
-                .orElseThrow(() -> new AppException(ErrorCode.PACKAGE_NOT_FOUND));
-        existingSubscription.setPackageName(pkgDto.getSubscriptionName());
+                .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
+        existingSubscription.setName(pkgDto.getName());
         existingSubscription.setSaleLimit(pkgDto.getSaleLimit());
         existingSubscription.setPrice(pkgDto.getPrice());
-        existingSubscription.setImageUrls(pkgDto.getImageUrls());
-        existingSubscription.setDuration(pkgDto.getDuration());
-        existingSubscription.setStatus(pkgDto.isActive());
         Subscription updatedSubscription = subscriptionRepository.save(existingSubscription);
         return apiResponseBuilder.buildResponse(updatedSubscription, HttpStatus.OK, "Subscription updated successfully");
     }
@@ -78,15 +79,10 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     @Override
     public ApiItemResponse<Void> deleteSubscription(UUID uuid) {
         if (!subscriptionRepository.existsById(uuid)) {
-            throw new AppException(ErrorCode.PACKAGE_NOT_FOUND);
+            throw new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND);
         }
         subscriptionRepository.deleteById(uuid);
         return apiResponseBuilder.buildResponse(null, HttpStatus.OK, "Subscription deleted successfully");
     }
-
-
-
-
-
 
 }

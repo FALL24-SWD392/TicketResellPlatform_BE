@@ -45,7 +45,7 @@ public class UserServiceImplement implements UserService {
             if (user.isPresent()) {
                 return user;
             } else {
-                throw new AppException(ErrorCode.USER_NOT_FOUND); // Throw an exception if the user is not found
+                throw new AppException(ErrorCode.USER_NOT_FOUND);
             }
         } catch (AppException e) {
             throw new RuntimeException(e);
