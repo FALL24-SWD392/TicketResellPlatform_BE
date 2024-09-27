@@ -37,6 +37,4 @@ public class Membership {
     @Column(name = "end_date", nullable = false)
     private Date endDate;
 
-    @Column(name = "status", nullable = false)
-    private boolean active;
 }

@@ -74,12 +74,6 @@ public class SubscriptionController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiItemResponse<Void>> deleteSubscription(@PathVariable("id") UUID packageId) {
-        ApiItemResponse<Void> response = subscriptionService.deleteSubscription(packageId);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/purchase-subscription")
     public String submitOrder(@RequestParam("subscriptionId") UUID subscriptionId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

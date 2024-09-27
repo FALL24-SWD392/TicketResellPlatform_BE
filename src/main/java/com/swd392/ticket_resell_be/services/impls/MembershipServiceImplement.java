@@ -45,7 +45,6 @@ public class MembershipServiceImplement implements MembershipService {
         calendar.add(Calendar.DAY_OF_MONTH, 30);
         Date endDate = calendar.getTime();
         membership.setEndDate(endDate);
-        membership.setActive(true);
         Membership savedMembership = membershipRepository.save(membership);
         return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.CREATED, "Membership created successfully");
     }
@@ -85,7 +84,6 @@ public class MembershipServiceImplement implements MembershipService {
             calendar.add(Calendar.DAY_OF_MONTH, 30);
             Date endDate = calendar.getTime();
             membership.setEndDate(endDate);
-            membership.setActive(true);
         }
         Membership savedMembership = membershipRepository.save(membership);
         return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.OK, "Membership updated successfully");
