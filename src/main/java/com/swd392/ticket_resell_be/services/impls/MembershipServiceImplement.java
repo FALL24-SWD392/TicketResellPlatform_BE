@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -52,23 +53,42 @@ public class MembershipServiceImplement implements MembershipService {
 
     @Override
     public ApiItemResponse<Membership> updateMembership(User user, Subscription subscription) {
+        // Kiểm tra đầu vào
         if (user == null || subscription == null) {
             throw new AppException(ErrorCode.USER_SUBSCRIPTION_NOT_FOUND);
         }
-        membershipRepository.deactivateActiveMemberships(user);
-        Membership membership = new Membership();
-        membership.setId(UUID.randomUUID());
-        membership.setUser(user);
-        membership.setSubscriptionName(subscription.getName());
-        Date currentDate = new Date();
-        membership.setStartDate(currentDate);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 30);
-        Date endDate = calendar.getTime();
-        membership.setEndDate(endDate);
-        membership.setActive(true);
+
+        // Tìm kiếm membership hiện tại của người dùng
+        Optional<Membership> existingMembership = membershipRepository.findMembershipByUser(user);
+        Membership membership;
+        if (existingMembership.isPresent()) {
+            membership = existingMembership.get();
+            membership.setSubscriptionName(subscription.getName());
+            membership.setSaleRemain(subscription.getSaleLimit());
+            Date currentDate = new Date();
+            membership.setStartDate(currentDate);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDate);
+            calendar.add(Calendar.DAY_OF_MONTH, 30);
+            Date endDate = calendar.getTime();
+            membership.setEndDate(endDate);
+        } else {
+            membership = new Membership();
+            membership.setId(UUID.randomUUID());
+            membership.setUser(user);
+            membership.setSubscriptionName(subscription.getName());
+            membership.setSaleRemain(subscription.getSaleLimit());
+            Date currentDate = new Date();
+            membership.setStartDate(currentDate);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDate);
+            calendar.add(Calendar.DAY_OF_MONTH, 30);
+            Date endDate = calendar.getTime();
+            membership.setEndDate(endDate);
+            membership.setActive(true);
+        }
         Membership savedMembership = membershipRepository.save(membership);
         return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.OK, "Membership updated successfully");
     }
+
 }

@@ -39,9 +39,9 @@ public class TransactionServiceImplement implements TransactionService {
         Transaction transaction = new Transaction();
         transaction.setId(UUID.randomUUID());
         transaction.setSubscription(subscription);
-        transaction.setUser(user);
+        transaction.setSeller(user);
         transaction.setOrderId(orderId);
-        transaction.setStatus(TransactionStatus.PENDING);
+        transaction.setStatus((TransactionStatus.PENDING));
         transactionRepository.save(transaction);
         return apiResponseBuilder.buildResponse(transaction,HttpStatus.CREATED,"Pending transaction saved successfully");
 

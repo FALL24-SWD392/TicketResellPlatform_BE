@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Token\"")
+@Table(name = "Token")
 public class Token {
     @Id
     @ColumnDefault("gen_random_uuid()")

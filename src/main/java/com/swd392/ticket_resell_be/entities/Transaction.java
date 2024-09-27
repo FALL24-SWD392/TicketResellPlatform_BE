@@ -23,13 +23,13 @@ public class Transaction {
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "seller_id", nullable = false)
-    private User user;
+    private User seller;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "subscription_id", nullable = false)
     private Subscription subscription;
 
@@ -38,6 +38,7 @@ public class Transaction {
     private String orderId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", columnDefinition = "transaction_status", nullable = false)
-    private TransactionStatus status = TransactionStatus.ACTIVE;
+    @Column(name = "status", nullable = false)
+    private TransactionStatus status = TransactionStatus.PENDING;
+
 }

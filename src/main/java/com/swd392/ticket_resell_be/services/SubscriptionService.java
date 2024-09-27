@@ -12,5 +12,4 @@ public interface SubscriptionService {
     Optional<ApiItemResponse<Subscription>> getSubscriptionById(UUID uuid);
     ApiListResponse<Subscription> getAllSubscriptions(int page, int size);
     ApiItemResponse<Subscription> updateSubscription(UUID uuid, SubscriptionDtoRequest pkgDto);
-    ApiItemResponse<Void> deleteSubscription(UUID uuid);
 }

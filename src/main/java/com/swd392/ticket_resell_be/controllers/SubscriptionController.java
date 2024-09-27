@@ -81,12 +81,12 @@ public class SubscriptionController {
     }
 
     @PostMapping("/purchase-subscription")
-    public String submitOrder(@RequestParam("packageId") UUID packageId) {
+    public String submitOrder(@RequestParam("subscriptionId") UUID subscriptionId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Subscription subscription = subscriptionService.getSubscriptionById(packageId)
+        Subscription subscription = subscriptionService.getSubscriptionById(subscriptionId)
                 .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND)).data();
         if (user.getReputation() < subscription.getPointRequired()) {
             throw new AppException(ErrorCode.INSUFFICIENT_REPUTATION);
@@ -122,7 +122,7 @@ public class SubscriptionController {
                 Transaction transaction = transactionResponse.data();
                 transaction.setStatus(TransactionStatus.COMPLETED);
                 transactionService.updateTransactionStatus(transaction.getId(), TransactionStatus.COMPLETED);
-                membershipService.createMembership(transaction.getUser(), transaction.getSubscription());
+                membershipService.updateMembership(transaction.getSeller(), transaction.getSubscription());
                 return ResponseEntity.ok("Thanh toán thành công!");
             } else {
                 return ResponseEntity.badRequest().body("Thanh toán thất bại. Mã lỗi: " + responseCode);

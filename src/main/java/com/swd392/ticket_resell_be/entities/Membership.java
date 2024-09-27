@@ -29,7 +29,7 @@ public class Membership {
     private String subscriptionName;
 
     @Column(name = "sale_remain", nullable = false)
-    private String saleRemain;
+    private int saleRemain;
 
     @Column(name = "start_date", nullable = false)
     private Date startDate;

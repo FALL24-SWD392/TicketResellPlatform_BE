@@ -19,9 +19,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
     private static final String[] PUBLIC_POST_ENDPOINTS = {
             "auth/login",
-            "/packages/confirm-payment",
-            "/packages/confirm",
-            "/packages/vnpay-payment"
+            "/packages/payment-callback"
     };
 
     @Value("${JWT_SECRET_KEY}")

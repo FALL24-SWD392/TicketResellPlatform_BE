@@ -76,13 +76,5 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         return apiResponseBuilder.buildResponse(updatedSubscription, HttpStatus.OK, "Subscription updated successfully");
     }
 
-    @Override
-    public ApiItemResponse<Void> deleteSubscription(UUID uuid) {
-        if (!subscriptionRepository.existsById(uuid)) {
-            throw new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND);
-        }
-        subscriptionRepository.deleteById(uuid);
-        return apiResponseBuilder.buildResponse(null, HttpStatus.OK, "Subscription deleted successfully");
-    }
 
 }
