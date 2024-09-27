@@ -14,6 +14,7 @@ public class GoogleTokenUtil {
     public String getEmail(String token) {
         TokenVerifier verifier = TokenVerifier.newBuilder()
                 .setAudience(clientId)
+                .setIssuer("https://accounts.google.com")
                 .build();
         try {
             return verifier.verify(token).getPayload().get("email").toString();
