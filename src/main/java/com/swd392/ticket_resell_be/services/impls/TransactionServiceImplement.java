@@ -65,7 +65,7 @@ public class TransactionServiceImplement implements TransactionService {
                 .page(transactionPage.getNumber())
                 .totalSize((int) transactionPage.getTotalElements())
                 .totalPage(transactionPage.getTotalPages())
-                .message("All subscriptions retrieved")
+                .message("All transaction retrieved")
                 .status(HttpStatus.OK)
                 .build();
     }

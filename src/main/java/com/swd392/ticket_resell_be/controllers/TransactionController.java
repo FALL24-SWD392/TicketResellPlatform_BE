@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TransactionController {
 
-    private final TransactionService transactionService; // Service to handle transaction logic
+    private final TransactionService transactionService;
 
     @GetMapping
     public ResponseEntity<ApiListResponse<Transaction>> getAllTransactions(   @RequestParam(defaultValue = "0") int page,

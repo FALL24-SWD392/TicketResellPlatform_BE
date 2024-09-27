@@ -30,11 +30,11 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     @Override
     public ApiItemResponse<Subscription> createSubscription(SubscriptionDtoRequest subscriptionDtoRequest) {
         Subscription subscription = new Subscription();
-        subscription.setId(subscriptionDtoRequest.getId());
-        subscription.setName(subscriptionDtoRequest.getDescription());
+        subscription.setName(subscriptionDtoRequest.getName());
         subscription.setSaleLimit(subscriptionDtoRequest.getSaleLimit());
         subscription.setPrice(subscriptionDtoRequest.getPrice());
         subscription.setPointRequired(subscriptionDtoRequest.getPointRequired());
+        subscription.setDescription(subscriptionDtoRequest.getDescription());
         Subscription savedSubscription = subscriptionRepository.save(subscription);
         return apiResponseBuilder.buildResponse(savedSubscription, HttpStatus.CREATED, "Subscription created successfully");
     }

@@ -1,6 +1,7 @@
 package com.swd392.ticket_resell_be.configs;
 
 import com.swd392.ticket_resell_be.entities.User;
+import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.repositories.UserRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -15,9 +16,12 @@ public class ApplicationInitConfig {
 
                 User user = User.builder()
                         .username("admin")
-                        .password("12345678")
+                        .password(("12345678")) // Encode the password
+                        .email("datnhse170330@fpt.edu.vn")
+                        .status(Categorize.ACTIVE)
+                        .role(Categorize.ADMIN)
+                        .typeRegister(Categorize.GOOGLE)
                         .build();
-
                 userRepository.save(user);
             }
         };
