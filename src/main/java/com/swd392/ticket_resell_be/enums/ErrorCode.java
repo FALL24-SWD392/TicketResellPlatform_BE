@@ -25,6 +25,21 @@ public enum ErrorCode {
     EMAIL_ALREADY_EXISTS("Email already exists", HttpStatus.CONFLICT),
     INVALID_TOKEN("Invalid token", HttpStatus.BAD_REQUEST),
     //Ticket's Error
+    TICKET_NOT_FOUND("Ticket not found", HttpStatus.NOT_FOUND),
+
+    //Feedback error
+    FEEDBACK_NOT_FOUND("Feedback not found", HttpStatus.NOT_FOUND),
+    USER_HAVE_NOT_BUY_YET("User has not buyed yet", HttpStatus.CONFLICT),
+
+    //Report error
+    REPORT_NOT_FOUND("Report not found", HttpStatus.NOT_FOUND),
+    REPORT_NOT_IN_PENDING_STATE("Report not in pending state", HttpStatus.ALREADY_REPORTED),
+    USER_HAVE_NOT_YET_TRANSACTED("User has not yet transacted", HttpStatus.CONFLICT),
+    INVALID_STATUS("Invalid status", HttpStatus.CONFLICT),
+
+    //ChatBox error
+    CHAT_BOX_NOT_FOUND("Chatbox not found", HttpStatus.NOT_FOUND),
+
     //Transaction's Error
     AMOUNT_INVALID("Invalid amount provided", HttpStatus.BAD_REQUEST),
     SUBSCRIPTION_INVALID("Invalid subscription provided", HttpStatus.BAD_REQUEST),

@@ -2,11 +2,13 @@ package com.swd392.ticket_resell_be.enums;
 
 public enum Categorize {
     //User's status
-    UNVERIFIED,
-    VERIFIED,
-    BAN,
-    DELETED,
+    INACTIVE,
+    ACTIVE,
+    BANNED,
+    REMOVED,
     RESTRICTED,
+    VERIFIED,
+    UNVERIFIED,
     //User's role
     MEMBER,
     STAFF,
@@ -15,4 +17,28 @@ public enum Categorize {
     SYSTEM,
     GOOGLE,
 
+    //General Status
+    PENDING,
+    APPROVED,
+    REJECTED,
+    COMPLETED,
+    CANCEL,
+    SUCCESS,
+    FAILED,
+
+    //Ticket Status
+    TRADING,
+    EXPIRED,
+    SOLD,
+
+    //Ticket Type
+    MOVIE,
+    EVENT,
+    VOUCHER,
+    TRANSPORTATION,
+    AMUSEMENT,
+    TOURIST,
+    ALL,
+
+    //
 }

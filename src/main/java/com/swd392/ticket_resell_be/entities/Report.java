@@ -1,12 +1,13 @@
 package com.swd392.ticket_resell_be.entities;
 
+import com.swd392.ticket_resell_be.enums.Categorize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -19,34 +20,38 @@ public class Report {
     @Column(name = "report_id", nullable = false)
     private UUID id;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "report_id", nullable = false)
-    private User users;
+    @NotNull
+    @Column(name = "reporter_id", nullable = false)
+    private UUID reporterId;
 
     @NotNull
-    @Column(name = "reported_by", nullable = false)
-    private UUID reportedBy;
+    @Column(name = "reported_id", nullable = false)
+    private UUID reportedId;
 
     @NotNull
-    @Column(name = "seller_id", nullable = false)
-    private UUID sellerId;
+    @Column(name = "order_id", nullable = false)
+    private UUID orderId;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
+    @ColumnDefault("'pending'")
+    @Column(name = "status", columnDefinition = "status")
+    private Categorize status;
+
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @ColumnDefault("now()")
-    @Column(name = "created_at")
-    private OffsetDateTime createdAt;
-    @ColumnDefault("now()")
-    @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
+    @NotNull
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
 
-/*
- TODO [Reverse Engineering] create field to map the 'status' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @ColumnDefault("'pending'")
-    @Column(name = "status", columnDefinition = "report_status")
-    private Object status;
-*/
+    @NotNull
+    @Column(name = "created_at", nullable = false)
+    private LocalDate createdAt;
+
+    @NotNull
+    @Column(name = "updated_by", nullable = false)
+    private String updatedBy;
+
+    @NotNull
+    @Column(name = "updated_at", nullable = false)
+    private LocalDate updatedAt;
 }

@@ -9,41 +9,28 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Feedback\"")
-public class Feedback {
+@Table(name = "\"Order\"")
+public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "feedback_id", nullable = false)
+    @Column(name = "order_id", nullable = false)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "buyer_id")
-    private User buyerId;
+    @JoinColumn(name = "chat_box_id")
+    private ChatBox chatBoxId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "order_id")
-    private Order orderId;
-
-    @Column(name = "feedback_description", length = Integer.MAX_VALUE)
-    private String description;
+    @NotNull
+    @Column(name = "quantity", nullable = false)
+    private int quantity;
 
     @ColumnDefault("'pending'")
     @Column(name = "status", columnDefinition = "status")
     private Categorize status;
-
-    @NotNull
-    @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
-
-    @NotNull
-    @Column(name = "updated_at", nullable = false)
-    private LocalDate updatedAt;
 }
