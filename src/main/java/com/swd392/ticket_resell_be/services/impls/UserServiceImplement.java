@@ -26,6 +26,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -184,5 +187,21 @@ public class UserServiceImplement implements UserService {
         Object member = SecurityContextHolder.getContext().getAuthentication().getName();
         return apiResponseBuilder.buildResponse(member, HttpStatus.OK, null);
     }
+
+
+    @Override
+    public Optional<User> getUserByName(String username) throws AppException {
+        try {
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isPresent()) {
+                return user;
+            } else {
+                throw new AppException(ErrorCode.USER_NOT_FOUND);
+            }
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

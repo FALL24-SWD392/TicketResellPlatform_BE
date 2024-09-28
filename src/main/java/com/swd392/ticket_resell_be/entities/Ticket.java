@@ -20,7 +20,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Tickets\"")
+@Table(name = "tickets")
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,7 +55,9 @@ public class Ticket {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-    @ColumnDefault("'pending'")
-    @Column(name = "status", columnDefinition = "ticket_status")
-    private TicketStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    @ColumnDefault("'PENDING'")
+    private TicketStatus status = TicketStatus.PENDING;
+
 }

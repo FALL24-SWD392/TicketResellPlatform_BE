@@ -16,6 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] PUBLIC_POST_ENDPOINTS = {
+            "auth/login",
+            "/packages/payment-callback",
             "/auth/register",
     };
     private static final String[] PUBLIC_GET_ENDPOINTS = {

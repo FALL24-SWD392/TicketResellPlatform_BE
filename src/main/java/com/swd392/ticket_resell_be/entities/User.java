@@ -15,7 +15,7 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "username", nullable = false, unique = true, updatable = false)
@@ -25,20 +25,28 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @NotEmpty
     @Column(name = "email", nullable = false, unique = true)
     private String email;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private Categorize status;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, updatable = false)
     private Categorize role;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Categorize status;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "type_register", nullable = false, updatable = false)
     private Categorize typeRegister;
+
+    @Column(name = "avatar")
+    private String avatar;
+
+    @Column(name = "rating", nullable = false)
+    private float rating = 0;
+
+    @Column(name = "reputation", nullable = false)
+    private int reputation = 100;
 
 }
