@@ -14,6 +14,14 @@ public class ApiResponseBuilder {
         return new ApiItemResponse<>(data, status, message);
     }
 
+    public <T> ApiItemResponse<T> buildResponse(T data, HttpStatus status) {
+        return new ApiItemResponse<>(data, status, null);
+    }
+
+    public <T> ApiItemResponse<T> buildResponse(HttpStatus status, String message) {
+        return new ApiItemResponse<>(null, status, message);
+    }
+
     public <T> ApiListResponse<T> buildResponse(List<T> data, int size, int page, long totalSize,
                                                 int totalPage, HttpStatus status, String message) {
         return new ApiListResponse<>(data, size, page, totalSize, totalPage, status, message);

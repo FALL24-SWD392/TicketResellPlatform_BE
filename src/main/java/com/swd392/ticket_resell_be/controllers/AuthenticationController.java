@@ -1,10 +1,7 @@
 package com.swd392.ticket_resell_be.controllers;
 
 import com.nimbusds.jose.JOSEException;
-import com.swd392.ticket_resell_be.dtos.requests.ChangePasswordDtoRequest;
-import com.swd392.ticket_resell_be.dtos.requests.LoginDtoRequest;
-import com.swd392.ticket_resell_be.dtos.requests.RegisterDtoRequest;
-import com.swd392.ticket_resell_be.dtos.requests.ResetPasswordDtoRequest;
+import com.swd392.ticket_resell_be.dtos.requests.*;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
 import com.swd392.ticket_resell_be.services.UserService;
@@ -24,18 +21,27 @@ public class AuthenticationController {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     UserService userService;
 
-    @GetMapping("/login")
-    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid
-                                                                   LoginDtoRequest loginDtoRequest)
+    @GetMapping("/login/system")
+    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginDtoRequest request)
             throws JOSEException {
-        return ResponseEntity.ok(userService.login(loginDtoRequest));
+        return ResponseEntity.ok(userService.login(request));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<ApiItemResponse<String>> register(@RequestBody @Valid
-                                                            RegisterDtoRequest registerDtoRequest)
+    @GetMapping("/login/google")
+    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody String token)
+            throws JOSEException {
+        return ResponseEntity.ok(userService.login(token));
+    }
+
+    @PostMapping("/register/system")
+    public ResponseEntity<ApiItemResponse<String>> register(@RequestBody @Valid RegisterDtoRequest request)
             throws JOSEException, MessagingException {
-        return ResponseEntity.ok(userService.register(registerDtoRequest));
+        return ResponseEntity.ok(userService.register(request));
+    }
+
+    @PostMapping("/register/google")
+    public ResponseEntity<ApiItemResponse<String>> register(@RequestBody @Valid RegisterGoogleDtoRequest request) {
+        return ResponseEntity.ok(userService.register(request));
     }
 
     @GetMapping("/verify-email")
@@ -57,8 +63,7 @@ public class AuthenticationController {
     }
 
     @PutMapping("change-password")
-    public ResponseEntity<ApiItemResponse<String>> changePassword(@RequestBody @Valid
-                                                                  ChangePasswordDtoRequest request) {
+    public ResponseEntity<ApiItemResponse<String>> changePassword(@RequestBody @Valid ChangePasswordDtoRequest request) {
         return ResponseEntity.ok(userService.changePassword(request));
     }
 
@@ -69,10 +74,11 @@ public class AuthenticationController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<ApiItemResponse<String>> resetPassword(HttpServletRequest request, @RequestBody @Valid
-    ResetPasswordDtoRequest resetPasswordDtoRequest)
+    public ResponseEntity<ApiItemResponse<String>> resetPassword(HttpServletRequest request,
+                                                                 @RequestBody @Valid
+                                                                 ResetPasswordDtoRequest dtoRequest)
             throws JOSEException {
         String token = request.getHeader(AUTHORIZATION_HEADER).substring(7);
-        return ResponseEntity.ok(userService.resetPassword(token, resetPasswordDtoRequest));
+        return ResponseEntity.ok(userService.resetPassword(token, dtoRequest));
     }
 }

@@ -14,8 +14,12 @@ import java.util.Optional;
 public interface UserService {
     ApiItemResponse<LoginDtoResponse> login(LoginDtoRequest loginDtoRequest) throws JOSEException;
 
+    ApiItemResponse<LoginDtoResponse> login(String token) throws JOSEException;
+
     ApiItemResponse<String> register(RegisterDtoRequest registerDtoRequest)
             throws JOSEException, MessagingException;
+
+    ApiItemResponse<String> register(RegisterGoogleDtoRequest request);
 
     ApiItemResponse<String> verifyEmail(String token);
 

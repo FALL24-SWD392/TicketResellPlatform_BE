@@ -25,9 +25,9 @@ public class ApplicationInitConfig {
                 user.setUsername("admin");
                 user.setPassword(passwordEncoder.encode("12345678"));
                 user.setEmail("datnhse170330@fpt.edu.vn");
-                user.setStatus(Categorize.ACTIVE);
+                user.setStatus(Categorize.VERIFIED);
                 user.setRole(Categorize.ADMIN);
-                user.setTypeRegister(Categorize.SYSTEM);
+                user.setTypeRegister(Categorize.GOOGLE);
 
                 userRepository.save(user);
             }

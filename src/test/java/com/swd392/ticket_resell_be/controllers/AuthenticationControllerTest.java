@@ -79,7 +79,7 @@ class AuthenticationControllerTest {
         ApiItemResponse<Object> apiItemResponse =
                 new ApiItemResponse<>(null, HttpStatus.NOT_FOUND, "User not found");
         //when
-        when(userService.login(any())).thenThrow(new AppException(ErrorCode.USER_NOT_FOUND));
+        when(userService.login(any(LoginDtoRequest.class))).thenThrow(new AppException(ErrorCode.USER_NOT_FOUND));
         when(apiResponseBuilder.buildResponse(isNull(), any(HttpStatus.class), anyString()))
                 .thenReturn(apiItemResponse);
         //then
@@ -96,7 +96,7 @@ class AuthenticationControllerTest {
         ApiItemResponse<Object> apiItemResponse =
                 new ApiItemResponse<>(null, HttpStatus.BAD_REQUEST, "Wrong password");
         //when
-        when(userService.login(any())).thenThrow(new AppException(ErrorCode.WRONG_PASSWORD));
+        when(userService.login(any(LoginDtoRequest.class))).thenThrow(new AppException(ErrorCode.WRONG_PASSWORD));
         when(apiResponseBuilder.buildResponse(isNull(), any(HttpStatus.class), anyString()))
                 .thenReturn(apiItemResponse);
         //then

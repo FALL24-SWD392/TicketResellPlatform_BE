@@ -16,12 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] PUBLIC_POST_ENDPOINTS = {
-            "auth/login",
             "/packages/payment-callback",
-            "/auth/register",
+            "/auth/register/system",
+            "/auth/register/google",
     };
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/auth/login",
+            "/auth/login/system",
+            "/auth/login/google",
             "/auth/verify-email",
             "/auth/forgot-password",
     };

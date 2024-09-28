@@ -2,10 +2,11 @@ package com.swd392.ticket_resell_be.enums;
 
 public enum Categorize {
     //User's status
-    INACTIVE,
-    ACTIVE,
+    UNVERIFIED,
+    VERIFIED,
     BAN,
     DELETED,
+    RESTRICTED,
     //User's role
     MEMBER,
     STAFF,
