@@ -27,4 +27,13 @@ public class ApiResponseBuilder {
         return new ApiListResponse<>(data, size, page, totalSize, totalPage, status, message);
     }
 
+    public <T> ApiListResponse<T> buildResponse(List<T> data, int size, int page, long totalSize,
+                                                int totalPage, HttpStatus status) {
+        return new ApiListResponse<>(data, size, page, totalSize, totalPage, status, null);
+    }
+
+    public <T> ApiListResponse<T> buildResponse(int size, int page, long totalSize,
+                                                int totalPage, HttpStatus status, String message) {
+        return new ApiListResponse<>(null, size, page, totalSize, totalPage, status, message);
+    }
 }

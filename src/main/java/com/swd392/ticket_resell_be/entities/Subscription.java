@@ -1,15 +1,12 @@
 package com.swd392.ticket_resell_be.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
+import org.hibernate.validator.constraints.Length;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -18,23 +15,29 @@ import java.util.UUID;
 @Table(name = "subscriptions")
 public class Subscription {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @NotEmpty
+    @Length(max = 50)
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @Positive
     @Column(name = "sale_limit", nullable = false)
     private int saleLimit;
 
-    @Column(name = "description", nullable = false)
+    @NotEmpty
+    @Length(max = 500)
+    @Column(name = "description", nullable = false, length = 500)
     private String description;
 
+    @Positive
     @Column(name = "point_required", nullable = false)
     private int pointRequired;
 
-    @Column(name = "price", nullable = false, precision = 10, scale = 2)
-    private int price;
+    @Column(name = "price", nullable = false)
+    private float price;
 
 }

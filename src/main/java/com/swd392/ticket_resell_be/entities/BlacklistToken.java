@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class BlacklistToken {
     private UUID id;
 
     @NotNull
+    @FutureOrPresent
     @Column(name = "exp_at", nullable = false, updatable = false)
     private Date expAt;
 

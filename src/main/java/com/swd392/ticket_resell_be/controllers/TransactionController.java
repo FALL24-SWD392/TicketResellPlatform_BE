@@ -18,9 +18,9 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @GetMapping
-    public ResponseEntity<ApiListResponse<Transaction>> getAllTransactions(   @RequestParam(defaultValue = "0") int page,
-                                                                              @RequestParam(defaultValue = "10") int size) {
-        ApiListResponse<Transaction> response = transactionService.getAllTransactions(page,size);
+    public ResponseEntity<ApiListResponse<Transaction>> getAllTransactions(@RequestParam(defaultValue = "0") int page,
+                                                                           @RequestParam(defaultValue = "10") int size) {
+        ApiListResponse<Transaction> response = transactionService.getAllTransactions(page, size);
         return ResponseEntity.ok(response);
     }
 }

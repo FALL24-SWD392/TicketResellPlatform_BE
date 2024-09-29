@@ -2,43 +2,43 @@ package com.swd392.ticket_resell_be.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"ChatBox\"")
+@Table(name = "chat_boxs")
 public class ChatBox {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "chat_box_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "seller_id", nullable = false)
-    private User sellerId;
+    @JoinColumn(nullable = false, updatable = false)
+    private User seller;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "buyer_id", nullable = false)
-    private User buyerID;
+    @JoinColumn(nullable = false, updatable = false)
+    private User buyer;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "ticket_id", nullable = false)
-    private Ticket ticketId;
+    @JoinColumn(nullable = false, updatable = false)
+    private Ticket ticket;
 
+    @CreatedDate
     @NotNull
-    @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    @PastOrPresent
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
 }

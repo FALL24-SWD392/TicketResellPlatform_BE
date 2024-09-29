@@ -2,73 +2,85 @@ package com.swd392.ticket_resell_be.entities;
 
 import com.swd392.ticket_resell_be.enums.Categorize;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Tickets\"")
+@Table(name = "tickets")
 public class Ticket {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ticket_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "seller_id", nullable = false)
-    private User sellerId;
+    @JoinColumn(nullable = false, updatable = false)
+    private User seller;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "title", nullable = false)
+    @NotEmpty
+    @Length(max = 50)
+    @Column(name = "title", nullable = false, length = 50)
     private String title;
 
-    @NotNull
-    @Column(name = "exp_date", nullable = false)
-    private LocalDate expDate;
+    @Column(name = "image")
+    private String image;
 
-    @Size(max = 50)
-    @Column(name = "type", length = 50)
+    @Future
+    @NotNull
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "exp_date", nullable = false)
+    private Date expDate;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 25)
     private Categorize type;
 
-    @Column(name = "unit_price", precision = 10, scale = 2)
-    private BigDecimal unitPrice;
+    @Column(name = "unit_price", nullable = false)
+    private float unitPrice;
 
-    @NotNull
+    @Positive
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
-    @Column(name = "description", length = Integer.MAX_VALUE)
+    @NotNull
+    @Length(max = 500)
+    @Column(name = "description", nullable = false, length = 500)
     private String description;
 
-    @Column(name = "image", columnDefinition = "image")
-    private String image;
-
-    @ColumnDefault("'pending'")
-    @Column(name = "status", columnDefinition = "status")
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 15)
     private Categorize status;
 
+    @CreatedDate
     @NotNull
-    @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    @PastOrPresent
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
 
-    @NotNull
-    @Column(name = "updated_by", nullable = false)
+    @LastModifiedBy
+    @NotBlank
+    @Length(max = 50)
+    @Column(name = "updated_by", nullable = false, length = 50)
     private String updatedBy;
 
+    @LastModifiedDate
     @NotNull
+    @PastOrPresent
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at", nullable = false)
-    private LocalDate updatedAt;
+    private Date updatedAt;
 }

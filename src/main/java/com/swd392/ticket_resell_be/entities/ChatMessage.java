@@ -1,41 +1,46 @@
 package com.swd392.ticket_resell_be.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"ChatMessage\"")
+@Table(name = "chat_messages")
 public class ChatMessage {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "chat_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "chat_box_id", nullable = false)
-    private ChatBox chatBoxId;
+    @JoinColumn(nullable = false, updatable = false)
+    private User sender;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "sender_id", nullable = false)
-    private User senderId;
+    @JoinColumn(name = "chat_box_id", nullable = false, updatable = false)
+    private ChatBox chatBox;
 
-    @Column(name = "message", length = Integer.MAX_VALUE)
+    @NotEmpty
+    @Length(max = 750)
+    @Column(name = "message", length = 750)
     private String message;
 
+    @CreatedDate
     @NotNull
-    @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    @PastOrPresent
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
 }

@@ -38,7 +38,7 @@ public enum ErrorCode {
     INVALID_STATUS("Invalid status", HttpStatus.CONFLICT),
 
     //ChatBox error
-    CHAT_BOX_NOT_FOUND("Chatbox not found", HttpStatus.NOT_FOUND),
+    CHAT_BOX_NOT_FOUND("Chat box not found", HttpStatus.NOT_FOUND),
 
     //Transaction's Error
     AMOUNT_INVALID("Invalid amount provided", HttpStatus.BAD_REQUEST),
@@ -56,8 +56,7 @@ public enum ErrorCode {
     PAYMENT_FAILED("Payment failed", HttpStatus.BAD_REQUEST),
 
     USER_SUBSCRIPTION_NOT_FOUND("User or Subscription not found", HttpStatus.NOT_FOUND),
-    INSUFFICIENT_REPUTATION("You do not have enough reputation points to purchase this subscription.", HttpStatus.BAD_REQUEST )
-    ;
+    INSUFFICIENT_REPUTATION("You do not have enough reputation points to purchase this subscription.", HttpStatus.BAD_REQUEST);
     String message;
     HttpStatus status;
 }

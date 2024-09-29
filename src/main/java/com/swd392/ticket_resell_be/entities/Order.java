@@ -5,32 +5,26 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Order\"")
+@Table(name = "orders")
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "order_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "chat_box_id")
-    private ChatBox chatBoxId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false, updatable = false)
+    private ChatBox chatBox;
 
     @NotNull
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
-
-    @ColumnDefault("'pending'")
-    @Column(name = "status", columnDefinition = "status")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 15)
     private Categorize status;
 }

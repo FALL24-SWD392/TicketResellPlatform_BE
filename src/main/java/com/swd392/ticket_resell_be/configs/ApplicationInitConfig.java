@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Date;
+
 @Configuration
 @EnableAsync
 @RequiredArgsConstructor
@@ -23,12 +25,16 @@ public class ApplicationInitConfig {
 
                 User user = new User();
                 user.setUsername("admin");
-                user.setPassword(passwordEncoder.encode("12345678"));
+                user.setPassword("$2a$10$xkNc05o0d5SP5ZdZ24t7qO4Y9b7BvJOTRYdAvRmx5nnrkTaVQUeXq");
                 user.setEmail("datnhse170330@fpt.edu.vn");
-                user.setStatus(Categorize.VERIFIED);
                 user.setRole(Categorize.ADMIN);
+                user.setStatus(Categorize.VERIFIED);
                 user.setTypeRegister(Categorize.GOOGLE);
-
+                user.setAvatar("https://i.imgur.com/4Z2ZQ9s.png");
+                user.setCreatedBy("admin");
+                user.setCreatedAt(new Date());
+                user.setUpdatedBy("admin");
+                user.setUpdatedAt(new Date());
                 userRepository.save(user);
             }
         };

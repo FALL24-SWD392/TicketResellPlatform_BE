@@ -29,7 +29,7 @@ public class ReportController {
     }
 
     @PutMapping("/process")
-    public  ResponseEntity<ApiItemResponse<Report>> processReport(
+    public ResponseEntity<ApiItemResponse<Report>> processReport(
             @RequestBody @Valid UUID id, Categorize status) {
         return ResponseEntity.ok(reportService.processReport(id, status));
     }

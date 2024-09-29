@@ -4,7 +4,6 @@ package com.swd392.ticket_resell_be.services;
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
-import com.swd392.ticket_resell_be.entities.Report;
 import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.enums.Categorize;
 

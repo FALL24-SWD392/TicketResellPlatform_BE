@@ -192,7 +192,7 @@ public class UserServiceImplement implements UserService {
     public ApiItemResponse<String> deleteUser(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        user.setStatus(Categorize.DELETED);
+        user.setStatus(Categorize.REMOVED);
         userRepository.save(user);
         return apiResponseBuilder.buildResponse("User deleted successfully!", HttpStatus.OK, null);
     }

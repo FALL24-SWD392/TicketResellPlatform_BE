@@ -10,5 +10,5 @@ import java.util.UUID;
 
 
 public interface ChatBoxRepository extends JpaRepository<ChatBox, UUID> {
-    Collection<ChatBox> findChatBoxByBuyerIDOrSellerId(User buyerID, User sellerID);
+    Collection<ChatBox> findChatBoxByBuyerOrSeller(User buyerID, User sellerID);
 }

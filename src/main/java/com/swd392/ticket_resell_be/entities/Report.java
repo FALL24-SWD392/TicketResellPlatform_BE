@@ -2,56 +2,83 @@ package com.swd392.ticket_resell_be.entities;
 
 import com.swd392.ticket_resell_be.enums.Categorize;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.validator.constraints.Length;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "\"Report\"")
+@Table(name = "reports")
 public class Report {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "report_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "report_id", nullable = false, updatable = false)
     private UUID id;
 
     @NotNull
-    @Column(name = "reporter_id", nullable = false)
-    private UUID reporterId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false, updatable = false)
+    private User reporter;
 
     @NotNull
-    @Column(name = "reported_id", nullable = false)
-    private UUID reportedId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false, updatable = false)
+    private User reported;
 
     @NotNull
-    @Column(name = "order_id", nullable = false)
-    private UUID orderId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(nullable = false, updatable = false)
+    private Order order;
 
-    @ColumnDefault("'pending'")
-    @Column(name = "status", columnDefinition = "status")
-    private Categorize status;
-
-    @Column(name = "description", nullable = false)
+    @NotEmpty
+    @Length(max = 500)
+    @Column(name = "description", nullable = false, updatable = false, length = 500)
     private String description;
 
+    @Column(name = "attachment")
+    private String attachment;
+
     @NotNull
-    @Column(name = "created_by", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 15)
+    private Categorize status;
+
+    @CreatedBy
+    @NotBlank
+    @Length(max = 50)
+    @Column(name = "created_by", nullable = false, updatable = false, length = 50)
     private String createdBy;
 
+    @CreatedDate
     @NotNull
-    @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    @PastOrPresent
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
 
-    @NotNull
-    @Column(name = "updated_by", nullable = false)
+    @LastModifiedBy
+    @NotBlank
+    @Length(max = 50)
+    @Column(name = "updated_by", nullable = false, length = 50)
     private String updatedBy;
 
+    @LastModifiedDate
     @NotNull
+    @PastOrPresent
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_at", nullable = false)
-    private LocalDate updatedAt;
+    private Date updatedAt;
+
 }

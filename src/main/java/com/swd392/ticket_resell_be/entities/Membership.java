@@ -1,11 +1,10 @@
 package com.swd392.ticket_resell_be.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.Date;
 import java.util.UUID;
@@ -16,24 +15,31 @@ import java.util.UUID;
 @Table(name = "memberships")
 public class Membership {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
+    @NotNull
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "seller_id", nullable = false)
-    private User user;
+    @JoinColumn(nullable = false, updatable = false)
+    private User seller;
 
-    @Column(name = "subscription_name", nullable = false)
+    @NotEmpty
+    @Length(max = 50)
+    @Column(name = "subscription_name", nullable = false, length = 50)
     private String subscriptionName;
 
+    @PositiveOrZero
     @Column(name = "sale_remain", nullable = false)
     private int saleRemain;
 
+    @NotNull
+    @PastOrPresent
     @Column(name = "start_date", nullable = false)
     private Date startDate;
 
+    @NotNull
+    @FutureOrPresent
     @Column(name = "end_date", nullable = false)
     private Date endDate;
 

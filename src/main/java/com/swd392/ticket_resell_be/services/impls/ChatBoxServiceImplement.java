@@ -62,7 +62,7 @@ public class ChatBoxServiceImplement implements ChatBoxService {
     @Override
     public ApiListResponse<ChatBox> viewAllChatBoxByUserId(UUID userId) {
         User user = userRepository.findById(userId).orElse(null);
-        List<UUID> uuidList = chatBoxRepository.findChatBoxByBuyerIDOrSellerId(user, user)
+        List<UUID> uuidList = chatBoxRepository.findChatBoxByBuyerOrSeller(user, user)
                 .stream()
                 .map(ChatBox::getId)
                 .toList();

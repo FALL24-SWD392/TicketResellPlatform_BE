@@ -40,8 +40,7 @@ public class TicketServiceImplement implements TicketService {
         ticket.setStatus(Categorize.PENDING);
         return apiResponseBuilder.buildResponse(
                 ticketRepository.save(ticket),
-                HttpStatus.CREATED,
-                null
+                HttpStatus.CREATED
         );
     }
 
@@ -58,10 +57,9 @@ public class TicketServiceImplement implements TicketService {
             existingTicket.setStatus(Categorize.PENDING);
             return apiResponseBuilder.buildResponse(
                     ticketRepository.save(existingTicket),
-                    HttpStatus.OK,
-                    null
+                    HttpStatus.OK
             );
-        } catch (AppException e){
+        } catch (AppException e) {
             return apiResponseBuilder.buildResponse(
                     null,
                     HttpStatus.NOT_FOUND,
@@ -82,11 +80,10 @@ public class TicketServiceImplement implements TicketService {
                 ticketRepository.save(ticket);
                 return apiResponseBuilder.buildResponse(
                         ticket,
-                        HttpStatus.OK,
-                        null
+                        HttpStatus.OK
                 );
             }
-        } catch (AppException e){
+        } catch (AppException e) {
             return apiResponseBuilder.buildResponse(
                     null,
                     HttpStatus.NOT_FOUND,
@@ -102,16 +99,15 @@ public class TicketServiceImplement implements TicketService {
         ticket.setStatus(Categorize.REMOVED);
         return apiResponseBuilder.buildResponse(
                 ticketRepository.save(ticket),
-                HttpStatus.OK,
-                null
+                HttpStatus.OK
         );
     }
 
     @Override
     public ApiListResponse<Ticket> getByStatus(Categorize status) {
         List<Ticket> ticketList = ticketRepository.findTicketByStatus(status);
-        try{
-            if(ticketList.isEmpty())
+        try {
+            if (ticketList.isEmpty())
                 throw new AppException(ErrorCode.TICKET_NOT_FOUND);
             else
                 return apiResponseBuilder.buildResponse(
@@ -120,10 +116,9 @@ public class TicketServiceImplement implements TicketService {
                         0,
                         0,
                         0,
-                        HttpStatus.OK,
-                        null
+                        HttpStatus.OK
                 );
-        } catch (AppException e){
+        } catch (AppException e) {
             return apiResponseBuilder.buildResponse(
                     null,
                     0,
@@ -145,8 +140,7 @@ public class TicketServiceImplement implements TicketService {
                 0,
                 0,
                 0,
-                HttpStatus.OK,
-                null
+                HttpStatus.OK
         );
     }
 
@@ -165,8 +159,7 @@ public class TicketServiceImplement implements TicketService {
                 0,
                 0,
                 0,
-                HttpStatus.OK,
-                null
+                HttpStatus.OK
         );
     }
 
@@ -179,8 +172,8 @@ public class TicketServiceImplement implements TicketService {
                 .toList();
         List<Ticket> ticketList = ticketRepository.findAllById(uuidList);
         List<Ticket> returnList = new ArrayList<>();
-        for(Ticket ticket : ticketList) {
-            if(ticket.getStatus() == status) {
+        for (Ticket ticket : ticketList) {
+            if (ticket.getStatus() == status) {
                 returnList.add(ticket);
             }
         }
@@ -190,8 +183,7 @@ public class TicketServiceImplement implements TicketService {
                 0,
                 0,
                 0,
-                HttpStatus.OK,
-                null
+                HttpStatus.OK
         );
     }
 
@@ -204,8 +196,7 @@ public class TicketServiceImplement implements TicketService {
                 0,
                 0,
                 0,
-                HttpStatus.OK,
-                null
+                HttpStatus.OK
         );
     }
 
@@ -215,8 +206,7 @@ public class TicketServiceImplement implements TicketService {
         Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
         return apiResponseBuilder.buildResponse(
                 ticket,
-                HttpStatus.OK,
-                null
+                HttpStatus.OK
         );
     }
 }

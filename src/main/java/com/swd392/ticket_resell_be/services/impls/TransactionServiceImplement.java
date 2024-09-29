@@ -6,8 +6,8 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.Transaction;
 import com.swd392.ticket_resell_be.entities.User;
+import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
-import com.swd392.ticket_resell_be.enums.TransactionStatus;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.TransactionRepository;
 import com.swd392.ticket_resell_be.services.TransactionService;
@@ -17,7 +17,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -43,19 +42,18 @@ public class TransactionServiceImplement implements TransactionService {
         transaction.setId(UUID.randomUUID());
         transaction.setSubscription(subscription);
         transaction.setSeller(user);
-        transaction.setOrderId(orderId);
-        transaction.setStatus((TransactionStatus.PENDING));
+        transaction.setStatus((Categorize.PENDING));
         transactionRepository.save(transaction);
-        return apiResponseBuilder.buildResponse(transaction,HttpStatus.CREATED,"Pending transaction saved successfully");
+        return apiResponseBuilder.buildResponse(transaction, HttpStatus.CREATED, "Pending transaction saved successfully");
 
     }
 
-    @Override
-    public ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException {
-        Transaction transaction = transactionRepository.findTransactionByOrderId(orderCode)
-                .orElseThrow(() -> new AppException(ErrorCode.TRANSACTION_NOT_FOUND));
-        return  apiResponseBuilder.buildResponse(transaction, HttpStatus.OK, "Subscription created successfully");
-    }
+//    @Override
+//    public ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException {
+//        Transaction transaction = transactionRepository.findTransactionByOrderId(orderCode)
+//                .orElseThrow(() -> new AppException(ErrorCode.TRANSACTION_NOT_FOUND));
+//        return  apiResponseBuilder.buildResponse(transaction, HttpStatus.OK, "Subscription created successfully");
+//    }
 
     @Override
     public ApiListResponse<Transaction> getAllTransactions(int page, int size) {
@@ -69,7 +67,7 @@ public class TransactionServiceImplement implements TransactionService {
     }
 
     @Override
-    public ApiItemResponse<Transaction> updateTransactionStatus(UUID transactionId, TransactionStatus status) throws AppException {
+    public ApiItemResponse<Transaction> updateTransactionStatus(UUID transactionId, Categorize status) throws AppException {
         Optional<Transaction> optionalTransaction = transactionRepository.findById(transactionId);
         if (optionalTransaction.isPresent()) {
             Transaction transaction = optionalTransaction.get(); // Get the transaction
@@ -80,6 +78,5 @@ public class TransactionServiceImplement implements TransactionService {
             throw new AppException(ErrorCode.TRANSACTION_NOT_FOUND); // Define the appropriate error code
         }
     }
-
 
 }

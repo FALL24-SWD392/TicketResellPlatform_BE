@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-
 import com.swd392.ticket_resell_be.dtos.requests.ReportDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -13,8 +12,8 @@ import com.swd392.ticket_resell_be.repositories.OrderRepository;
 import com.swd392.ticket_resell_be.repositories.ReportRepository;
 import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.ReportService;
+import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
-import com.swd392.ticket_resell_be.utils.UserUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,11 +22,10 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 
 @Service
 @RequiredArgsConstructor
@@ -38,14 +36,14 @@ public class ReportServiceImplement implements ReportService {
     ModelMapper modelMapper;
     ApiResponseBuilder apiResponseBuilder;
     UserRepository userRepository;
-    UserUtil userUtil = new UserUtil();
+    UserService userService;
 
     @Override
     public ApiItemResponse<Report> createReport(ReportDtoRequest reportDtoRequest) {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
         try {
             Report report = modelMapper.map(reportDtoRequest, Report.class);
-            boolean check = orderRepository.findById(report.getOrderId());
+            boolean check = orderRepository.findById(report.getOrder().getId());
             if (!check) {
                 throw new AppException(ErrorCode.USER_HAVE_NOT_YET_TRANSACTED);
             }
@@ -73,10 +71,10 @@ public class ReportServiceImplement implements ReportService {
         if (status.equals(Categorize.APPROVED)) {
             report.setStatus(Categorize.APPROVED);
 
-            minusReputation(report.getReportedId());
+            minusReputation(report.getReported().getId());
 
-            report.setUpdatedBy(userUtil.getCurrentUser().getUsername());
-            report.setUpdatedAt(LocalDate.now());
+            report.setUpdatedBy(userService.getCurrentUser().data().toString());
+            report.setUpdatedAt(new Date());
 
             return apiResponseBuilder.buildResponse(
                     reportRepository.save(report),
@@ -86,10 +84,10 @@ public class ReportServiceImplement implements ReportService {
         } else if (status.equals(Categorize.REJECTED)) {
             report.setStatus(Categorize.REJECTED);
 
-            minusReputation(report.getReporterId());
+            minusReputation(report.getReporter().getId());
 
-            report.setUpdatedBy(userUtil.getCurrentUser().getUsername());
-            report.setUpdatedAt(LocalDate.now());
+            report.setUpdatedBy(userService.getCurrentUser().data().toString());
+            report.setUpdatedAt(new Date());
 
             return apiResponseBuilder.buildResponse(
                     reportRepository.save(report),
@@ -143,7 +141,7 @@ public class ReportServiceImplement implements ReportService {
 
     @Override
     public ApiListResponse<Report> getAllReportsByStatus(Categorize status) {
-        return  apiResponseBuilder.buildResponse(
+        return apiResponseBuilder.buildResponse(
                 reportRepository.findAllByStatus(status),
                 0,
                 0,
