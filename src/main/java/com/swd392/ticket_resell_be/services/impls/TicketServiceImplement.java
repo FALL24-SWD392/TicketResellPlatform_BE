@@ -4,6 +4,7 @@ import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Ticket;
+import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
@@ -92,7 +93,6 @@ public class TicketServiceImplement implements TicketService {
         }
     }
 
-
     @Override
     public ApiItemResponse<Ticket> removeTicket(UUID id) {
         Ticket ticket = ticketRepository.findTicketByIdIs(id);
@@ -144,7 +144,6 @@ public class TicketServiceImplement implements TicketService {
         );
     }
 
-
     @Override
     public ApiListResponse<Ticket> viewTicketsByCategory(Categorize category, Categorize status) {
         List<Ticket> ticketList;
@@ -162,7 +161,6 @@ public class TicketServiceImplement implements TicketService {
                 HttpStatus.OK
         );
     }
-
 
     @Override
     public ApiListResponse<Ticket> getByNameAndStatus(String name, Categorize status) {
@@ -187,7 +185,6 @@ public class TicketServiceImplement implements TicketService {
         );
     }
 
-
     @Override
     public ApiListResponse<Categorize> getAllCategory() {
         return apiResponseBuilder.buildResponse(
@@ -200,7 +197,6 @@ public class TicketServiceImplement implements TicketService {
         );
     }
 
-
     @Override
     public ApiItemResponse<Ticket> viewTicketById(UUID id) {
         Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
@@ -208,5 +204,10 @@ public class TicketServiceImplement implements TicketService {
                 ticket,
                 HttpStatus.OK
         );
+    }
+
+    @Override
+    public int getCountBySellerAndStatus(User seller, Categorize status) {
+        return ticketRepository.countBySellerAndStatus(seller, status);
     }
 }

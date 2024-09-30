@@ -4,18 +4,25 @@ import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.VNPayOrderResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
+import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.SubscriptionRepository;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
+import com.swd392.ticket_resell_be.services.TransactionService;
+import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
+import jakarta.validation.ConstraintViolationException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +37,9 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     SubscriptionRepository subscriptionRepository;
     ApiResponseBuilder apiResponseBuilder;
     PagingUtil pagingUtil;
+    VNPayServiceImplement vnPayService;
+    UserService userService;
+    TransactionService transactionService;
 
     @Override
     public ApiItemResponse<Subscription> createSubscription(SubscriptionDtoRequest subscriptionDtoRequest) {
@@ -62,14 +72,46 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     }
 
     @Override
-    public ApiItemResponse<Subscription> updateSubscription(UUID uuid, SubscriptionDtoRequest pkgDto) {
-        Subscription existingSubscription = subscriptionRepository.findById(uuid)
-                .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
-        existingSubscription.setName(pkgDto.name());
-        existingSubscription.setSaleLimit(pkgDto.saleLimit());
-        existingSubscription.setPrice(pkgDto.price());
-        Subscription updatedSubscription = subscriptionRepository.save(existingSubscription);
-        return apiResponseBuilder.buildResponse(updatedSubscription, HttpStatus.OK, "Subscription updated successfully");
+    public ApiItemResponse<Subscription> handleUpdateSubscription(UUID packageId, SubscriptionDtoRequest subscriptionDtoRequest) {
+        try {
+            Subscription existingSubscription = subscriptionRepository.findById(packageId)
+                    .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
+            Optional.ofNullable(subscriptionDtoRequest.name())
+                    .filter(name -> !name.isEmpty())
+                    .ifPresent(existingSubscription::setName);
+            Optional.of(subscriptionDtoRequest.saleLimit())
+                    .filter(saleLimit -> saleLimit != 0)
+                    .ifPresent(existingSubscription::setSaleLimit);
+            Optional.of(subscriptionDtoRequest.price())
+                    .filter(price -> price != 0)
+                    .ifPresent(existingSubscription::setPrice);
+            Subscription updatedSubscription = subscriptionRepository.save(existingSubscription);
+            return apiResponseBuilder.buildResponse(updatedSubscription, HttpStatus.OK, "Subscription updated successfully");
+        } catch (AppException e) {
+            return apiResponseBuilder.buildResponse(null, HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (ConstraintViolationException e) {
+            return apiResponseBuilder.buildResponse(null, HttpStatus.BAD_REQUEST, "Validation failed: " + e.getMessage());
+        } catch (Exception e) {
+            return apiResponseBuilder.buildResponse(null, HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public ApiItemResponse<String> purchaseSubscription(UUID subscriptionId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByName(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Subscription subscription = getSubscriptionById(subscriptionId)
+                .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND)).data();
+        if (user.getReputation() < subscription.getPointRequired()) {
+            throw new AppException(ErrorCode.INSUFFICIENT_REPUTATION);
+        }
+        long orderTotal = (long) subscription.getPrice();
+        String orderInfo = "Thanh toán cho gói " + subscription.getName();
+        VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo);
+        transactionService.savePendingTransaction(subscription, user, orderResponse.orderCode());
+        return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK,"Purchase Successfully");
     }
 
 }

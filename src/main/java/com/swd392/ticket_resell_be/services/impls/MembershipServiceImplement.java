@@ -4,10 +4,12 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
+import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.MembershipRepository;
 import com.swd392.ticket_resell_be.services.MembershipService;
+import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +29,12 @@ public class MembershipServiceImplement implements MembershipService {
 
     MembershipRepository membershipRepository;
     ApiResponseBuilder apiResponseBuilder;
-
+    TicketService ticketService;
     @Override
     public ApiItemResponse<Membership> createMembership(User user, Subscription subscription) {
         if (user == null || subscription == null) {
             throw new AppException(ErrorCode.USER_SUBSCRIPTION_NOT_FOUND);
         }
-//        membershipRepository.deactivateActiveMemberships(user);
         Membership membership = new Membership();
         membership.setId(UUID.randomUUID());
         membership.setSeller(user);
@@ -49,23 +50,21 @@ public class MembershipServiceImplement implements MembershipService {
         return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.CREATED, "Membership created successfully");
     }
 
-
     @Override
     public ApiItemResponse<Membership> updateMembership(User user, Subscription subscription) {
-        // Kiểm tra đầu vào
         if (user == null || subscription == null) {
             throw new AppException(ErrorCode.USER_SUBSCRIPTION_NOT_FOUND);
         }
-
-        // Tìm kiếm membership hiện tại của người dùng
         Optional<Membership> existingMembership = membershipRepository.findMembershipBySeller(user);
         Membership membership;
+        int ticketCount = ticketService.getCountBySellerAndStatus(user, Categorize.APPROVED);
+        int saleRemain = subscription.getSaleLimit() - ticketCount;
+
         if (existingMembership.isPresent()) {
             membership = existingMembership.get();
             membership.setSubscriptionName(subscription.getName());
-            membership.setSaleRemain(subscription.getSaleLimit());
+            membership.setSaleRemain(saleRemain);
             Date currentDate = new Date();
-            membership.setStartDate(currentDate);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(currentDate);
             calendar.add(Calendar.DAY_OF_MONTH, 30);
