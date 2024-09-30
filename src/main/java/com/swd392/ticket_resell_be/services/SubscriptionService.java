@@ -4,6 +4,7 @@ import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -15,5 +16,7 @@ public interface SubscriptionService {
 
     ApiListResponse<Subscription> getAllSubscriptions(int page, int size);
 
-    ApiItemResponse<Subscription> updateSubscription(UUID uuid, SubscriptionDtoRequest pkgDto);
+    ApiItemResponse<Subscription> handleUpdateSubscription(UUID packageId, SubscriptionDtoRequest subscriptionDtoRequest);
+
+    ApiItemResponse<String> purchaseSubscription(UUID subscriptionId);
 }

@@ -14,8 +14,7 @@ public interface TransactionService {
 
     ApiItemResponse<Transaction> savePendingTransaction(Subscription subscription, User user, String orderId);
 
-//    ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException;
-
+    ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException;
 
     ApiListResponse<Transaction> getAllTransactions(int page, int size);
 

@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,26 +35,33 @@ public class TransactionServiceImplement implements TransactionService {
     PagingUtil pagingUtil;
 
     @Override
-    public ApiItemResponse<Transaction> savePendingTransaction(Subscription subscription, User user, String orderId) {
-        if (subscription == null || user == null || orderId == null) {
+    public ApiItemResponse<Transaction> savePendingTransaction(Subscription subscription, User user, String orderCode) {
+        if (subscription == null || user == null || orderCode == null) {
             throw new AppException(ErrorCode.TRANSACTION_DATA_INVALID);
         }
         Transaction transaction = new Transaction();
-        transaction.setId(UUID.randomUUID());
+        transaction.setOrderCode(orderCode);
         transaction.setSubscription(subscription);
         transaction.setSeller(user);
-        transaction.setStatus((Categorize.PENDING));
-        transactionRepository.save(transaction);
-        return apiResponseBuilder.buildResponse(transaction, HttpStatus.CREATED, "Pending transaction saved successfully");
+        transaction.setStatus(Categorize.PENDING);
+        transaction.setCreatedAt(new Date());
+        transaction.setUpdatedAt(new Date());
+        try {
+            transactionRepository.save(transaction);
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.TRANSACTION_CREATION_FAILED);
+        }
 
+        return apiResponseBuilder.buildResponse(transaction, HttpStatus.CREATED, "Pending transaction saved successfully");
     }
 
-//    @Override
-//    public ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException {
-//        Transaction transaction = transactionRepository.findTransactionByOrderId(orderCode)
-//                .orElseThrow(() -> new AppException(ErrorCode.TRANSACTION_NOT_FOUND));
-//        return  apiResponseBuilder.buildResponse(transaction, HttpStatus.OK, "Subscription created successfully");
-//    }
+
+    @Override
+    public ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException {
+        Transaction transaction = transactionRepository.getTransactionByOrderCode(orderCode)
+                .orElseThrow(() -> new AppException(ErrorCode.TRANSACTION_NOT_FOUND));
+        return  apiResponseBuilder.buildResponse(transaction, HttpStatus.OK, "Subscription created successfully");
+    }
 
     @Override
     public ApiListResponse<Transaction> getAllTransactions(int page, int size) {
