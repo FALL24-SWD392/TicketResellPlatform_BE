@@ -19,9 +19,10 @@ public class SecurityConfig {
             "/packages/payment-callback",
             "/auth/register/system",
             "/auth/register/google",
+            "/auth/login/**",
     };
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/auth/login/system",
+            "/auth/login/**",
             "/auth/login/google",
             "/auth/verify-email",
             "/auth/forgot-password",
