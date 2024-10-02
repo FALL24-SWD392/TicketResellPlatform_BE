@@ -8,6 +8,8 @@ import com.swd392.ticket_resell_be.entities.ChatBox;
 import com.swd392.ticket_resell_be.entities.ChatMessage;
 import com.swd392.ticket_resell_be.services.ChatBoxService;
 import com.swd392.ticket_resell_be.services.ChatMessageService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/chat")
+@Tag(name = "Chat APIs")
 public class ChatController {
     ChatBoxService chatBoxService;
     ChatMessageService chatMessageService;

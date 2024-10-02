@@ -5,6 +5,8 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.services.UserService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/users")
+@Tag(name = "User APIs")
 public class UserController {
     UserService userService;
 

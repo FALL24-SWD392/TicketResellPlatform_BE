@@ -6,6 +6,8 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.TicketService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/ticket")
+@Tag(name = "Ticket APIs")
 public class TicketController {
     TicketService ticketService;
 

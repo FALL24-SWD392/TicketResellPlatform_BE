@@ -5,6 +5,8 @@ import com.swd392.ticket_resell_be.dtos.requests.*;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
 import com.swd392.ticket_resell_be.services.UserService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -17,11 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/auth")
+@Tag(name = "Authentication APIs")
 public class AuthenticationController {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     UserService userService;
 
-    @GetMapping("/login/system")
+    @PostMapping("/login/system")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginDtoRequest request)
             throws JOSEException {
         return ResponseEntity.ok(userService.login(request));

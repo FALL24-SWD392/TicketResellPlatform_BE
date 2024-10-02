@@ -34,6 +34,7 @@ RUN --mount=type=bind,source=pom.xml,target=pom.xml \
 FROM deps as package
 
 WORKDIR /build
+
 COPY ./src src/
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     --mount=type=cache,target=/root/.m2 \
@@ -86,6 +87,6 @@ COPY --from=extract build/target/extracted/spring-boot-loader/ ./
 COPY --from=extract build/target/extracted/snapshot-dependencies/ ./
 COPY --from=extract build/target/extracted/application/ ./
 
-EXPOSE 8080
+EXPOSE 8081
 
 ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]

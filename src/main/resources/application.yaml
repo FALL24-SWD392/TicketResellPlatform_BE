@@ -13,7 +13,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/ticket_resell
+    url: jdbc:postgresql://178.128.96.120:5432/ticket_resell
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   #mail configuration
@@ -30,6 +30,15 @@ spring:
             enable: true
           ssl:
             trust: smtp.gmail.com
+  springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/index.html
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    disable-swagger-default-url: true
 #server configuration
 server:
   port: 8081

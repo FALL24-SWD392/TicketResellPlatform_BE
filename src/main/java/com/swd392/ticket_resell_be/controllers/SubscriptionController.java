@@ -5,6 +5,8 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.services.*;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/subscriptions")
+@Tag(name = "Subscription APIs")
 public class SubscriptionController {
     SubscriptionService subscriptionService;
 
