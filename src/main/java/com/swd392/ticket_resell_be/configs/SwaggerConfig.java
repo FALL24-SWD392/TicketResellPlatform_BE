@@ -35,15 +35,15 @@ public class SwaggerConfig {
                         new Tag().name("Transaction APIs"),
                         new Tag().name("User APIs")
                 ))
-                // .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                // .components(new Components().addSecuritySchemes(
-                //         "bearerAuth", new SecurityScheme()
-                //                 .type(SecurityScheme.Type.HTTP)
-                //                 .scheme("bearer")
-                //                 .bearerFormat("JWT")
-                //                 .in(SecurityScheme.In.HEADER)
-                //                 .name("Authorization")
-                // ))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new Components().addSecuritySchemes(
+                        "bearerAuth", new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .in(SecurityScheme.In.HEADER)
+                                .name("Authorization")
+                ))
                 ;
     }
 }

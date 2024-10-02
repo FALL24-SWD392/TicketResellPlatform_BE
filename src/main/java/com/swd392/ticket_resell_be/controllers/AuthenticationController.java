@@ -24,6 +24,7 @@ public class AuthenticationController {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     UserService userService;
 
+    
     @PostMapping("/login/system")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginDtoRequest request)
             throws JOSEException {
