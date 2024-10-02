@@ -25,6 +25,8 @@ public class SecurityConfig {
             "/auth/login/google",
             "/auth/verify-email",
             "/auth/forgot-password",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
     private static final String[] PUBLIC_PUT_ENDPOINTS = {
             ,

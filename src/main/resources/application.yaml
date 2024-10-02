@@ -30,6 +30,15 @@ spring:
             enable: true
           ssl:
             trust: smtp.gmail.com
+  springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui/index.html
+    operationsSorter: method
+    tagsSorter: alpha
+    display-request-duration: true
+    disable-swagger-default-url: true
 #server configuration
 server:
   port: 8081
