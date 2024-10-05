@@ -10,7 +10,7 @@ spring:
     database: postgresql
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/ticket_resell
+    url: jdbc:postgresql://178.128.96.120:5432/ticket_resell
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   #mail configuration
