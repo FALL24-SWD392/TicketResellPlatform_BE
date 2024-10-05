@@ -27,6 +27,6 @@ jobs:
         echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
         echo "REFRESH_TOKEN_EXP=${{ secrets.REFRESH_TOKEN_EXP }}" >> .env
         echo "AUTHORIZATION_HEADER=${{ secrets.AUTHORIZATION_HEADER }}" >> .env
-      
+      bash: shell
     - name: Run `docker compose`
       run: docker compose up --build -d
