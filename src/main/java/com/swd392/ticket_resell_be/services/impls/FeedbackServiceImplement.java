@@ -38,26 +38,19 @@ public class FeedbackServiceImplement implements FeedbackService {
     @Override
     public ApiItemResponse<Feedback> createFeedback(FeedbackDtoRequest feedbackDtoRequest) {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
-        try {
-            Feedback feedback = modelMapper.map(feedbackDtoRequest, Feedback.class);
-            UUID orderId = feedbackDtoRequest.order_id();
-            boolean check = orderRepository.findByIdAndStatus(orderId, Categorize.APPROVED);
-            if (!check) {
-                throw new AppException(ErrorCode.USER_HAVE_NOT_BUY_YET);
-            }
-            feedback.setStatus(Categorize.PENDING);
-            return apiResponseBuilder.buildResponse(
-                    feedbackRepository.save(feedback),
-                    HttpStatus.CREATED,
-                    null
-            );
-        } catch (AppException e) {
-            return apiResponseBuilder.buildResponse(
-                    null,
-                    HttpStatus.CONFLICT,
-                    "Error at FeedbackServiceImplement"
-            );
+
+        Feedback feedback = modelMapper.map(feedbackDtoRequest, Feedback.class);
+        UUID orderId = feedbackDtoRequest.order_id();
+        boolean check = orderRepository.findByIdAndStatus(orderId, Categorize.APPROVED);
+        if (!check) {
+            throw new AppException(ErrorCode.USER_HAVE_NOT_BUY_YET);
         }
+        feedback.setStatus(Categorize.PENDING);
+        return apiResponseBuilder.buildResponse(
+                feedbackRepository.save(feedback),
+                HttpStatus.CREATED,
+                null
+        );
     }
 
     @Override
