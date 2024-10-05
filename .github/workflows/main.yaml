@@ -1,20 +1,32 @@
-name: Toi muon deploy
+name: Depoly on VPS
 
-#sẽ trigger cái job này khi đẩy code lên nhánh nào: => đẩy code lên main thì tự trigger
 on:
   push:
     branches:
       - main
 
-#những công việc mà no sẽ khi ddaayr code
+
 jobs:
   docker-compose:
     runs-on: self-hosted
     environment: docker
     steps:
-    # tải code về vps
+
     - name: Checkout code
       uses: actions/checkout@v2 
-    #build tại vps bằng docker thì sau đó con backend sẽ chạy ở docker trong vps
+
+    - name: Use Github Secrets
+      run: |
+        echo "ACCESS_TOKEN_EXP=$ACCESS_TOKEN_EXP" >> .env
+        echo "DB_PASSWORD=$DB_PASSWORD" >> .env
+        echo "DB_USERNAME=$DB_USERNAME" >> .env
+        echo "DB_URL=$DB_URL" >> .env
+        echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env
+        echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
+        echo "MAIL_PASSWORD=$MAIL_PASSWORD" >> .env
+        echo "MAIL_USERNAME=$MAIL_USERNAME" >> .env
+        echo "REFRESH_TOKEN_EXP=$REFRESH_TOKEN_EXP" >> .env
+        echo "AUTHORIZATION_HEADER=$AUTHORIZATION_HEADER" >> .env
+      
     - name: Run `docker compose`
       run: docker compose up --build -d
