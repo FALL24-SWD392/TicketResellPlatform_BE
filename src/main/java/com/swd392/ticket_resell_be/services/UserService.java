@@ -5,6 +5,7 @@ import com.swd392.ticket_resell_be.dtos.requests.*;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
+import com.swd392.ticket_resell_be.dtos.responses.UserDto;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import jakarta.mail.MessagingException;
@@ -36,7 +37,7 @@ public interface UserService {
 
     ApiItemResponse<Object> getCurrentUser();
 
-    ApiItemResponse<User> getUserByUsername(String username);
+    ApiItemResponse<UserDto> getUserByUsername(String username);
 
     ApiListResponse<User> getUsers(PageDtoRequest pageDtoRequest);
 

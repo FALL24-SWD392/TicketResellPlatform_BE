@@ -5,6 +5,7 @@ import com.swd392.ticket_resell_be.dtos.requests.*;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
+import com.swd392.ticket_resell_be.dtos.responses.UserDto;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
@@ -174,11 +175,12 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public ApiItemResponse<User> getUserByUsername(String username) {
-        return apiResponseBuilder
-                .buildResponse(userRepository.findByUsername(username)
-                                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)),
-                        HttpStatus.OK, null);
+    public ApiItemResponse<UserDto> getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        UserDto userDto = new UserDto(user.getUsername(), user.getEmail(), user.getAvatar(),
+                user.getRating(), user.getReputation());
+        return apiResponseBuilder.buildResponse(userDto, HttpStatus.OK);
     }
 
     @Override

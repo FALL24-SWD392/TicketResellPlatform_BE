@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @Tag(name = "Authentication APIs")
 public class AuthenticationController {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
+    @Value("${AUTHORIZATION_HEADER}")
+    private static String authorizationHeader;
     UserService userService;
 
     
@@ -55,14 +57,14 @@ public class AuthenticationController {
 
     @GetMapping("/logout")
     public ResponseEntity<ApiItemResponse<String>> logout(HttpServletRequest request) {
-        String token = request.getHeader(AUTHORIZATION_HEADER).substring(7);
+        String token = request.getHeader(authorizationHeader).substring(7);
         return ResponseEntity.ok(userService.logout(token));
     }
 
     @GetMapping("/refresh-token")
     public ResponseEntity<ApiItemResponse<String>> refreshToken(HttpServletRequest request)
             throws JOSEException {
-        String token = request.getHeader(AUTHORIZATION_HEADER).substring(7);
+        String token = request.getHeader(authorizationHeader).substring(7);
         return ResponseEntity.ok(userService.refreshToken(token));
     }
 
@@ -82,7 +84,7 @@ public class AuthenticationController {
                                                                  @RequestBody @Valid
                                                                  ResetPasswordDtoRequest dtoRequest)
             throws JOSEException {
-        String token = request.getHeader(AUTHORIZATION_HEADER).substring(7);
+        String token = request.getHeader(authorizationHeader).substring(7);
         return ResponseEntity.ok(userService.resetPassword(token, dtoRequest));
     }
 }
