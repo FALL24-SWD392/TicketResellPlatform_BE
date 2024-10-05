@@ -99,7 +99,8 @@ public class TransactionServiceImplement implements TransactionService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // Get the username of the logged-in user
         PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
-        User user = userService.getUserByUsername(username).data();
+        User user = userService.getUserByName(username)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         Page<Transaction> transactionPage = transactionRepository.findBySeller(user, pagingUtil.getPageable(pageDtoRequest));
         List<Transaction> transactions = transactionPage.getContent();
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()

@@ -97,7 +97,8 @@ public class MembershipServiceImplement implements MembershipService {
     public ApiItemResponse<MembershipDtoResponse> getMembershipForUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        User user = userService.getUserByUsername(username).data();
+        User user = userService.getUserByName(username)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         Membership membership = membershipRepository.findMembershipBySeller(user)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBERSHIP_NOT_FOUND));
         MembershipDtoResponse membershipDtoResponse = mapToDto(membership);
