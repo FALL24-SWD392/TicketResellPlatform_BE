@@ -1,6 +1,7 @@
 package com.swd392.ticket_resell_be.services.impls;
 
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
+import com.swd392.ticket_resell_be.dtos.responses.MembershipDtoResponse;
 import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
@@ -10,11 +11,14 @@ import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.MembershipRepository;
 import com.swd392.ticket_resell_be.services.MembershipService;
 import com.swd392.ticket_resell_be.services.TicketService;
+import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -30,6 +34,7 @@ public class MembershipServiceImplement implements MembershipService {
     MembershipRepository membershipRepository;
     ApiResponseBuilder apiResponseBuilder;
     TicketService ticketService;
+    UserService userService;
     @Override
     public ApiItemResponse<Membership> createMembership(User user, Subscription subscription) {
         if (user == null || subscription == null) {
@@ -87,5 +92,28 @@ public class MembershipServiceImplement implements MembershipService {
         Membership savedMembership = membershipRepository.save(membership);
         return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.OK, "Membership updated successfully");
     }
+
+    @Override
+    public ApiItemResponse<MembershipDtoResponse> getMembershipForUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByUsername(username).data();
+        Membership membership = membershipRepository.findMembershipBySeller(user)
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBERSHIP_NOT_FOUND));
+        MembershipDtoResponse membershipDtoResponse = mapToDto(membership);
+
+        return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.OK, "Membership retrieved successfully");
+    }
+
+    private MembershipDtoResponse mapToDto(Membership membership) {
+        return MembershipDtoResponse.builder()
+                .id(membership.getId())
+                .subscriptionName(membership.getSubscriptionName())
+                .saleRemain(membership.getSaleRemain())
+                .startDate(membership.getStartDate())
+                .endDate(membership.getEndDate())
+                .build();
+    }
+
 
 }

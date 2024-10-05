@@ -15,6 +15,7 @@ import com.swd392.ticket_resell_be.services.TransactionService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -97,7 +98,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     }
 
     @Override
-    public ApiItemResponse<String> purchaseSubscription(UUID subscriptionId) {
+    public ApiItemResponse<String> purchaseSubscription(UUID subscriptionId, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userService.getUserByName(username)
@@ -109,7 +110,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         }
         long orderTotal = (long) subscription.getPrice();
         String orderInfo = "Thanh toán cho gói " + subscription.getName();
-        VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo);
+        VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo, request);
         transactionService.savePendingTransaction(subscription, user, orderResponse.orderCode());
         return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK,"Purchase Successfully");
     }

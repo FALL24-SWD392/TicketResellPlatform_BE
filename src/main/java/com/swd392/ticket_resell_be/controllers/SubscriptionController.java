@@ -5,6 +5,7 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.services.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -45,8 +46,10 @@ public class SubscriptionController {
     }
 
     @PostMapping("/purchase-subscription")
-    public ResponseEntity<ApiItemResponse<String>> submitOrder(@RequestParam("subscriptionId") UUID subscriptionId) {
-        return ResponseEntity.ok(subscriptionService.purchaseSubscription(subscriptionId));
+    public ResponseEntity<ApiItemResponse<String>> submitOrder(
+            @RequestParam("subscriptionId") UUID subscriptionId,
+            HttpServletRequest request) {
+        return ResponseEntity.ok(subscriptionService.purchaseSubscription(subscriptionId,request));
     }
 }
 

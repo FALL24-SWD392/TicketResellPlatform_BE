@@ -25,7 +25,7 @@ public class Transaction {
     private UUID id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, updatable = false)
     private User seller;
 
@@ -35,7 +35,7 @@ public class Transaction {
     private String orderCode;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(nullable = false, updatable = false)
     private Subscription subscription;
 
