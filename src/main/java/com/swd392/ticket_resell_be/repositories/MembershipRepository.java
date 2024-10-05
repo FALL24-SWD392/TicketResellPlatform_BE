@@ -10,11 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
-//    @Modifying
-//    @Transactional
-//    @Query("UPDATE Membership m SET m.active = false WHERE m.user = :user AND m.active = true")
-//    void deactivateActiveMemberships(@Param("user") User user);
-
     Optional<Membership> findMembershipBySeller(User user);
 
 

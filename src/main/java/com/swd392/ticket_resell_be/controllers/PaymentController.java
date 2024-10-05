@@ -24,7 +24,7 @@ public class PaymentController {
     public ResponseEntity<ApiItemResponse<String>> paymentCallback(
             @RequestParam("vnp_Amount") String vnpAmount,
             @RequestParam("vnp_BankCode") String vnpBankCode,
-            @RequestParam("vnp_BankTranNo") String vnpBankTranNo,
+            @RequestParam(value = "vnp_BankTranNo", required = false) String vnpBankTranNo,
             @RequestParam("vnp_CardType") String vnpCardType,
             @RequestParam("vnp_OrderInfo") String orderInfo,
             @RequestParam("vnp_PayDate") String vnpPayDate,

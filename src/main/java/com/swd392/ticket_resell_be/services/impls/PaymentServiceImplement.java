@@ -30,18 +30,19 @@ public class PaymentServiceImplement implements PaymentService {
             String vnpTransactionNo, String transactionStatus, String vnpTxnRef, String vnpSecureHash
     )
     {
+        ApiItemResponse<Transaction> transactionResponse = transactionService.findTransactionByOrderId(vnpTxnRef);
+        Transaction transaction = transactionResponse.data();
+
         try {
             if ("00".equalsIgnoreCase(responseCode) && "00".equalsIgnoreCase(transactionStatus)) {
-                ApiItemResponse<Transaction> transactionResponse = transactionService.findTransactionByOrderId(vnpTxnRef);
                 if (transactionResponse.data() == null) {
                     return apiResponseBuilder.buildResponse(null, HttpStatus.NOT_FOUND, "Transaction not found");
                 }
-                Transaction transaction = transactionResponse.data();
-                transaction.setStatus(Categorize.COMPLETED);
                 transactionService.updateTransactionStatus(transaction.getId(), Categorize.COMPLETED);
                 membershipService.updateMembership(transaction.getSeller(), transaction.getSubscription());
                 return apiResponseBuilder.buildResponse("Thanh toán thành công!", HttpStatus.OK, "Payment successful");
             } else {
+                transactionService.updateTransactionStatus(transaction.getId(), Categorize.FAILED);
                 return apiResponseBuilder.buildResponse(null, HttpStatus.BAD_REQUEST, "Thanh toán thất bại. Mã lỗi: " + responseCode);
             }
         } catch (AppException e) {

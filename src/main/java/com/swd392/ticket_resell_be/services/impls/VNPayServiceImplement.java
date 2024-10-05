@@ -14,7 +14,7 @@ import java.util.*;
 @Service
 public class VNPayServiceImplement {
 
-    public VNPayOrderResponse createOrder(long total, String orderInfor) {
+    public VNPayOrderResponse createOrder(long total, String orderInfor, HttpServletRequest request)  {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -36,7 +36,7 @@ public class VNPayServiceImplement {
         String locate = "vn";
         vnp_Params.put("vnp_Locale", locate);
 
-        String urlReturn = VNPayConfig.vnp_ReturnUrl;
+        String urlReturn = VNPayConfig.getReturnUrl(request);
         vnp_Params.put("vnp_ReturnUrl", urlReturn);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
