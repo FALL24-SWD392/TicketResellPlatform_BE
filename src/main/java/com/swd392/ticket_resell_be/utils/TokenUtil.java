@@ -44,11 +44,18 @@ public class TokenUtil {
                 .expirationTime(new Date(System.currentTimeMillis() + expTime))
                 .jwtID(UUID.randomUUID().toString())
                 .subject(user.getUsername())
-                .claim("scope", user.getRole().name())
+                .claim("id", user.getId().toString())
                 .claim("email", user.getEmail())
                 .claim("avatar", user.getAvatar())
                 .claim("rating", user.getRating())
                 .claim("reputation", user.getReputation())
+                .claim("scope", user.getRole().name())
+                .claim("status", user.getStatus().name())
+                .claim("typeRegister", user.getTypeRegister().name())
+                .claim("createdBy", user.getCreatedBy())
+                .claim("createdAt", user.getCreatedAt())
+                .claim("updatedBy", user.getUpdatedBy())
+                .claim("updatedAt", user.getUpdatedAt())
                 .build();
         Payload payload = new Payload(claimsSet.toJSONObject());
         //Sign jwt
