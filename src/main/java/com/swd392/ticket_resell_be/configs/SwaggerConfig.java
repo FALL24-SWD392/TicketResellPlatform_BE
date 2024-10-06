@@ -10,15 +10,11 @@ import java.util.Arrays;
 
 import io.swagger.v3.oas.models.tags.Tag;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-    
-    @Value("${API_URL}")
-    private String api_url;
 
     @Bean
     public OpenAPI myCustomConfig(){
@@ -27,7 +23,8 @@ public class SwaggerConfig {
                 new Info().title("Ticket Resell App APIs")
                         .description("By SWD392")
                 ).servers(Arrays.asList(
-                            new Server().url(api_url).description("local")
+                            new Server().url("http://localhost:8081").description("local"),
+                            new Server().url("https://api.ticketresell.thucnee.studio/").description("production")
                         )
                 ).tags(Arrays.asList(
                         new Tag().name("Authentication APIs"),
