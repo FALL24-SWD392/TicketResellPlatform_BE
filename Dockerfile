@@ -35,6 +35,7 @@ FROM deps as package
 
 WORKDIR /build
 
+COPY ./.env .env
 COPY ./src src/
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     --mount=type=cache,target=/root/.m2 \
