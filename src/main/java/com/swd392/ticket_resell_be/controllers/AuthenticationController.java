@@ -55,8 +55,9 @@ public class AuthenticationController {
         return ResponseEntity.ok(userService.verifyEmail(token));
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<ApiItemResponse<String>> logout(@RequestBody String token) {
+    @GetMapping("/logout")
+    public ResponseEntity<ApiItemResponse<String>> logout(HttpServletRequest request) {
+        String token = request.getHeader(authorizationHeader).substring(7);
         return ResponseEntity.ok(userService.logout(token));
     }
 
