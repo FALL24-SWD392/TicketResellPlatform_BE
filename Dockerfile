@@ -35,6 +35,7 @@ FROM deps as package
 
 WORKDIR /build
 
+
 COPY ./src src/
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     --mount=type=cache,target=/root/.m2 \
@@ -68,27 +69,11 @@ RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/e
 # eclipse-temurin@sha256:99cede493dfd88720b610eb8077c8688d3cca50003d76d1d539b0efc8cca72b4.
 FROM eclipse-temurin:17-jre-jammy AS final
 
-COPY ./.env .env
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
-ARG UID=10001
-ARG ACCESS_TOKEN_EXP
-ARG DB_PASSWORD
-ARG DB_USERNAME
-ARG GOOGLE_CLIENT_ID
-ARG JWT_SECRET_KEY
-ARG MAIL_PASSWORD
-ARG MAIL_USERNAME
-ARG REFRESH_TOKEN_EXP
 
-ENV DB_USERNAME=${DB_USERNAME}
-ENV DB_PASSWORD=${DB_PASSWORD}
-ENV MAIL_USERNAME=${MAIL_USERNAME}
-ENV MAIL_PASSWORD=${MAIL_PASSWORD}
-ENV JWT_SECRET_KEY=${JWT_SECRET_KEY}
-ENV GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-ENV ACCESS_TOKEN_EXP=${ACCESS_TOKEN_EXP}
-ENV REFRESH_TOKEN_EXP=${REFRESH_TOKEN_EXP}
+COPY ./.env .env
+ARG UID=10001
 
 RUN adduser \
     --disabled-password \
