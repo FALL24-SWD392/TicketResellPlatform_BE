@@ -35,7 +35,7 @@ FROM deps as package
 
 WORKDIR /build
 
-COPY ./.env .env
+
 COPY ./src src/
 RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     --mount=type=cache,target=/root/.m2 \
@@ -71,6 +71,8 @@ FROM eclipse-temurin:17-jre-jammy AS final
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
+
+COPY ./.env .env
 ARG UID=10001
 
 RUN adduser \
