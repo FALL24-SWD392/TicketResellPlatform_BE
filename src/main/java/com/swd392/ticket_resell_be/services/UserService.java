@@ -32,7 +32,7 @@ public interface UserService {
 
     ApiItemResponse<String> forgotPassword(String email) throws MessagingException, JOSEException;
 
-    ApiItemResponse<String> resetPassword(String token, ResetPasswordDtoRequest resetPasswordDtoRequest)
+    ApiItemResponse<String> resetPassword(ResetPasswordDtoRequest resetPasswordDtoRequest)
             throws JOSEException;
 
     ApiItemResponse<Object> getCurrentUser();

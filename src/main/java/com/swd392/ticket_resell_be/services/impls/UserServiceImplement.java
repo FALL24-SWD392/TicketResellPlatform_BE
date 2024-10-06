@@ -159,11 +159,12 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public ApiItemResponse<String> resetPassword(String token, ResetPasswordDtoRequest resetPasswordDtoRequest)
+    public ApiItemResponse<String> resetPassword(ResetPasswordDtoRequest resetPasswordDtoRequest)
             throws JOSEException {
         if (!resetPasswordDtoRequest.newPassword().equals(resetPasswordDtoRequest.confirmPassword())) {
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
         }
+        String token = resetPasswordDtoRequest.token();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));

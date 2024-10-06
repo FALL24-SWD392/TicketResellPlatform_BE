@@ -22,10 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @Tag(name = "Authentication APIs")
 public class AuthenticationController {
-    @Value("${AUTHORIZATION_HEADER}")
-    private static String authorizationHeader;
     UserService userService;
-
     
     @PostMapping("/login/system")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginDtoRequest request)
@@ -61,9 +58,8 @@ public class AuthenticationController {
     }
 
     @GetMapping("/refresh-token")
-    public ResponseEntity<ApiItemResponse<String>> refreshToken(HttpServletRequest request)
+    public ResponseEntity<ApiItemResponse<String>> refreshToken(@RequestBody String token)
             throws JOSEException {
-        String token = request.getHeader(authorizationHeader).substring(7);
         return ResponseEntity.ok(userService.refreshToken(token));
     }
 
@@ -79,11 +75,9 @@ public class AuthenticationController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<ApiItemResponse<String>> resetPassword(HttpServletRequest request,
-                                                                 @RequestBody @Valid
+    public ResponseEntity<ApiItemResponse<String>> resetPassword(@RequestBody @Valid
                                                                  ResetPasswordDtoRequest dtoRequest)
             throws JOSEException {
-        String token = request.getHeader(authorizationHeader).substring(7);
-        return ResponseEntity.ok(userService.resetPassword(token, dtoRequest));
+        return ResponseEntity.ok(userService.resetPassword(dtoRequest));
     }
 }
