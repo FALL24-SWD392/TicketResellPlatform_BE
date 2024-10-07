@@ -51,3 +51,4 @@ public record TicketDtoRequest(
         Date updated_at
 ) implements Serializable {
 }
+

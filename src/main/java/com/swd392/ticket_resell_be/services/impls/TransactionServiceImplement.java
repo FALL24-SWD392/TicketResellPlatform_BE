@@ -106,7 +106,9 @@ public class TransactionServiceImplement implements TransactionService {
         dto.setStatus(transaction.getStatus());
         dto.setCreatedAt(transaction.getCreatedAt());
         dto.setUpdatedAt(transaction.getUpdatedAt());
-        dto.setDescription("Thanh toán cho gói "+transaction.getSubscription().getName());
+        dto.setDescription("Thanh toán cho gói"
+        +" "
+        +transaction.getSubscription().getName());
         return dto;
     }
 }

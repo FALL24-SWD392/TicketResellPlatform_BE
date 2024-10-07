@@ -5,11 +5,14 @@ import com.swd392.ticket_resell_be.dtos.requests.*;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
 import com.swd392.ticket_resell_be.services.UserService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequestMapping("/auth")
+@Tag(name = "Authentication APIs")
 public class AuthenticationController {
-    private static final String AUTHORIZATION_HEADER = "Authorization";
     UserService userService;
-
-    @GetMapping("/login/system")
+    
+    @PostMapping("/login/system")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginDtoRequest request)
             throws JOSEException {
         return ResponseEntity.ok(userService.login(request));
@@ -49,16 +52,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(userService.verifyEmail(token));
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<ApiItemResponse<String>> logout(HttpServletRequest request) {
-        String token = request.getHeader(AUTHORIZATION_HEADER).substring(7);
+    @PostMapping("/logout")
+    public ResponseEntity<ApiItemResponse<String>> logout(@RequestBody String token) {
         return ResponseEntity.ok(userService.logout(token));
     }
 
     @GetMapping("/refresh-token")
-    public ResponseEntity<ApiItemResponse<String>> refreshToken(HttpServletRequest request)
+    public ResponseEntity<ApiItemResponse<String>> refreshToken(@RequestBody String token)
             throws JOSEException {
-        String token = request.getHeader(AUTHORIZATION_HEADER).substring(7);
         return ResponseEntity.ok(userService.refreshToken(token));
     }
 
@@ -74,11 +75,9 @@ public class AuthenticationController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<ApiItemResponse<String>> resetPassword(HttpServletRequest request,
-                                                                 @RequestBody @Valid
+    public ResponseEntity<ApiItemResponse<String>> resetPassword(@RequestBody @Valid
                                                                  ResetPasswordDtoRequest dtoRequest)
             throws JOSEException {
-        String token = request.getHeader(AUTHORIZATION_HEADER).substring(7);
-        return ResponseEntity.ok(userService.resetPassword(token, dtoRequest));
+        return ResponseEntity.ok(userService.resetPassword(dtoRequest));
     }
 }

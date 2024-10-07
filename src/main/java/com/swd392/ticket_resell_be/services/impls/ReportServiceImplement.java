@@ -41,25 +41,18 @@ public class ReportServiceImplement implements ReportService {
     @Override
     public ApiItemResponse<Report> createReport(ReportDtoRequest reportDtoRequest) {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
-        try {
-            Report report = modelMapper.map(reportDtoRequest, Report.class);
-            boolean check = orderRepository.findById(report.getOrder().getId());
-            if (!check) {
-                throw new AppException(ErrorCode.USER_HAVE_NOT_YET_TRANSACTED);
-            }
-            report.setStatus(Categorize.PENDING);
-            return apiResponseBuilder.buildResponse(
-                    reportRepository.save(report),
-                    HttpStatus.CREATED,
-                    null
-            );
-        } catch (AppException e) {
-            return apiResponseBuilder.buildResponse(
-                    null,
-                    HttpStatus.CONFLICT,
-                    "Error at ReportServiceImplement"
-            );
+
+        Report report = modelMapper.map(reportDtoRequest, Report.class);
+        boolean check = orderRepository.findById(report.getOrder().getId());
+        if (!check) {
+            throw new AppException(ErrorCode.USER_HAVE_NOT_YET_TRANSACTED);
         }
+        report.setStatus(Categorize.PENDING);
+        return apiResponseBuilder.buildResponse(
+                reportRepository.save(report),
+                HttpStatus.CREATED,
+                null
+        );
     }
 
     @Override
