@@ -54,24 +54,27 @@ public class TicketController {
     }
 
     @GetMapping("/view-all-tickets")
-    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTickets(
-            @RequestParam @Valid Categorize status) {
-        return ResponseEntity.ok(ticketService.viewAllTickets(status));
+    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTickets() {
+        return ResponseEntity.ok(ticketService.viewAllTickets());
     }
 
     @GetMapping("/view-tickets-by-category")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategory(
-            @RequestParam @Valid Categorize category, Categorize status) {
-        return ResponseEntity.ok(ticketService.viewTicketsByCategory(category, status));
+            @RequestParam @Valid Categorize category) {
+        return ResponseEntity.ok(ticketService.viewTicketsByCategory(category));
     }
 
 
     @GetMapping("/view-tickets-by-name")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByName(
-            @RequestParam @Valid String name, Categorize status) {
-        return ResponseEntity.ok(ticketService.getByNameAndStatus(name, status));
+            @RequestParam @Valid String name) {
+        return ResponseEntity.ok(ticketService.getByName(name));
     }
 
+    @GetMapping("/view-all-tickets-for-admin")
+    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin() {
+        return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin());
+    }
 
     @GetMapping("/categories")
     public ResponseEntity<ApiListResponse<Categorize>> getAllCategory() {
