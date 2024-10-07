@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -14,13 +13,11 @@ import com.swd392.ticket_resell_be.services.SubscriptionService;
 import com.swd392.ticket_resell_be.services.TransactionService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
-import com.swd392.ticket_resell_be.utils.PagingUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +34,6 @@ public class SubscriptionServiceImplement implements SubscriptionService {
 
     SubscriptionRepository subscriptionRepository;
     ApiResponseBuilder apiResponseBuilder;
-    PagingUtil pagingUtil;
     VNPayServiceImplement vnPayService;
     UserService userService;
     TransactionService transactionService;
@@ -62,14 +58,11 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     }
 
     @Override
-    public ApiListResponse<Subscription> getAllSubscriptions(int page, int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
-        Page<Subscription> subscriptionPage = subscriptionRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
-        List<Subscription> subscriptions = subscriptionPage.getContent();
+    public ApiListResponse<Subscription> getAllSubscriptions() {
+        List<Subscription> subscriptions = subscriptionRepository.findAll();
 
-        return apiResponseBuilder.buildResponse(subscriptions, subscriptionPage.getSize(),
-                subscriptionPage.getNumber(), subscriptionPage.getTotalElements(),
-                subscriptionPage.getTotalPages(), HttpStatus.OK, "All subscriptions retrieved");
+        return apiResponseBuilder.buildResponse(subscriptions,0,0,0,0,
+                 HttpStatus.OK, "All subscriptions retrieved");
     }
 
     @Override

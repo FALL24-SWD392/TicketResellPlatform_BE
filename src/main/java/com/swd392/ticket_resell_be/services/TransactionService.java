@@ -17,10 +17,9 @@ public interface TransactionService {
 
     ApiItemResponse<Transaction> findTransactionByOrderId(String orderCode) throws AppException;
 
-    ApiListResponse<TransactionDtoResponse> getAllTransactions(int page, int size);
+    ApiListResponse<TransactionDtoResponse> getAllTransactions();
 
     ApiItemResponse<Transaction> updateTransactionStatus(UUID transactionId, Categorize status) throws AppException;
 
-
-    ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername(int page, int size);
+    ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername();
 }
