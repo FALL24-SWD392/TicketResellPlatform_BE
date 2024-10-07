@@ -21,20 +21,20 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/ticket")
+@RequestMapping("/tickets")
 @Tag(name = "Ticket APIs")
 public class TicketController {
     TicketService ticketService;
 
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ApiItemResponse<Ticket>> createTicket(
             @RequestBody @Valid TicketDtoRequest ticketDtoRequest) {
         return ResponseEntity.ok(ticketService.createTicket(ticketDtoRequest));
     }
 
 
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<ApiItemResponse<Ticket>> updateTicket(
             @RequestParam UUID id,
             @RequestBody @Valid TicketDtoRequest ticketDtoRequest) {
@@ -47,7 +47,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.processTicket(id, status));
     }
 
-    @DeleteMapping("/remove")
+    @DeleteMapping
     public ResponseEntity<ApiItemResponse<Ticket>> removeTicket(
             @RequestParam UUID id) {
         return ResponseEntity.ok(ticketService.removeTicket(id));

@@ -20,12 +20,12 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/report")
+@RequestMapping("/reports")
 @Tag(name = "Report APIs")
 public class ReportController {
     ReportService reportService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ApiItemResponse<Report>> createReport(
             @RequestBody @Valid ReportDtoRequest reportDtoRequest) {
         return ResponseEntity.ok(reportService.createReport(reportDtoRequest));

@@ -20,25 +20,25 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/feedback")
+@RequestMapping("/feedbacks")
 @Tag(name = "Feedback APIs")
 public class FeedbackController {
     FeedbackService feedbackService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ApiItemResponse<Feedback>> createFeedback(
             @RequestBody @Valid FeedbackDtoRequest feedbackDtoRequest) {
         return ResponseEntity.ok(feedbackService.createFeedback(feedbackDtoRequest));
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<ApiItemResponse<Feedback>> updateFeedback(
             @RequestParam UUID id,
             @RequestBody @Valid FeedbackDtoRequest feedbackDtoRequest) {
         return ResponseEntity.ok(feedbackService.updateFeedback(id, feedbackDtoRequest));
     }
 
-    @DeleteMapping("/remove")
+    @DeleteMapping
     public ResponseEntity<ApiItemResponse<Feedback>> removeFeedback(
             @RequestParam @Valid UUID id) {
         return ResponseEntity.ok(feedbackService.removeFeedback(id));

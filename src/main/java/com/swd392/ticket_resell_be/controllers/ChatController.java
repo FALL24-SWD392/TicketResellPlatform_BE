@@ -22,30 +22,30 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/chat")
+@RequestMapping("/chats")
 @Tag(name = "Chat APIs")
 public class ChatController {
     ChatBoxService chatBoxService;
     ChatMessageService chatMessageService;
 
-    @PostMapping("/chat-box/create")
+    @PostMapping("/chat-boxes")
     public ResponseEntity<ApiItemResponse<ChatBox>> createChatBox(
             @RequestBody @Valid ChatBoxDtoRequest chatBoxDtoRequest) {
         return ResponseEntity.ok(chatBoxService.createChatBox(chatBoxDtoRequest));
     }
 
-    @GetMapping("/chat-box/view-all-chat-box")
+    @GetMapping("/chat-boxes/view-all-chat-box")
     public ResponseEntity<ApiListResponse<ChatBox>> viewAllChatBox() {
         return ResponseEntity.ok(chatBoxService.viewAllChatBox());
     }
 
-    @GetMapping("/chat-box/view-all-chat-box-by-user-id")
+    @GetMapping("/chat-boxes/view-all-chat-box-by-user-id")
     public ResponseEntity<ApiListResponse<ChatBox>> viewAllChatBoxByUserId(
             @RequestParam @Valid UUID userId) {
         return ResponseEntity.ok(chatBoxService.viewAllChatBoxByUserId(userId));
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ApiItemResponse<ChatMessage>> createChatMessage(
             @RequestBody @Valid ChatMessageDtoRequest chatMessageDtoRequest) {
         return ResponseEntity.ok(chatMessageService.createChatMessage(chatMessageDtoRequest));
