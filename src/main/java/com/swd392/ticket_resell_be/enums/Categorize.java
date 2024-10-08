@@ -37,5 +37,7 @@ public enum Categorize {
     REJECTED,
     COMPLETED,
     CANCEL,
+    ACTIVE,
+    INACTIVE,
 
 }

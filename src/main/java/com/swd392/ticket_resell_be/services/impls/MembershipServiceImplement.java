@@ -35,6 +35,7 @@ public class MembershipServiceImplement implements MembershipService {
     ApiResponseBuilder apiResponseBuilder;
     TicketService ticketService;
     UserService userService;
+
     @Override
     public ApiItemResponse<Membership> createMembership(User user, Subscription subscription) {
         if (user == null || subscription == null) {
@@ -98,7 +99,7 @@ public class MembershipServiceImplement implements MembershipService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userService.getUserByName(username)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Membership membership = membershipRepository.findMembershipBySeller(user)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBERSHIP_NOT_FOUND));
         MembershipDtoResponse membershipDtoResponse = mapToDto(membership);

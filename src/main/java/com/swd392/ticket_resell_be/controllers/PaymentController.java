@@ -2,7 +2,6 @@ package com.swd392.ticket_resell_be.controllers;
 
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.services.PaymentService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,7 +33,7 @@ public class PaymentController {
             @RequestParam("vnp_TransactionStatus") String transactionStatus,
             @RequestParam("vnp_TxnRef") String vnpTxnRef,
             @RequestParam("vnp_SecureHash") String vnpSecureHash) {
-            return ResponseEntity.ok(paymentService.handlePaymentCallback(vnpAmount, vnpBankCode, vnpBankTranNo, vnpCardType,
-                    orderInfo, vnpPayDate, responseCode, vnpTmnCode, vnpTransactionNo, transactionStatus, vnpTxnRef, vnpSecureHash));
+        return ResponseEntity.ok(paymentService.handlePaymentCallback(vnpAmount, vnpBankCode, vnpBankTranNo, vnpCardType,
+                orderInfo, vnpPayDate, responseCode, vnpTmnCode, vnpTransactionNo, transactionStatus, vnpTxnRef, vnpSecureHash));
     }
 }

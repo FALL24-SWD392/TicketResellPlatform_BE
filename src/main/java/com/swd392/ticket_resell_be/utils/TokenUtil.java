@@ -4,8 +4,9 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.swd392.ticket_resell_be.entities.BlacklistToken;
+import com.swd392.ticket_resell_be.entities.Token;
 import com.swd392.ticket_resell_be.entities.User;
+import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +65,7 @@ public class TokenUtil {
         return jwsObject.serialize();
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getUsername(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return signedJWT.getJWTClaimsSet().getSubject();
@@ -73,15 +74,52 @@ public class TokenUtil {
         }
     }
 
-    public BlacklistToken generateBlacklistToken(String token) {
+    public Token createTokenEntity(String token, Categorize status) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             String id = signedJWT.getJWTClaimsSet().getJWTID();
+            String username = signedJWT.getJWTClaimsSet().getSubject();
             Date expAt = signedJWT.getJWTClaimsSet().getExpirationTime();
-            BlacklistToken blacklistToken = new BlacklistToken();
-            blacklistToken.setId(UUID.fromString(id));
-            blacklistToken.setExpAt(expAt);
-            return blacklistToken;
+
+            Token result = new Token();
+            result.setId(UUID.fromString(id));
+            result.setExpAt(expAt);
+            result.setStatus(status);
+            result.setCreatedBy(username);
+            result.setUpdatedBy(username);
+            return result;
+        } catch (ParseException e) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    public String getJwtId(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return signedJWT.getJWTClaimsSet().getJWTID();
+        } catch (ParseException e) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    public User getUser(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            User user = new User();
+            user.setId(UUID.fromString(signedJWT.getJWTClaimsSet().getClaim("id").toString()));
+            user.setUsername(signedJWT.getJWTClaimsSet().getSubject());
+            user.setEmail(signedJWT.getJWTClaimsSet().getClaim("email").toString());
+            user.setAvatar(signedJWT.getJWTClaimsSet().getClaim("avatar").toString());
+            user.setRating(Float.parseFloat(signedJWT.getJWTClaimsSet().getClaim("rating").toString()));
+            user.setReputation(Integer.parseInt(signedJWT.getJWTClaimsSet().getClaim("reputation").toString()));
+            user.setRole(Categorize.valueOf(signedJWT.getJWTClaimsSet().getClaim("scope").toString()));
+            user.setStatus(Categorize.valueOf(signedJWT.getJWTClaimsSet().getClaim("status").toString()));
+            user.setTypeRegister(Categorize.valueOf(signedJWT.getJWTClaimsSet().getClaim("typeRegister").toString()));
+            user.setCreatedBy(signedJWT.getJWTClaimsSet().getClaim("createdBy").toString());
+            user.setCreatedAt(new Date(Long.parseLong(signedJWT.getJWTClaimsSet().getClaim("createdAt").toString())));
+            user.setUpdatedBy(signedJWT.getJWTClaimsSet().getClaim("updatedBy").toString());
+            user.setUpdatedAt(new Date(Long.parseLong(signedJWT.getJWTClaimsSet().getClaim("updatedAt").toString())));
+            return user;
         } catch (ParseException e) {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }

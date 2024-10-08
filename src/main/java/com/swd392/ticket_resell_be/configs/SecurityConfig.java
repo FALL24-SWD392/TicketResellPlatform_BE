@@ -1,9 +1,6 @@
 package com.swd392.ticket_resell_be.configs;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.Arrays;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,33 +17,47 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] PUBLIC_POST_ENDPOINTS = {
+            "/auth/register",
+            "/auth/register-google",
+            "/auth/login",
+            "/auth/login-google",
+            "/auth/get-access-token",
             "/packages/payment-callback",
-            "/auth/register/**",
-            "/auth/login/**",
     };
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/auth/verify-email",
-            "/auth/forgot-password",
             "/swagger-ui/**",
-            "/v3/api-docs/**"
+            "/v3/api-docs/**",
+            "/auth/verify-email",
+            "/tickets/view-all-tickets",
+            "/tickets/view-tickets-by-category",
+            "/tickets/view-tickets-by-name",
+            "/tickets/categories",
+            "/tickets/view-ticket-by-id",
+            "/subscriptions",
+            "/subscriptions/{id}",
+            "/feedbacks/view-by-user-id",
+            "/users/{username}",
     };
     private static final String[] PUBLIC_PUT_ENDPOINTS = {
-            ,
+            "/auth/forgot-password",
+            "/auth/reset-password",
     };
     private final JwtDecoderConfig jwtDecoderConfig;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -74,7 +85,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
 

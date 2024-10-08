@@ -7,12 +7,12 @@ import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
 import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.TicketService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -26,13 +26,11 @@ import java.util.UUID;
 public class TicketController {
     TicketService ticketService;
 
-
     @PostMapping
     public ResponseEntity<ApiItemResponse<Ticket>> createTicket(
             @RequestBody @Valid TicketDtoRequest ticketDtoRequest) {
         return ResponseEntity.ok(ticketService.createTicket(ticketDtoRequest));
     }
-
 
     @PutMapping
     public ResponseEntity<ApiItemResponse<Ticket>> updateTicket(
@@ -71,6 +69,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.getByName(name));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @GetMapping("/view-all-tickets-for-admin")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin() {
         return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin());

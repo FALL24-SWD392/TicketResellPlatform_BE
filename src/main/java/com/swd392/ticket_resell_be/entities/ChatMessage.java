@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "chat_messages")
+@EntityListeners(AuditingEntityListener.class)
 public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
