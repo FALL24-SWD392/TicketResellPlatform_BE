@@ -100,7 +100,7 @@ public class TransactionServiceImplement implements TransactionService {
         String username = authentication.getName(); // Get the username of the logged-in user
         PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
         User user = userService.getUserByName(username)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Page<Transaction> transactionPage = transactionRepository.findBySeller(user, pagingUtil.getPageable(pageDtoRequest));
         List<Transaction> transactions = transactionPage.getContent();
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
@@ -120,8 +120,8 @@ public class TransactionServiceImplement implements TransactionService {
         dto.setCreatedAt(transaction.getCreatedAt());
         dto.setUpdatedAt(transaction.getUpdatedAt());
         dto.setDescription("Thanh toán cho gói"
-        +" "
-        +transaction.getSubscription().getName());
+                + " "
+                + transaction.getSubscription().getName());
         return dto;
     }
 }

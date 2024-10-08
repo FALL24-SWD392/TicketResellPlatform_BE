@@ -26,7 +26,7 @@ public interface UserService {
 
     ApiItemResponse<String> logout(String token);
 
-    ApiItemResponse<String> refreshToken(String token) throws JOSEException;
+    ApiItemResponse<LoginDtoResponse> getAccessToken(String token) throws JOSEException;
 
     ApiItemResponse<String> changePassword(ChangePasswordDtoRequest changePasswordDtoRequest);
 
@@ -35,11 +35,11 @@ public interface UserService {
     ApiItemResponse<String> resetPassword(ResetPasswordDtoRequest resetPasswordDtoRequest)
             throws JOSEException;
 
-    ApiItemResponse<Object> getCurrentUser();
+    ApiItemResponse<UserDto> getCurrentUser();
+
+    ApiListResponse<UserDto> getUsers(PageDtoRequest pageDtoRequest);
 
     ApiItemResponse<UserDto> getUserByUsername(String username);
-
-    ApiListResponse<User> getUsers(PageDtoRequest pageDtoRequest);
 
     ApiItemResponse<String> deleteUser(String username);
 

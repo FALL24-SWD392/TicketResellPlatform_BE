@@ -28,8 +28,7 @@ public class PaymentServiceImplement implements PaymentService {
             String vnpAmount, String vnpBankCode, String vnpBankTranNo, String vnpCardType,
             String orderInfo, String vnpPayDate, String responseCode, String vnpTmnCode,
             String vnpTransactionNo, String transactionStatus, String vnpTxnRef, String vnpSecureHash
-    )
-    {
+    ) {
         ApiItemResponse<Transaction> transactionResponse = transactionService.findTransactionByOrderId(vnpTxnRef);
         Transaction transaction = transactionResponse.data();
 

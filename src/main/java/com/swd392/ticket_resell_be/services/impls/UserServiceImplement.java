@@ -11,19 +11,22 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.UserRepository;
-import com.swd392.ticket_resell_be.services.BlacklistTokenService;
+import com.swd392.ticket_resell_be.services.TokenService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.*;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,34 +36,41 @@ import java.util.UUID;
 public class UserServiceImplement implements UserService {
 
     UserRepository userRepository;
-    BlacklistTokenService blacklistTokenService;
+    TokenService tokenService;
     PasswordEncoder passwordEncoder;
     ApiResponseBuilder apiResponseBuilder;
     GoogleTokenUtil googleTokenUtil;
     TokenUtil tokenUtil;
     EmailUtil emailUtil;
     PagingUtil pagingUtil;
+    private final ModelMapper modelMapper;
 
     @Override
     public ApiItemResponse<LoginDtoResponse> login(LoginDtoRequest loginDtoRequest) throws JOSEException {
-        User user = userRepository.findByUsername(loginDtoRequest.username())
+        User user = userRepository.findByUsernameAndStatus(loginDtoRequest.username(), Categorize.VERIFIED)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (!passwordEncoder.matches(loginDtoRequest.password(), user.getPassword()))
             throw new AppException(ErrorCode.WRONG_PASSWORD);
-        LoginDtoResponse loginDtoResponse = new LoginDtoResponse(tokenUtil.generateAccessToken(user),
-                tokenUtil.generateRefreshToken(user));
-        return apiResponseBuilder.buildResponse(loginDtoResponse, HttpStatus.OK);
+        String refreshToken = tokenUtil.generateRefreshToken(user);
+        //Save refresh-token to db
+        tokenService.save(tokenUtil.createTokenEntity(refreshToken, Categorize.ACTIVE));
+        //return access-token and refresh-token
+        return apiResponseBuilder.buildResponse(new LoginDtoResponse(tokenUtil.generateAccessToken(user), refreshToken),
+                HttpStatus.OK);
     }
 
     @Override
     public ApiItemResponse<LoginDtoResponse> login(String token)
             throws JOSEException {
         String email = googleTokenUtil.getEmail(token);
-        User user = userRepository.findByEmailAndTypeRegister(email, Categorize.GOOGLE)
+        User user = userRepository.findByEmailAndTypeRegisterAndStatus(email, Categorize.GOOGLE, Categorize.VERIFIED)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        LoginDtoResponse loginDtoResponse = new LoginDtoResponse(tokenUtil.generateAccessToken(user),
-                tokenUtil.generateRefreshToken(user));
-        return apiResponseBuilder.buildResponse(loginDtoResponse, HttpStatus.OK);
+        String refreshToken = tokenUtil.generateRefreshToken(user);
+        //Save refresh-token to db
+        tokenService.save(tokenUtil.createTokenEntity(refreshToken, Categorize.ACTIVE));
+        //return access-token and refresh-token
+        return apiResponseBuilder.buildResponse(new LoginDtoResponse(tokenUtil.generateAccessToken(user), refreshToken),
+                HttpStatus.OK);
     }
 
     @Override
@@ -75,13 +85,8 @@ public class UserServiceImplement implements UserService {
         if (userRepository.existsByEmail(registerDtoRequest.email())) {
             throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
-        User user = new User();
-        user.setUsername(registerDtoRequest.username());
-        user.setEmail(registerDtoRequest.email());
-        user.setPassword(passwordEncoder.encode(registerDtoRequest.password()));
-        user.setStatus(Categorize.UNVERIFIED);
-        user.setRole(Categorize.MEMBER);
-        user.setTypeRegister(Categorize.SYSTEM);
+        User user = createRegisterUser(registerDtoRequest.username(), registerDtoRequest.password(),
+                registerDtoRequest.email(), Categorize.UNVERIFIED, Categorize.SYSTEM, "");
         userRepository.save(user);
         emailUtil.sendVerifyEmail(user.getEmail(), user.getUsername(), tokenUtil.generateAccessToken(user));
         return apiResponseBuilder.buildResponse(HttpStatus.CREATED, "Please verify your email!");
@@ -96,39 +101,44 @@ public class UserServiceImplement implements UserService {
         if (userRepository.existsByUsername(request.username())) {
             throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
-        User user = new User();
-        user.setUsername(request.username());
-        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-        user.setEmail(email);
-        user.setStatus(Categorize.VERIFIED);
-        user.setRole(Categorize.MEMBER);
-        user.setTypeRegister(Categorize.GOOGLE);
+        User user = createRegisterUser(request.username(), UUID.randomUUID().toString(), email, Categorize.VERIFIED,
+                Categorize.GOOGLE, "default");
         userRepository.save(user);
         return apiResponseBuilder.buildResponse(HttpStatus.CREATED, "Create account successfully!");
     }
 
     @Override
     public ApiItemResponse<String> verifyEmail(String token) {
-        User user = userRepository.findByUsername(tokenUtil.getUsernameFromToken(token))
+        User user = userRepository.findByUsername(tokenUtil.getUsername(token))
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setStatus(Categorize.VERIFIED);
         userRepository.save(user);
-        blacklistTokenService.save(tokenUtil.generateBlacklistToken(token));
-        return apiResponseBuilder.buildResponse("Email verified!", HttpStatus.OK, null);
+        //de-active token
+        tokenService.save(tokenUtil.createTokenEntity(token, Categorize.INACTIVE));
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "Email verified!");
     }
 
     @Override
     public ApiItemResponse<String> logout(String token) {
-        blacklistTokenService.save(tokenUtil.generateBlacklistToken(token));
-        return apiResponseBuilder.buildResponse("Logout successfully!", HttpStatus.OK, null);
+        //inactive refresh token
+        tokenService.inactive(UUID.fromString(tokenUtil.getJwtId(token)));
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "Logout successfully!");
     }
 
     @Override
-    public ApiItemResponse<String> refreshToken(String token) throws JOSEException {
-        User user = new User();
-        user.setUsername(tokenUtil.getUsernameFromToken(token));
-        return apiResponseBuilder.buildResponse(tokenUtil.generateAccessToken(user),
-                HttpStatus.OK, null);
+    public ApiItemResponse<LoginDtoResponse> getAccessToken(String token) throws JOSEException {
+        String id = tokenUtil.getJwtId(token);
+        if (!tokenService.existsByIdAndStatus(UUID.fromString(id), Categorize.ACTIVE))
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        tokenService.inactive(UUID.fromString(id));
+        //Get user info from token
+        User user = tokenUtil.getUser(token);
+        String refreshToken = tokenUtil.generateRefreshToken(user);
+        //Save refresh-token to db
+        tokenService.save(tokenUtil.createTokenEntity(refreshToken, Categorize.ACTIVE));
+        //return new access-token, refresh-token
+        return apiResponseBuilder.buildResponse(new LoginDtoResponse(tokenUtil.generateAccessToken(user), refreshToken),
+                HttpStatus.OK);
     }
 
     @Override
@@ -144,8 +154,7 @@ public class UserServiceImplement implements UserService {
         }
         user.setPassword(passwordEncoder.encode(changePasswordDtoRequest.newPassword()));
         userRepository.save(user);
-        return apiResponseBuilder.buildResponse("Password changed successfully!",
-                HttpStatus.OK, null);
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "Password changed successfully!");
     }
 
     @Override
@@ -154,41 +163,57 @@ public class UserServiceImplement implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         emailUtil.sendResetPassword(user.getEmail(), user.getUsername(),
                 tokenUtil.generateAccessToken(user));
-        return apiResponseBuilder.buildResponse("Please check your email to reset password!",
-                HttpStatus.OK, null);
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "Please check your email to reset password!");
     }
 
     @Override
-    public ApiItemResponse<String> resetPassword(ResetPasswordDtoRequest resetPasswordDtoRequest)
-            throws JOSEException {
+    public ApiItemResponse<String> resetPassword(ResetPasswordDtoRequest resetPasswordDtoRequest) {
         if (!resetPasswordDtoRequest.newPassword().equals(resetPasswordDtoRequest.confirmPassword())) {
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
         }
         String token = resetPasswordDtoRequest.token();
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = tokenUtil.getUsername(token);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setPassword(passwordEncoder.encode(resetPasswordDtoRequest.newPassword()));
         userRepository.save(user);
-        blacklistTokenService.save(tokenUtil.generateBlacklistToken(token));
-        return apiResponseBuilder.buildResponse("Password reset successfully!",
-                HttpStatus.OK, null);
+        tokenService.save(tokenUtil.createTokenEntity(token, Categorize.INACTIVE));
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "Password reset successfully!");
+    }
+
+    @Override
+    public ApiItemResponse<UserDto> getCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        UserDto userDto = new UserDto(user.getUsername(), user.getEmail(), null, null, null,
+                user.getAvatar(), user.getRating(), user.getReputation(),
+                null, null, null, null);
+        return apiResponseBuilder.buildResponse(userDto, HttpStatus.OK);
+    }
+
+    @Override
+    public ApiListResponse<UserDto> getUsers(PageDtoRequest pageDtoRequest) {
+        Page<User> users = userRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
+        //Parse to UserDto
+        List<UserDto> list = users.getContent().stream()
+                .map(user -> new UserDto(user.getUsername(), user.getEmail(),
+                        user.getRole(), user.getStatus(), user.getTypeRegister(),
+                        user.getAvatar(), user.getRating(), user.getReputation(),
+                        user.getCreatedBy(), user.getCreatedAt(), user.getUpdatedBy(), user.getUpdatedAt()))
+                .toList();
+        return apiResponseBuilder.buildResponse(list, users.getSize(), users.getNumber(),
+                users.getTotalElements(), users.getTotalPages(), HttpStatus.OK);
     }
 
     @Override
     public ApiItemResponse<UserDto> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        UserDto userDto = new UserDto(user.getUsername(), user.getEmail(), user.getAvatar(),
-                user.getRating(), user.getReputation());
+        UserDto userDto = new UserDto(user.getUsername(), user.getEmail(), null, null, null,
+                user.getAvatar(), user.getRating(), user.getReputation(),
+                null, null, null, null);
         return apiResponseBuilder.buildResponse(userDto, HttpStatus.OK);
-    }
-
-    @Override
-    public ApiListResponse<User> getUsers(PageDtoRequest pageDtoRequest) {
-        Page<User> users = userRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
-        return apiResponseBuilder.buildResponse(users.getContent(), users.getSize(), users.getNumber(),
-                users.getTotalElements(), users.getTotalPages(), HttpStatus.OK, null);
     }
 
     @Override
@@ -197,7 +222,7 @@ public class UserServiceImplement implements UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setStatus(Categorize.REMOVED);
         userRepository.save(user);
-        return apiResponseBuilder.buildResponse("User deleted successfully!", HttpStatus.OK, null);
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "User deleted successfully!");
     }
 
     @Override
@@ -210,15 +235,8 @@ public class UserServiceImplement implements UserService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return apiResponseBuilder.buildResponse(user, HttpStatus.CREATED, null);
+        return apiResponseBuilder.buildResponse(user, HttpStatus.CREATED);
     }
-
-    @Override
-    public ApiItemResponse<Object> getCurrentUser() {
-        Object member = SecurityContextHolder.getContext().getAuthentication().getName();
-        return apiResponseBuilder.buildResponse(member, HttpStatus.OK, null);
-    }
-
 
     @Override
     public Optional<User> getUserByName(String username) throws AppException {
@@ -234,5 +252,18 @@ public class UserServiceImplement implements UserService {
         }
     }
 
-
+    private User createRegisterUser(String username, String password, String email,
+                                    Categorize status, Categorize typeRegister, String avatar) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setEmail(email);
+        user.setRole(Categorize.MEMBER);
+        user.setStatus(status);
+        user.setTypeRegister(typeRegister);
+        user.setAvatar(avatar);
+        user.setCreatedBy(username);
+        user.setUpdatedBy(username);
+        return user;
+    }
 }

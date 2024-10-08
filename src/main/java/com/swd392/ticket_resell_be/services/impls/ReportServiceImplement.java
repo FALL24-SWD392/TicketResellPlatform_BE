@@ -66,7 +66,7 @@ public class ReportServiceImplement implements ReportService {
 
             minusReputation(report.getReported().getId());
 
-            report.setUpdatedBy(userService.getCurrentUser().data().toString());
+            report.setUpdatedBy(userService.getCurrentUser().data().username());
             report.setUpdatedAt(new Date());
 
             return apiResponseBuilder.buildResponse(
@@ -79,7 +79,7 @@ public class ReportServiceImplement implements ReportService {
 
             minusReputation(report.getReporter().getId());
 
-            report.setUpdatedBy(userService.getCurrentUser().data().toString());
+            report.setUpdatedBy(userService.getCurrentUser().data().username());
             report.setUpdatedAt(new Date());
 
             return apiResponseBuilder.buildResponse(

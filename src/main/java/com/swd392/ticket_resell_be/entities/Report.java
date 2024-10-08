@@ -13,6 +13,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "reports")
+@EntityListeners(AuditingEntityListener.class)
 public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

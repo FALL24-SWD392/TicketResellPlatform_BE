@@ -2,9 +2,7 @@ package com.swd392.ticket_resell_be.controllers;
 
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TransactionDtoResponse;
-import com.swd392.ticket_resell_be.entities.Transaction;
 import com.swd392.ticket_resell_be.services.TransactionService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,11 +27,12 @@ public class TransactionController {
         ApiListResponse<TransactionDtoResponse> response = transactionService.getAllTransactions(page, size);
         return ResponseEntity.ok(response);
     }
+
     @GetMapping("/user")
     public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return transactionService.getAllTransactionsByUsername( page, size);
+        return transactionService.getAllTransactionsByUsername(page, size);
     }
 
 }

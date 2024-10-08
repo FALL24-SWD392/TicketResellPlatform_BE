@@ -87,9 +87,9 @@ public class TicketServiceImplement implements TicketService {
         );
     }
 
-    private List<TicketDtoResponse> parseToTicketDtoResponse(List<Ticket> ticketList){
+    private List<TicketDtoResponse> parseToTicketDtoResponse(List<Ticket> ticketList) {
         List<TicketDtoResponse> ticketDtoResponses = new ArrayList<>();
-        for(Ticket tick : ticketList) {
+        for (Ticket tick : ticketList) {
             TicketDtoResponse dto = new TicketDtoResponse(
                     tick.getId(),
                     tick.getSeller().getId(),

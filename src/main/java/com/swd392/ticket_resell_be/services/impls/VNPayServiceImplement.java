@@ -14,7 +14,7 @@ import java.util.*;
 @Service
 public class VNPayServiceImplement {
 
-    public VNPayOrderResponse createOrder(long total, String orderInfor, HttpServletRequest request)  {
+    public VNPayOrderResponse createOrder(long total, String orderInfor, HttpServletRequest request) {
         String vnp_Version = "2.1.0";
         String vnp_Command = "pay";
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
