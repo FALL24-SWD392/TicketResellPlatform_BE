@@ -14,7 +14,8 @@ public interface SubscriptionService {
 
     Optional<ApiItemResponse<Subscription>> getSubscriptionById(UUID uuid);
 
-    ApiListResponse<Subscription> getAllSubscriptions(int page, int size);
+
+    ApiListResponse<Subscription> getAllSubscriptions();
 
     ApiItemResponse<Subscription> handleUpdateSubscription(UUID packageId, SubscriptionDtoRequest subscriptionDtoRequest);
 

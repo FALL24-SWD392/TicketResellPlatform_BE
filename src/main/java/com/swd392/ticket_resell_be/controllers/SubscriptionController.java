@@ -37,10 +37,8 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiListResponse<Subscription>> getAllSubscriptions(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(subscriptionService.getAllSubscriptions(page, size));
+    public ResponseEntity<ApiListResponse<Subscription>> getAllSubscriptions() {
+        return ResponseEntity.ok(subscriptionService.getAllSubscriptions());
     }
 
     @PutMapping("/{id}")

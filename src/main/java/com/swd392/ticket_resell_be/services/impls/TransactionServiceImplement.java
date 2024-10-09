@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TransactionDtoResponse;
@@ -14,11 +13,9 @@ import com.swd392.ticket_resell_be.repositories.TransactionRepository;
 import com.swd392.ticket_resell_be.services.TransactionService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
-import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +34,6 @@ public class TransactionServiceImplement implements TransactionService {
 
     TransactionRepository transactionRepository;
     ApiResponseBuilder apiResponseBuilder;
-    PagingUtil pagingUtil;
     UserService userService;
 
     @Override
@@ -68,17 +64,13 @@ public class TransactionServiceImplement implements TransactionService {
     }
 
     @Override
-    public ApiListResponse<TransactionDtoResponse> getAllTransactions(int page, int size) {
+    public ApiListResponse<TransactionDtoResponse> getAllTransactions() {
         // Create pagination request
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
-        Page<Transaction> transactionPage = transactionRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
-        List<Transaction> transactions = transactionPage.getContent();
+        List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
-        return apiResponseBuilder.buildResponse(transactionDtoResponses, transactionPage.getSize(),
-                transactionPage.getNumber(), transactionPage.getTotalElements(),
-                transactionPage.getTotalPages(), HttpStatus.OK, "All transactions retrieved successfully");
+        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0,0,0,0, HttpStatus.OK, "All transactions retrieved successfully");
     }
 
     @Override
@@ -95,20 +87,16 @@ public class TransactionServiceImplement implements TransactionService {
     }
 
     @Override
-    public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername(int page, int size) {
+    public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // Get the username of the logged-in user
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
-        User user = userService.getUserByName(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Page<Transaction> transactionPage = transactionRepository.findBySeller(user, pagingUtil.getPageable(pageDtoRequest));
-        List<Transaction> transactions = transactionPage.getContent();
+        User user = userService.getUserByUsername(username).data();
+        List<Transaction> transactions = transactionRepository.findBySeller(user);
+
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
-                .map(this::mapToDto) // Use the mapping method to convert each transaction
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
-        return apiResponseBuilder.buildResponse(transactionDtoResponses, transactionPage.getSize(),
-                transactionPage.getNumber(), transactionPage.getTotalElements(),
-                transactionPage.getTotalPages(), HttpStatus.OK, "All transactions retrieved for user: " + username);
+        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0,0,0,0, HttpStatus.OK);
     }
 
     private TransactionDtoResponse mapToDto(Transaction transaction) {
