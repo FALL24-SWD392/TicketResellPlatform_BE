@@ -36,14 +36,12 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/auth/verify-email",
-            "/tickets/view-all-tickets",
-            "/tickets/view-tickets-by-category",
-            "/tickets/view-tickets-by-name",
+            "/tickets/get-all",
+            "/tickets",
             "/tickets/categories",
-            "/tickets/view-ticket-by-id",
             "/subscriptions",
             "/subscriptions/{id}",
-            "/feedbacks/view-by-user-id",
+            "/feedbacks",
             "/users/{username}",
     };
     private static final String[] PUBLIC_PUT_ENDPOINTS = {
