@@ -6,7 +6,6 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.Feedback;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.FeedbackService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,25 +19,25 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/feedback")
+@RequestMapping("/feedbacks")
 @Tag(name = "Feedback APIs")
 public class FeedbackController {
     FeedbackService feedbackService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ApiItemResponse<Feedback>> createFeedback(
             @RequestBody @Valid FeedbackDtoRequest feedbackDtoRequest) {
         return ResponseEntity.ok(feedbackService.createFeedback(feedbackDtoRequest));
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<ApiItemResponse<Feedback>> updateFeedback(
             @RequestParam UUID id,
             @RequestBody @Valid FeedbackDtoRequest feedbackDtoRequest) {
         return ResponseEntity.ok(feedbackService.updateFeedback(id, feedbackDtoRequest));
     }
 
-    @DeleteMapping("/remove")
+    @DeleteMapping
     public ResponseEntity<ApiItemResponse<Feedback>> removeFeedback(
             @RequestParam @Valid UUID id) {
         return ResponseEntity.ok(feedbackService.removeFeedback(id));

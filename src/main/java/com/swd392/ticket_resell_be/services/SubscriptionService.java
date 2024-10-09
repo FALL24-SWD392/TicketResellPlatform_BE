@@ -19,6 +19,5 @@ public interface SubscriptionService {
 
     ApiItemResponse<Subscription> handleUpdateSubscription(UUID packageId, SubscriptionDtoRequest subscriptionDtoRequest);
 
-
     ApiItemResponse<String> purchaseSubscription(UUID subscriptionId, HttpServletRequest request);
 }

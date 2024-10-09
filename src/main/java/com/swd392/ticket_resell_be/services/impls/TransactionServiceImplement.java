@@ -92,6 +92,7 @@ public class TransactionServiceImplement implements TransactionService {
         String username = authentication.getName(); // Get the username of the logged-in user
         User user = userService.getUserByUsername(username).data();
         List<Transaction> transactions = transactionRepository.findBySeller(user);
+
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
@@ -107,8 +108,8 @@ public class TransactionServiceImplement implements TransactionService {
         dto.setCreatedAt(transaction.getCreatedAt());
         dto.setUpdatedAt(transaction.getUpdatedAt());
         dto.setDescription("Thanh toán cho gói"
-        +" "
-        +transaction.getSubscription().getName());
+                + " "
+                + transaction.getSubscription().getName());
         return dto;
     }
 }

@@ -87,28 +87,9 @@ public class TicketServiceImplement implements TicketService {
         );
     }
 
-
-
-    @Override
-    public ApiListResponse<TicketDtoResponse> getByStatus(Categorize status) {
-        List<Ticket> ticketList = ticketRepository.findTicketByStatus(status);
-
-        if (ticketList.isEmpty())
-            throw new AppException(ErrorCode.TICKET_NOT_FOUND);
-        else
-            return apiResponseBuilder.buildResponse(
-                    parseToTicketDtoResponse(ticketList),
-                    0,
-                    0,
-                    0,
-                    0,
-                    HttpStatus.OK
-            );
-    }
-
-    private List<TicketDtoResponse> parseToTicketDtoResponse(List<Ticket> ticketList){
+    private List<TicketDtoResponse> parseToTicketDtoResponse(List<Ticket> ticketList) {
         List<TicketDtoResponse> ticketDtoResponses = new ArrayList<>();
-        for(Ticket tick : ticketList) {
+        for (Ticket tick : ticketList) {
             TicketDtoResponse dto = new TicketDtoResponse(
                     tick.getId(),
                     tick.getSeller().getId(),
@@ -130,8 +111,8 @@ public class TicketServiceImplement implements TicketService {
     }
 
     @Override
-    public ApiListResponse<TicketDtoResponse> viewAllTickets(Categorize status) {
-        List<Ticket> ticketList = ticketRepository.findAllByStatus(status);
+    public ApiListResponse<TicketDtoResponse> viewAllTickets() {
+        List<Ticket> ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
         if (ticketList.isEmpty())
             throw new AppException(ErrorCode.TICKET_NOT_FOUND);
         else
@@ -146,7 +127,23 @@ public class TicketServiceImplement implements TicketService {
     }
 
     @Override
-    public ApiListResponse<TicketDtoResponse> viewTicketsByCategory(Categorize category, Categorize status) {
+    public ApiListResponse<TicketDtoResponse> viewAllTicketsForAdmin() {
+        List<Ticket> ticketList = ticketRepository.findAll();
+        if (ticketList.isEmpty())
+            throw new AppException(ErrorCode.TICKET_NOT_FOUND);
+        else
+            return apiResponseBuilder.buildResponse(
+                    parseToTicketDtoResponse(ticketList),
+                    0,
+                    0,
+                    0,
+                    0,
+                    HttpStatus.OK
+            );
+    }
+
+    @Override
+    public ApiListResponse<TicketDtoResponse> viewTicketsByCategory(Categorize category) {
         List<Ticket> ticketList;
         if (category == Categorize.ALL) {
             ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
@@ -164,7 +161,7 @@ public class TicketServiceImplement implements TicketService {
     }
 
     @Override
-    public ApiListResponse<TicketDtoResponse> getByNameAndStatus(String name, Categorize status) {
+    public ApiListResponse<TicketDtoResponse> getByName(String name) {
         List<UUID> uuidList = ticketRepository.findTicketsByTitleLike("%" + name + "%")
                 .stream()
                 .map(Ticket::getId)
@@ -172,7 +169,7 @@ public class TicketServiceImplement implements TicketService {
         List<Ticket> ticketList = ticketRepository.findAllById(uuidList);
         List<Ticket> returnList = new ArrayList<>();
         for (Ticket ticket : ticketList) {
-            if (ticket.getStatus() == status) {
+            if (ticket.getStatus() == Categorize.APPROVED) {
                 returnList.add(ticket);
             }
         }

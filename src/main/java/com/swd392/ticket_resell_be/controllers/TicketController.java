@@ -7,12 +7,12 @@ import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
 import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.TicketService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,20 +21,18 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/ticket")
+@RequestMapping("/tickets")
 @Tag(name = "Ticket APIs")
 public class TicketController {
     TicketService ticketService;
 
-
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ApiItemResponse<Ticket>> createTicket(
             @RequestBody @Valid TicketDtoRequest ticketDtoRequest) {
         return ResponseEntity.ok(ticketService.createTicket(ticketDtoRequest));
     }
 
-
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<ApiItemResponse<Ticket>> updateTicket(
             @RequestParam UUID id,
             @RequestBody @Valid TicketDtoRequest ticketDtoRequest) {
@@ -47,31 +45,35 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.processTicket(id, status));
     }
 
-    @DeleteMapping("/remove")
+    @DeleteMapping
     public ResponseEntity<ApiItemResponse<Ticket>> removeTicket(
             @RequestParam UUID id) {
         return ResponseEntity.ok(ticketService.removeTicket(id));
     }
 
     @GetMapping("/view-all-tickets")
-    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTickets(
-            @RequestParam @Valid Categorize status) {
-        return ResponseEntity.ok(ticketService.viewAllTickets(status));
+    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTickets() {
+        return ResponseEntity.ok(ticketService.viewAllTickets());
     }
 
     @GetMapping("/view-tickets-by-category")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategory(
-            @RequestParam @Valid Categorize category, Categorize status) {
-        return ResponseEntity.ok(ticketService.viewTicketsByCategory(category, status));
+            @RequestParam @Valid Categorize category) {
+        return ResponseEntity.ok(ticketService.viewTicketsByCategory(category));
     }
 
 
     @GetMapping("/view-tickets-by-name")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByName(
-            @RequestParam @Valid String name, Categorize status) {
-        return ResponseEntity.ok(ticketService.getByNameAndStatus(name, status));
+            @RequestParam @Valid String name) {
+        return ResponseEntity.ok(ticketService.getByName(name));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    @GetMapping("/view-all-tickets-for-admin")
+    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin() {
+        return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin());
+    }
 
     @GetMapping("/categories")
     public ResponseEntity<ApiListResponse<Categorize>> getAllCategory() {

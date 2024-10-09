@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "feedbacks")
+@EntityListeners(AuditingEntityListener.class)
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -5,14 +5,11 @@ import com.swd392.ticket_resell_be.dtos.requests.*;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
 import com.swd392.ticket_resell_be.services.UserService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,26 +20,26 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Authentication APIs")
 public class AuthenticationController {
     UserService userService;
-    
-    @PostMapping("/login/system")
+
+    @PostMapping("/login")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginDtoRequest request)
             throws JOSEException {
         return ResponseEntity.ok(userService.login(request));
     }
 
-    @GetMapping("/login/google")
+    @PostMapping("/login-google")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody String token)
             throws JOSEException {
         return ResponseEntity.ok(userService.login(token));
     }
 
-    @PostMapping("/register/system")
+    @PostMapping("/register")
     public ResponseEntity<ApiItemResponse<String>> register(@RequestBody @Valid RegisterDtoRequest request)
             throws JOSEException, MessagingException {
         return ResponseEntity.ok(userService.register(request));
     }
 
-    @PostMapping("/register/google")
+    @PostMapping("/register-google")
     public ResponseEntity<ApiItemResponse<String>> register(@RequestBody @Valid RegisterGoogleDtoRequest request) {
         return ResponseEntity.ok(userService.register(request));
     }
@@ -57,26 +54,25 @@ public class AuthenticationController {
         return ResponseEntity.ok(userService.logout(token));
     }
 
-    @GetMapping("/refresh-token")
-    public ResponseEntity<ApiItemResponse<String>> refreshToken(@RequestBody String token)
+    @PostMapping("/get-access-token")
+    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> getAccessToken(@RequestBody String token)
             throws JOSEException {
-        return ResponseEntity.ok(userService.refreshToken(token));
+        return ResponseEntity.ok(userService.getAccessToken(token));
     }
 
-    @PutMapping("change-password")
+    @PutMapping("/change-password")
     public ResponseEntity<ApiItemResponse<String>> changePassword(@RequestBody @Valid ChangePasswordDtoRequest request) {
         return ResponseEntity.ok(userService.changePassword(request));
     }
 
-    @GetMapping("/forgot-password")
+    @PutMapping("/forgot-password")
     public ResponseEntity<ApiItemResponse<String>> forgotPassword(@RequestBody String email)
             throws MessagingException, JOSEException {
         return ResponseEntity.ok(userService.forgotPassword(email));
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<ApiItemResponse<String>> resetPassword(@RequestBody @Valid
-                                                                 ResetPasswordDtoRequest dtoRequest)
+    public ResponseEntity<ApiItemResponse<String>> resetPassword(@RequestBody @Valid ResetPasswordDtoRequest dtoRequest)
             throws JOSEException {
         return ResponseEntity.ok(userService.resetPassword(dtoRequest));
     }

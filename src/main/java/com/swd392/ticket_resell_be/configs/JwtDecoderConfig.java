@@ -1,9 +1,9 @@
 package com.swd392.ticket_resell_be.configs;
 
-import com.swd392.ticket_resell_be.entities.BlacklistToken;
+import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
-import com.swd392.ticket_resell_be.services.BlacklistTokenService;
+import com.swd392.ticket_resell_be.services.TokenService;
 import com.swd392.ticket_resell_be.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +16,12 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.UUID;
 
 @Configuration
 @RequiredArgsConstructor
 public class JwtDecoderConfig implements JwtDecoder {
-    private final BlacklistTokenService blacklistTokenService;
+    private final TokenService tokenService;
     private final TokenUtil tokenUtil;
     @Value("${JWT_SECRET_KEY}")
     private String jwtSecretKey;
@@ -37,8 +38,8 @@ public class JwtDecoderConfig implements JwtDecoder {
 
     @Override
     public Jwt decode(String token) throws JwtException {
-        BlacklistToken blacklistToken = tokenUtil.generateBlacklistToken(token);
-        if (blacklistTokenService.existsById(blacklistToken.getId())) {
+        String id = tokenUtil.getJwtId(token);
+        if (tokenService.existsByIdAndStatus(UUID.fromString(id), Categorize.INACTIVE)) {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
         return jwtDecoder.decode(token);

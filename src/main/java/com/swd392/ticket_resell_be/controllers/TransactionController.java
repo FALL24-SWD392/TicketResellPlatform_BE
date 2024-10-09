@@ -3,7 +3,6 @@ package com.swd392.ticket_resell_be.controllers;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TransactionDtoResponse;
 import com.swd392.ticket_resell_be.services.TransactionService;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,9 +24,11 @@ public class TransactionController {
     public ResponseEntity<ApiListResponse<TransactionDtoResponse>> getAllTransactions() {
         return ResponseEntity.ok(transactionService.getAllTransactions());
     }
+
     @GetMapping("/user")
     public ResponseEntity<ApiListResponse<TransactionDtoResponse>> getAllTransactionsByUsername() {
         return ResponseEntity.ok(transactionService.getAllTransactionsByUsername());
+
     }
 
 }
