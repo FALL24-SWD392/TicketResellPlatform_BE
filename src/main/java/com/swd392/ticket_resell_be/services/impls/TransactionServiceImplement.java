@@ -90,7 +90,8 @@ public class TransactionServiceImplement implements TransactionService {
     public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // Get the username of the logged-in user
-        User user = userService.getUserByUsername(username).data();
+        User user = userService.getUserByName(username)
+                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         List<Transaction> transactions = transactionRepository.findBySeller(user);
 
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
