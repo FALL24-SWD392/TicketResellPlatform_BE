@@ -16,11 +16,7 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
 
     Ticket findTicketByIdIs(UUID id);
 
-    List<Ticket> findTicketsByTitleLike(String ticketName);
-
-    List<Ticket> findTicketByStatus(Categorize status);
-
-    List<Ticket> findTicketByTypeAndStatus(Categorize type, Categorize status);
+    List<Ticket> findTicketByTypeAndStatusAndTitle(Categorize type, Categorize status, String name);
 
     int countBySellerAndStatus(@NotNull User seller, @NotNull Categorize status);
 }

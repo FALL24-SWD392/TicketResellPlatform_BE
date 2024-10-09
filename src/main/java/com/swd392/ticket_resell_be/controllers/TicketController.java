@@ -51,26 +51,19 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.removeTicket(id));
     }
 
-    @GetMapping("/view-all-tickets")
+    @GetMapping("/get-all")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTickets() {
         return ResponseEntity.ok(ticketService.viewAllTickets());
     }
 
-    @GetMapping("/view-tickets-by-category")
-    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategory(
-            @RequestParam @Valid Categorize category) {
-        return ResponseEntity.ok(ticketService.viewTicketsByCategory(category));
-    }
-
-
-    @GetMapping("/view-tickets-by-name")
-    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByName(
-            @RequestParam @Valid String name) {
-        return ResponseEntity.ok(ticketService.getByName(name));
+    @GetMapping
+    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategoryAndName(
+            @RequestParam @Valid Categorize category, String name) {
+        return ResponseEntity.ok(ticketService.viewTicketsByCategoryAndName(category, name));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @GetMapping("/view-all-tickets-for-admin")
+    @GetMapping("/admin/get-all")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin() {
         return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin());
     }
@@ -81,7 +74,7 @@ public class TicketController {
     }
 
 
-    @GetMapping("/view-ticket-by-id")
+    @GetMapping
     public ResponseEntity<ApiItemResponse<TicketDtoResponse>> viewTicketById(
             @RequestParam UUID id) {
         return ResponseEntity.ok(ticketService.viewTicketById(id));
