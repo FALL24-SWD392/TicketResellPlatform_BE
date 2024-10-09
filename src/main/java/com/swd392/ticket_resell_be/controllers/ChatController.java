@@ -38,7 +38,7 @@ public class ChatController {
         return ResponseEntity.ok(chatBoxService.viewAllChatBox());
     }
 
-    @GetMapping("/chat-boxes/get-all")
+    @GetMapping("/chat-boxes")
     public ResponseEntity<ApiListResponse<ChatBox>> viewAllChatBoxByUserId(
             @RequestParam @Valid UUID userId) {
         return ResponseEntity.ok(chatBoxService.viewAllChatBoxByUserId(userId));
@@ -56,7 +56,7 @@ public class ChatController {
         return ResponseEntity.ok(chatMessageService.viewAllChatMessage());
     }
 
-    @GetMapping("/get-all")
+    @GetMapping
     public ResponseEntity<ApiListResponse<ChatMessage>> viewAllChatMessageByChatBox(
             @RequestParam @Valid UUID chatBoxId) {
         return ResponseEntity.ok(chatMessageService.viewAllChatMessageByChatBox(chatBoxId));

@@ -56,7 +56,7 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.viewAllTickets());
     }
 
-    @GetMapping
+    @GetMapping("/filter")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategoryAndName(
             @RequestParam @Valid Categorize category, String name) {
         return ResponseEntity.ok(ticketService.viewTicketsByCategoryAndName(category, name));
@@ -74,7 +74,7 @@ public class TicketController {
     }
 
 
-    @GetMapping
+    @GetMapping("/id")
     public ResponseEntity<ApiItemResponse<TicketDtoResponse>> viewTicketById(
             @RequestParam UUID id) {
         return ResponseEntity.ok(ticketService.viewTicketById(id));

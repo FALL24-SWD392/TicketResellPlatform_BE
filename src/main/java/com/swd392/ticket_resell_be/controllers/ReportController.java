@@ -38,20 +38,20 @@ public class ReportController {
         return ResponseEntity.ok(reportService.processReport(id, status));
     }
 
-    @GetMapping
+    @GetMapping("/id")
     public ResponseEntity<ApiItemResponse<Report>> getById(
             @RequestParam @Valid UUID id) {
         return ResponseEntity.ok(reportService.getById(id));
     }
 
-    @GetMapping
+    @GetMapping("/user-id")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ApiListResponse<Report>> getReportByUserId(
             @RequestParam @Valid UUID userId, Categorize status) {
         return ResponseEntity.ok(reportService.getReportByUserId(userId, status));
     }
 
-    @GetMapping
+    @GetMapping("/status")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ApiListResponse<Report>> getReportByStatus(
             @RequestParam @Valid Categorize status) {
