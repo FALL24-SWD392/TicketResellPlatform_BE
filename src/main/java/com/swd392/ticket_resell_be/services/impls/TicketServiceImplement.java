@@ -143,38 +143,15 @@ public class TicketServiceImplement implements TicketService {
     }
 
     @Override
-    public ApiListResponse<TicketDtoResponse> viewTicketsByCategory(Categorize category) {
+    public ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(Categorize category, String name) {
         List<Ticket> ticketList;
         if (category == Categorize.ALL) {
             ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
         } else {
-            ticketList = ticketRepository.findTicketByTypeAndStatus(category, Categorize.APPROVED);
+            ticketList = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name);
         }
         return apiResponseBuilder.buildResponse(
                 parseToTicketDtoResponse(ticketList),
-                0,
-                0,
-                0,
-                0,
-                HttpStatus.OK
-        );
-    }
-
-    @Override
-    public ApiListResponse<TicketDtoResponse> getByName(String name) {
-        List<UUID> uuidList = ticketRepository.findTicketsByTitleLike("%" + name + "%")
-                .stream()
-                .map(Ticket::getId)
-                .toList();
-        List<Ticket> ticketList = ticketRepository.findAllById(uuidList);
-        List<Ticket> returnList = new ArrayList<>();
-        for (Ticket ticket : ticketList) {
-            if (ticket.getStatus() == Categorize.APPROVED) {
-                returnList.add(ticket);
-            }
-        }
-        return apiResponseBuilder.buildResponse(
-                parseToTicketDtoResponse(returnList),
                 0,
                 0,
                 0,

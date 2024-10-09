@@ -22,13 +22,11 @@ public interface TicketService {
 
     ApiItemResponse<Ticket> removeTicket(UUID id);
 
-    ApiListResponse<TicketDtoResponse> getByName(String name);
-
     ApiListResponse<TicketDtoResponse> viewAllTickets();
 
     ApiListResponse<TicketDtoResponse> viewAllTicketsForAdmin();
 
-    ApiListResponse<TicketDtoResponse> viewTicketsByCategory(Categorize category);
+    ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(Categorize category, String name);
 
     ApiListResponse<Categorize> getAllCategory();
 

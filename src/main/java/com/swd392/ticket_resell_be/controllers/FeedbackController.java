@@ -43,7 +43,7 @@ public class FeedbackController {
         return ResponseEntity.ok(feedbackService.removeFeedback(id));
     }
 
-    @GetMapping("/view-by-user-id")
+    @GetMapping
     public ResponseEntity<ApiListResponse<Feedback>> getFeedbackByUserId(
             @RequestParam @Valid UUID id, Categorize status) {
         return ResponseEntity.ok(feedbackService.findFeedbackByOrderId(id, status));
