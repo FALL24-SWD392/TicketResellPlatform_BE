@@ -21,7 +21,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/tickets")
+@RequestMapping("/api/tickets")
 @Tag(name = "Ticket APIs")
 public class TicketController {
     TicketService ticketService;
@@ -51,19 +51,14 @@ public class TicketController {
         return ResponseEntity.ok(ticketService.removeTicket(id));
     }
 
-    @GetMapping("/get-all")
-    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTickets() {
-        return ResponseEntity.ok(ticketService.viewAllTickets());
-    }
-
-    @GetMapping("/filter")
+    @GetMapping
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategoryAndName(
             @RequestParam @Valid Categorize category, String name) {
         return ResponseEntity.ok(ticketService.viewTicketsByCategoryAndName(category, name));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @GetMapping("/admin/get-all")
+    @GetMapping("/admin")
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin() {
         return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin());
     }
@@ -74,9 +69,9 @@ public class TicketController {
     }
 
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiItemResponse<TicketDtoResponse>> viewTicketById(
-            @RequestParam UUID id) {
+            @PathVariable("id") UUID id) {
         return ResponseEntity.ok(ticketService.viewTicketById(id));
     }
 }

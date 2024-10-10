@@ -111,22 +111,6 @@ public class TicketServiceImplement implements TicketService {
     }
 
     @Override
-    public ApiListResponse<TicketDtoResponse> viewAllTickets() {
-        List<Ticket> ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
-        if (ticketList.isEmpty())
-            throw new AppException(ErrorCode.TICKET_NOT_FOUND);
-        else
-            return apiResponseBuilder.buildResponse(
-                    parseToTicketDtoResponse(ticketList),
-                    0,
-                    0,
-                    0,
-                    0,
-                    HttpStatus.OK
-            );
-    }
-
-    @Override
     public ApiListResponse<TicketDtoResponse> viewAllTicketsForAdmin() {
         List<Ticket> ticketList = ticketRepository.findAll();
         if (ticketList.isEmpty())
@@ -145,7 +129,10 @@ public class TicketServiceImplement implements TicketService {
     @Override
     public ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(Categorize category, String name) {
         List<Ticket> ticketList;
-        if (category == Categorize.ALL) {
+        if (category == null && name == null){
+            ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
+        }
+        else if (category == Categorize.ALL) {
             ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
         } else {
             ticketList = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name);

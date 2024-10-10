@@ -22,8 +22,6 @@ public interface TicketService {
 
     ApiItemResponse<Ticket> removeTicket(UUID id);
 
-    ApiListResponse<TicketDtoResponse> viewAllTickets();
-
     ApiListResponse<TicketDtoResponse> viewAllTicketsForAdmin();
 
     ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(Categorize category, String name);

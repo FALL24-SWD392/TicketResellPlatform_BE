@@ -20,7 +20,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/subscriptions")
+@RequestMapping("/api/subscriptions")
 @Tag(name = "Subscription APIs")
 public class SubscriptionController {
     SubscriptionService subscriptionService;

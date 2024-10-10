@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/payment")
+@RequestMapping("/api/payment")
 @Tag(name = "Payment APIs")
 public class PaymentController {
     PaymentService paymentService;

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @Tag(name = "Authentication APIs")
 public class AuthenticationController {
     UserService userService;
@@ -27,7 +27,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(userService.login(request));
     }
 
-    @PostMapping("/login-google")
+    @PostMapping("/login/google")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody String token)
             throws JOSEException {
         return ResponseEntity.ok(userService.login(token));
@@ -39,12 +39,12 @@ public class AuthenticationController {
         return ResponseEntity.ok(userService.register(request));
     }
 
-    @PostMapping("/register-google")
+    @PostMapping("/register/google")
     public ResponseEntity<ApiItemResponse<String>> register(@RequestBody @Valid RegisterGoogleDtoRequest request) {
         return ResponseEntity.ok(userService.register(request));
     }
 
-    @GetMapping("/verify-email")
+    @GetMapping("/email/verify")
     public ResponseEntity<ApiItemResponse<String>> verifyEmail(@RequestParam String token) {
         return ResponseEntity.ok(userService.verifyEmail(token));
     }
@@ -54,24 +54,24 @@ public class AuthenticationController {
         return ResponseEntity.ok(userService.logout(token));
     }
 
-    @PostMapping("/get-access-token")
+    @PostMapping("/access-token")
     public ResponseEntity<ApiItemResponse<LoginDtoResponse>> getAccessToken(@RequestBody String token)
             throws JOSEException {
         return ResponseEntity.ok(userService.getAccessToken(token));
     }
 
-    @PutMapping("/change-password")
+    @PutMapping("/password/change")
     public ResponseEntity<ApiItemResponse<String>> changePassword(@RequestBody @Valid ChangePasswordDtoRequest request) {
         return ResponseEntity.ok(userService.changePassword(request));
     }
 
-    @PutMapping("/forgot-password")
+    @PutMapping("/password/forgot")
     public ResponseEntity<ApiItemResponse<String>> forgotPassword(@RequestBody String email)
             throws MessagingException, JOSEException {
         return ResponseEntity.ok(userService.forgotPassword(email));
     }
 
-    @PutMapping("/reset-password")
+    @PutMapping("/password/reset")
     public ResponseEntity<ApiItemResponse<String>> resetPassword(@RequestBody @Valid ResetPasswordDtoRequest dtoRequest)
             throws JOSEException {
         return ResponseEntity.ok(userService.resetPassword(dtoRequest));

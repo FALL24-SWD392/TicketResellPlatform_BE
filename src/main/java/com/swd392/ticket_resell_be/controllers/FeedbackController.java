@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/feedbacks")
+@RequestMapping("/api/feedbacks")
 @Tag(name = "Feedback APIs")
 public class FeedbackController {
     FeedbackService feedbackService;

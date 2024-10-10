@@ -10,6 +10,7 @@ import com.swd392.ticket_resell_be.services.ChatBoxService;
 import com.swd392.ticket_resell_be.services.ChatMessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/chats")
+@RequestMapping("/api/chats")
 @Tag(name = "Chat APIs")
 public class ChatController {
     ChatBoxService chatBoxService;
@@ -33,15 +34,15 @@ public class ChatController {
         return ResponseEntity.ok(chatBoxService.createChatBox(chatBoxDtoRequest));
     }
 
-    @GetMapping("/chat-boxes/get-all")
+    @GetMapping("/chat-boxes")
     public ResponseEntity<ApiListResponse<ChatBox>> viewAllChatBox() {
         return ResponseEntity.ok(chatBoxService.viewAllChatBox());
     }
 
-    @GetMapping("/chat-boxes")
+    @GetMapping("/chat-boxes/user/{id}")
     public ResponseEntity<ApiListResponse<ChatBox>> viewAllChatBoxByUserId(
-            @RequestParam @Valid UUID userId) {
-        return ResponseEntity.ok(chatBoxService.viewAllChatBoxByUserId(userId));
+            @PathVariable("id") UUID id) {
+        return ResponseEntity.ok(chatBoxService.viewAllChatBoxByUserId(id));
     }
 
     @PostMapping
@@ -51,14 +52,14 @@ public class ChatController {
     }
 
 
-    @GetMapping("/get-all")
+    @GetMapping
     public ResponseEntity<ApiListResponse<ChatMessage>> viewAllChatMessage() {
         return ResponseEntity.ok(chatMessageService.viewAllChatMessage());
     }
 
-    @GetMapping
+    @GetMapping("/chat-boxes/{id}")
     public ResponseEntity<ApiListResponse<ChatMessage>> viewAllChatMessageByChatBox(
-            @RequestParam @Valid UUID chatBoxId) {
-        return ResponseEntity.ok(chatMessageService.viewAllChatMessageByChatBox(chatBoxId));
+            @PathVariable("id") UUID id) {
+        return ResponseEntity.ok(chatMessageService.viewAllChatMessageByChatBox(id));
     }
 }

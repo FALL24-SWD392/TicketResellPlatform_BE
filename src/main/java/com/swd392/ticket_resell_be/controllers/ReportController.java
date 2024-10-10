@@ -8,6 +8,7 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.ReportService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/reports")
+@RequestMapping("/api/reports")
 @Tag(name = "Report APIs")
 public class ReportController {
     ReportService reportService;
@@ -38,17 +39,18 @@ public class ReportController {
         return ResponseEntity.ok(reportService.processReport(id, status));
     }
 
-    @GetMapping("/id")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiItemResponse<Report>> getById(
-            @RequestParam @Valid UUID id) {
+            @PathVariable("id") UUID id) {
         return ResponseEntity.ok(reportService.getById(id));
     }
 
-    @GetMapping("/user-id")
+    @GetMapping("/user/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ApiListResponse<Report>> getReportByUserId(
-            @RequestParam @Valid UUID userId, Categorize status) {
-        return ResponseEntity.ok(reportService.getReportByUserId(userId, status));
+            @PathVariable("id") UUID id,
+            @RequestParam @Valid Categorize status) {
+        return ResponseEntity.ok(reportService.getReportByUserId(id, status));
     }
 
     @GetMapping("/status")

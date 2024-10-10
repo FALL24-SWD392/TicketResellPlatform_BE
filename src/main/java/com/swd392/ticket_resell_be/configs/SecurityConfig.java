@@ -25,28 +25,27 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] PUBLIC_POST_ENDPOINTS = {
-            "/auth/register",
-            "/auth/register-google",
-            "/auth/login",
-            "/auth/login-google",
-            "/auth/get-access-token",
-            "/packages/payment-callback",
+            "/api/auth/register",
+            "/api/auth/register/google",
+            "/api/auth/login",
+            "/api/auth/login/google",
+            "/api/auth/access-token",
+            "/api/packages/payment-callback",
     };
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/auth/verify-email",
-            "/tickets/get-all",
-            "/tickets",
-            "/tickets/categories",
-            "/subscriptions",
-            "/subscriptions/{id}",
-            "/feedbacks",
-            "/users/{username}",
+            "/api/swagger-ui/**",
+            "/api/v3/api-docs/**",
+            "/api/auth/email/verify",
+            "/api/tickets",
+            "/api/tickets/categories",
+            "/api/subscriptions",
+            "/api/subscriptions/{id}",
+            "/api/feedbacks",
+            "/api/users/{username}",
     };
     private static final String[] PUBLIC_PUT_ENDPOINTS = {
-            "/auth/forgot-password",
-            "/auth/reset-password",
+            "/api/auth/password/forgot",
+            "/api/auth/password/reset",
     };
     private final JwtDecoderConfig jwtDecoderConfig;
 
