@@ -3,6 +3,7 @@ package com.swd392.ticket_resell_be.utils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EmailUtil {
     private final JavaMailSender javaMailSender;
+    @Value("${RESET_PASSWORD_URL}")
+    private String resetPasswordUrl;
 
     private void send(String email, String subject, String content) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -25,7 +28,7 @@ public class EmailUtil {
     @Async
     public void sendVerifyEmail(String email, String username, String token) throws MessagingException {
         String subject = "Verify your email";
-        String url = "http://localhost:8081/auth/verify-email?token=" + token;
+        String url = "https://api.ticketresell.thucnee.studio/api/auth/email/verify?token=" + token;
         String content = """
                 <div>
                   Dear %s,<br>
@@ -44,7 +47,7 @@ public class EmailUtil {
     @Async
     public void sendResetPassword(String email, String username, String token) throws MessagingException {
         String subject = "Reset your password";
-        String url = "http://localhost:8081/auth/reset-password?token=" + token;
+        String url = resetPasswordUrl + "?token=" + token;
         String content = """
                 <div>
                   Dear %s,<br>
