@@ -28,7 +28,7 @@ jobs:
         echo "REFRESH_TOKEN_EXP=${{ secrets.REFRESH_TOKEN_EXP }}" >> .env
         echo "AUTHORIZATION_HEADER=${{ secrets.AUTHORIZATION_HEADER }}" >> .env
         echo "API_URL=${{ secrets.API_URL }}" >> .env
-        echo "RESET_PASSWRORD_URL=${{ secrets.RESET_PASSWORD_URL }}" >> .env
+        echo "RESET_PASSWORD_URL=${{ secrets.RESET_PASSWORD_URL }}" >> .env
       shell: bash
       
     - name: Run `docker compose`
