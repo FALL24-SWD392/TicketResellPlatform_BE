@@ -33,8 +33,8 @@ public class SecurityConfig {
             "/api/packages/payment-callback",
     };
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/api/swagger-ui/**",
-            "/api/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
             "/api/auth/email/verify",
             "/api/tickets",
             "/api/tickets/categories",
