@@ -33,3 +33,6 @@ jobs:
       
     - name: Run `docker compose`
       run: docker compose up --build -d
+
+    - name: Remove unused
+      run: docker system prune -a -f
