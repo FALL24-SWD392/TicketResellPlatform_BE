@@ -1,8 +1,10 @@
 package com.swd392.ticket_resell_be.services.impls;
 
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.ReportDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.ReportDtoResponse;
 import com.swd392.ticket_resell_be.entities.Report;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
@@ -14,17 +16,18 @@ import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.ReportService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
+import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -37,6 +40,7 @@ public class ReportServiceImplement implements ReportService {
     ApiResponseBuilder apiResponseBuilder;
     UserRepository userRepository;
     UserService userService;
+    PagingUtil pagingUtil;
 
     @Override
     public ApiItemResponse<Report> createReport(ReportDtoRequest reportDtoRequest) {
@@ -64,7 +68,7 @@ public class ReportServiceImplement implements ReportService {
         if (status.equals(Categorize.APPROVED)) {
             report.setStatus(Categorize.APPROVED);
 
-            minusReputation(report.getReported().getId());
+            minusReputation(report.getReported());
 
             report.setUpdatedBy(userService.getCurrentUser().data().username());
             report.setUpdatedAt(new Date());
@@ -77,7 +81,7 @@ public class ReportServiceImplement implements ReportService {
         } else if (status.equals(Categorize.REJECTED)) {
             report.setStatus(Categorize.REJECTED);
 
-            minusReputation(report.getReporter().getId());
+            minusReputation(report.getReporter());
 
             report.setUpdatedBy(userService.getCurrentUser().data().username());
             report.setUpdatedAt(new Date());
@@ -92,14 +96,13 @@ public class ReportServiceImplement implements ReportService {
         }
     }
 
-    private void minusReputation(UUID id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            int newReputationPoint = user.get().getReputation() - 5;
-            user.get().setReputation(newReputationPoint);
-            if (user.get().getReputation() < 80) {
-                int a = 1 + 1;
-                //doi Hoang Dat lam updateUser
+    private void minusReputation(User user) {
+        if (user != null) {
+            int newReputationPoint = user.getReputation() - 5;
+            user.setReputation(newReputationPoint);
+            if (user.getReputation() < 80) {
+                user.setStatus(Categorize.BANNED);
+                userRepository.save(user);
             }
         } else
             throw new AppException(ErrorCode.USER_NOT_FOUND);
@@ -115,35 +118,53 @@ public class ReportServiceImplement implements ReportService {
     }
 
     @Override
-    public ApiListResponse<Report> getReportByUserId(UUID id, Categorize status) {
-        List<UUID> uuidList = reportRepository.findReportByIdAndStatus(id, status)
-                .stream()
-                .map(Report::getId)
-                .toList();
-        List<Report> reportList = reportRepository.findAllById(uuidList);
+    public ApiListResponse<ReportDtoResponse> getReportByUserId(UUID id, Categorize status, PageDtoRequest pageDtoRequest) {
+        Page<Report> reports = reportRepository.findReportByIdAndStatus(id, status, pagingUtil.getPageable(pageDtoRequest));
+        if (reports.getTotalElements() > 0) {
+            throw new AppException(ErrorCode.REPORT_NOT_FOUND);
+        }
         return apiResponseBuilder.buildResponse(
-                reportList,
-                0,
-                0,
-                0,
-                0,
+                parseToReport(reports),
+                reports.getSize(),
+                reports.getNumber(),
+                reports.getTotalElements(),
+                reports.getTotalPages(),
                 HttpStatus.OK,
                 null
         );
     }
 
     @Override
-    public ApiListResponse<Report> getAllReportsByStatus(Categorize status) {
+    public ApiListResponse<ReportDtoResponse> getAllReportsByStatus(Categorize status, PageDtoRequest pageDtoRequest) {
+        Page<Report> reports = reportRepository.findAllByStatus(status, pagingUtil.getPageable(pageDtoRequest));
+        if (reports.getTotalElements() > 0) {
+            throw new AppException(ErrorCode.REPORT_NOT_FOUND);
+        }
         return apiResponseBuilder.buildResponse(
-                reportRepository.findAllByStatus(status),
-                0,
-                0,
-                0,
-                0,
+                parseToReport(reports),
+                reports.getSize(),
+                reports.getNumber(),
+                reports.getTotalElements(),
+                reports.getTotalPages(),
                 HttpStatus.OK,
                 null
         );
     }
 
-
+    private List<ReportDtoResponse> parseToReport(Page<Report> reports) {
+        return reports.getContent().stream()
+                .map(report -> new ReportDtoResponse(
+                        report.getId(),
+                        report.getReporter().getId(),
+                        report.getReported().getId(),
+                        report.getOrder().getId(),
+                        report.getDescription(),
+                        report.getAttachment(),
+                        report.getStatus(),
+                        report.getCreatedBy(),
+                        report.getCreatedAt(),
+                        report.getUpdatedBy(),
+                        report.getUpdatedAt()))
+                .toList();
+    }
 }

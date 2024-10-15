@@ -1,14 +1,15 @@
 package com.swd392.ticket_resell_be.controllers;
 
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.ReportDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.ReportDtoResponse;
 import com.swd392.ticket_resell_be.entities.Report;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.ReportService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
@@ -47,16 +48,22 @@ public class ReportController {
 
     @GetMapping("/user/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    public ResponseEntity<ApiListResponse<Report>> getReportByUserId(
+    public ResponseEntity<ApiListResponse<ReportDtoResponse>> getReportByUserId(
             @PathVariable("id") UUID id,
-            @RequestParam @Valid Categorize status) {
-        return ResponseEntity.ok(reportService.getReportByUserId(id, status));
+            @RequestParam @Valid Categorize status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        return ResponseEntity.ok(reportService.getReportByUserId(id, status, pageDtoRequest));
     }
 
     @GetMapping("/status")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    public ResponseEntity<ApiListResponse<Report>> getReportByStatus(
-            @RequestParam @Valid Categorize status) {
-        return ResponseEntity.ok(reportService.getAllReportsByStatus(status));
+    public ResponseEntity<ApiListResponse<ReportDtoResponse>> getReportByStatus(
+            @RequestParam @Valid Categorize status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        return ResponseEntity.ok(reportService.getAllReportsByStatus(status, pageDtoRequest));
     }
 }

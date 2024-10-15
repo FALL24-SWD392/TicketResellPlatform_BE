@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.services.impls;
 
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -12,16 +13,16 @@ import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.TicketRepository;
 import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
+import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +32,7 @@ import java.util.UUID;
 public class TicketServiceImplement implements TicketService {
     TicketRepository ticketRepository;
     ApiResponseBuilder apiResponseBuilder;
+    PagingUtil pagingUtil;
 
     ModelMapper modelMapper;
 
@@ -87,62 +89,58 @@ public class TicketServiceImplement implements TicketService {
         );
     }
 
-    private List<TicketDtoResponse> parseToTicketDtoResponse(List<Ticket> ticketList) {
-        List<TicketDtoResponse> ticketDtoResponses = new ArrayList<>();
-        for (Ticket tick : ticketList) {
-            TicketDtoResponse dto = new TicketDtoResponse(
-                    tick.getId(),
-                    tick.getSeller().getId(),
-                    tick.getTitle(),
-                    tick.getExpDate(),
-                    tick.getType(),
-                    tick.getUnitPrice(),
-                    tick.getQuantity(),
-                    tick.getDescription(),
-                    tick.getImage(),
-                    tick.getStatus(),
-                    tick.getCreatedAt(),
-                    tick.getUpdatedBy(),
-                    tick.getUpdatedAt()
-            );
-            ticketDtoResponses.add(dto);
-        }
-        return ticketDtoResponses;
+    private List<TicketDtoResponse> parseToTicketDtoResponse(Page<Ticket> tickets) {
+        return tickets.getContent().stream()
+                .map(ticket -> new TicketDtoResponse(
+                        ticket.getId(),
+                        ticket.getSeller().getId(),
+                        ticket.getTitle(),
+                        ticket.getExpDate(),
+                        ticket.getType(),
+                        ticket.getUnitPrice(),
+                        ticket.getQuantity(),
+                        ticket.getDescription(),
+                        ticket.getImage(),
+                        ticket.getStatus(),
+                        ticket.getCreatedAt(),
+                        ticket.getUpdatedBy(),
+                        ticket.getUpdatedAt()))
+                .toList();
     }
 
     @Override
-    public ApiListResponse<TicketDtoResponse> viewAllTicketsForAdmin() {
-        List<Ticket> ticketList = ticketRepository.findAll();
-        if (ticketList.isEmpty())
+    public ApiListResponse<TicketDtoResponse> viewAllTicketsForAdmin(PageDtoRequest pageDtoRequest) {
+        Page<Ticket> tickets = ticketRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
+        if (tickets.isEmpty())
             throw new AppException(ErrorCode.TICKET_NOT_FOUND);
         else
             return apiResponseBuilder.buildResponse(
-                    parseToTicketDtoResponse(ticketList),
-                    0,
-                    0,
-                    0,
-                    0,
-                    HttpStatus.OK
+                    parseToTicketDtoResponse(tickets),
+                    tickets.getSize(),
+                    tickets.getNumber(),
+                    tickets.getTotalElements(),
+                    tickets.getTotalPages(),
+                    HttpStatus.OK,
+                    null
             );
     }
 
     @Override
-    public ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(Categorize category, String name) {
-        List<Ticket> ticketList;
-        if (category == null && name == null){
-            ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
-        }
-        else if (category == Categorize.ALL) {
-            ticketList = ticketRepository.findAllByStatus(Categorize.APPROVED);
+    public ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(PageDtoRequest pageDtoRequest, Categorize category, String name) {
+        Page<Ticket> tickets;
+        if (category == null && name == null) {
+            tickets = ticketRepository.findAllByStatus(Categorize.APPROVED, pagingUtil.getPageable(pageDtoRequest));
+        } else if (category == Categorize.ALL) {
+            tickets = ticketRepository.findAllByStatus(Categorize.APPROVED, pagingUtil.getPageable(pageDtoRequest));
         } else {
-            ticketList = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name);
+            tickets = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name, pagingUtil.getPageable(pageDtoRequest));
         }
         return apiResponseBuilder.buildResponse(
-                parseToTicketDtoResponse(ticketList),
-                0,
-                0,
-                0,
-                0,
+                parseToTicketDtoResponse(tickets),
+                tickets.getSize(),
+                tickets.getNumber(),
+                tickets.getTotalElements(),
+                tickets.getTotalPages(),
                 HttpStatus.OK
         );
     }
@@ -150,11 +148,11 @@ public class TicketServiceImplement implements TicketService {
     @Override
     public ApiListResponse<Categorize> getAllCategory() {
         return apiResponseBuilder.buildResponse(
-                Arrays.asList(Categorize.values()),
-                0,
-                0,
-                0,
-                0,
+                Categorize.getByCategory("ticket"),
+                Categorize.getByCategory("ticket").size(),
+                1,
+                Categorize.getByCategory("ticket").size(),
+                1,
                 HttpStatus.OK
         );
     }

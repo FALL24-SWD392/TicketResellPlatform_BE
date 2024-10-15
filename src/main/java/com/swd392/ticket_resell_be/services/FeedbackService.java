@@ -2,8 +2,10 @@ package com.swd392.ticket_resell_be.services;
 
 
 import com.swd392.ticket_resell_be.dtos.requests.FeedbackDtoRequest;
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.FeedbackDtoResponse;
 import com.swd392.ticket_resell_be.entities.Feedback;
 import com.swd392.ticket_resell_be.enums.Categorize;
 
@@ -17,5 +19,5 @@ public interface FeedbackService {
 
     ApiItemResponse<Feedback> removeFeedback(UUID id);
 
-    ApiListResponse<Feedback> findFeedbackByOrderId(UUID id, Categorize status);
+    ApiListResponse<FeedbackDtoResponse> findFeedbackByOrderId(UUID id, Categorize status, PageDtoRequest pageDtoRequest);
 }

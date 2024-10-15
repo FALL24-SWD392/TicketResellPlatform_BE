@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.controllers;
 
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -53,14 +54,20 @@ public class TicketController {
 
     @GetMapping
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategoryAndName(
-            @RequestParam @Valid Categorize category, String name) {
-        return ResponseEntity.ok(ticketService.viewTicketsByCategoryAndName(category, name));
+            @RequestParam @Valid Categorize category, String name,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        return ResponseEntity.ok(ticketService.viewTicketsByCategoryAndName(pageDtoRequest, category, name));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @GetMapping("/admin")
-    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin() {
-        return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin());
+    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin(pageDtoRequest));
     }
 
     @GetMapping("/categories")
