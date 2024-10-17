@@ -1,8 +1,10 @@
 package com.swd392.ticket_resell_be.controllers;
 
 import com.swd392.ticket_resell_be.dtos.requests.FeedbackDtoRequest;
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.FeedbackDtoResponse;
 import com.swd392.ticket_resell_be.entities.Feedback;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.FeedbackService;
@@ -44,8 +46,11 @@ public class FeedbackController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiListResponse<Feedback>> getFeedbackByUserId(
-            @RequestParam @Valid UUID id, Categorize status) {
-        return ResponseEntity.ok(feedbackService.findFeedbackByOrderId(id, status));
+    public ResponseEntity<ApiListResponse<FeedbackDtoResponse>> getFeedbackByUserId(
+            @RequestParam @Valid UUID id, Categorize status,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        return ResponseEntity.ok(feedbackService.findFeedbackByOrderId(id, status, pageDtoRequest));
     }
 }

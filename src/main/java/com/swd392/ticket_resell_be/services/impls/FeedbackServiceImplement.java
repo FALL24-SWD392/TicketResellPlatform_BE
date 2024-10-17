@@ -2,8 +2,10 @@ package com.swd392.ticket_resell_be.services.impls;
 
 
 import com.swd392.ticket_resell_be.dtos.requests.FeedbackDtoRequest;
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.FeedbackDtoResponse;
 import com.swd392.ticket_resell_be.entities.Feedback;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
@@ -12,11 +14,13 @@ import com.swd392.ticket_resell_be.repositories.FeedbackRepository;
 import com.swd392.ticket_resell_be.repositories.OrderRepository;
 import com.swd392.ticket_resell_be.services.FeedbackService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
+import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +37,7 @@ public class FeedbackServiceImplement implements FeedbackService {
 
     ApiResponseBuilder apiResponseBuilder;
     ModelMapper modelMapper;
+    PagingUtil pagingUtil;
 
 
     @Override
@@ -82,20 +87,30 @@ public class FeedbackServiceImplement implements FeedbackService {
     }
 
     @Override
-    public ApiListResponse<Feedback> findFeedbackByOrderId(UUID id, Categorize status) {
-        List<UUID> uuidList = feedbackRepository.findAllByOrderIdAndStatus(id, status)
-                .stream()
-                .map(Feedback::getId)
-                .toList();
-        List<Feedback> feedbackList = feedbackRepository.findAllById(uuidList);
+    public ApiListResponse<FeedbackDtoResponse> findFeedbackByOrderId(UUID id, Categorize status, PageDtoRequest pageDtoRequest) {
+        Page<Feedback> feedbacks = feedbackRepository.findAllByOrderIdAndStatus(id, status, pagingUtil.getPageable(pageDtoRequest));
         return apiResponseBuilder.buildResponse(
-                feedbackList,
-                0,
-                0,
-                0,
-                0,
+                parseToFeedBack(feedbacks),
+                feedbacks.getSize(),
+                feedbacks.getNumber(),
+                feedbacks.getTotalElements(),
+                feedbacks.getTotalPages(),
                 HttpStatus.OK,
                 null
         );
+    }
+
+    private List<FeedbackDtoResponse> parseToFeedBack(Page<Feedback> feedbacks) {
+        return feedbacks.getContent().stream()
+                .map(feedback -> new FeedbackDtoResponse(
+                        feedback.getId(),
+                        feedback.getBuyer().getId(),
+                        feedback.getOrder().getId(),
+                        feedback.getDescription(),
+                        feedback.getRating(),
+                        feedback.getStatus(),
+                        feedback.getCreatedAt(),
+                        feedback.getUpdatedAt()))
+                .toList();
     }
 }

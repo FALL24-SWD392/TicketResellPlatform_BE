@@ -1,9 +1,11 @@
 package com.swd392.ticket_resell_be.services;
 
 
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.ReportDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.ReportDtoResponse;
 import com.swd392.ticket_resell_be.entities.Report;
 import com.swd392.ticket_resell_be.enums.Categorize;
 
@@ -17,7 +19,7 @@ public interface ReportService {
 
     ApiItemResponse<Report> getById(UUID id);
 
-    ApiListResponse<Report> getReportByUserId(UUID id, Categorize status);
+    ApiListResponse<ReportDtoResponse> getReportByUserId(UUID id, Categorize status, PageDtoRequest pageDtoRequest);
 
-    ApiListResponse<Report> getAllReportsByStatus(Categorize status);
+    ApiListResponse<ReportDtoResponse> getAllReportsByStatus(Categorize status, PageDtoRequest pageDtoRequest);
 }
