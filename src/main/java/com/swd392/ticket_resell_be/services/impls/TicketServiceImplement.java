@@ -20,10 +20,12 @@ import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -128,15 +130,24 @@ public class TicketServiceImplement implements TicketService {
     @Override
     public ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(PageDtoRequest pageDtoRequest, Categorize category, String name) {
         Page<Ticket> tickets;
-        if (category == null && name == null) {
-            tickets = ticketRepository.findAllByStatus(Categorize.APPROVED, pagingUtil.getPageable(pageDtoRequest));
-        } else if (category == Categorize.ALL) {
-            tickets = ticketRepository.findAllByStatus(Categorize.APPROVED, pagingUtil.getPageable(pageDtoRequest));
+        Pageable page = pagingUtil.getPageable(pageDtoRequest);
+
+        if(category != Categorize.ALL){
+            if(name.isEmpty())
+                tickets = ticketRepository.findTicketByTypeAndStatus(category, Categorize.APPROVED, page);
+            else
+                tickets = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name, page);
         } else {
-            tickets = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name, pagingUtil.getPageable(pageDtoRequest));
+            if(name.isEmpty())
+                tickets = ticketRepository.findTicketByStatus(Categorize.APPROVED, page);
+            else
+                tickets = ticketRepository.findTicketByTitleContainingAndStatus(name, Categorize.APPROVED, page);
         }
+
+        List<TicketDtoResponse> returnTickets = parseToTicketDtoResponse(tickets);
+
         return apiResponseBuilder.buildResponse(
-                parseToTicketDtoResponse(tickets),
+                returnTickets,
                 tickets.getSize(),
                 tickets.getNumber(),
                 tickets.getTotalElements(),

@@ -13,7 +13,11 @@ import java.util.UUID;
 
 
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
-    Page<Ticket> findAllByStatus(Categorize status, Pageable pageable);
+    Page<Ticket> findTicketByStatus(Categorize status, Pageable pageable);
+
+    Page<Ticket> findTicketByTypeAndStatus(Categorize categorize, Categorize status, Pageable pageable);
+
+    Page<Ticket> findTicketByTitleContainingAndStatus(String name, Categorize status, Pageable pageable);
 
     Ticket findTicketByIdIs(UUID id);
 

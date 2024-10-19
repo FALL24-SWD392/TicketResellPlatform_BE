@@ -50,7 +50,7 @@ public class FeedbackController {
             @RequestParam @Valid UUID id, Categorize status,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page - 1);
         return ResponseEntity.ok(feedbackService.findFeedbackByOrderId(id, status, pageDtoRequest));
     }
 }
