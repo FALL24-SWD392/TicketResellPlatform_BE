@@ -59,4 +59,8 @@ public class Transaction {
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
+    @NotNull
+    @Length(max = 50)
+    @Column(name = "description", nullable = false, updatable = false, length = 100)
+    private String description;
 }

@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.services.impls;
 
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TransactionDtoResponse;
@@ -13,9 +14,11 @@ import com.swd392.ticket_resell_be.repositories.TransactionRepository;
 import com.swd392.ticket_resell_be.services.TransactionService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
+import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,7 +28,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -35,6 +37,7 @@ public class TransactionServiceImplement implements TransactionService {
     TransactionRepository transactionRepository;
     ApiResponseBuilder apiResponseBuilder;
     UserService userService;
+    PagingUtil pagingUtil;
 
     @Override
     public ApiItemResponse<Transaction> savePendingTransaction(Subscription subscription, User user, String orderCode) {
@@ -45,6 +48,7 @@ public class TransactionServiceImplement implements TransactionService {
         transaction.setOrderCode(orderCode);
         transaction.setSubscription(subscription);
         transaction.setSeller(user);
+        transaction.setDescription("Thanh toán cho gói: " + subscription.getName());
         transaction.setStatus(Categorize.PENDING);
         transaction.setCreatedAt(new Date());
         transaction.setUpdatedAt(new Date());
@@ -64,14 +68,22 @@ public class TransactionServiceImplement implements TransactionService {
     }
 
     @Override
-    public ApiListResponse<TransactionDtoResponse> getAllTransactions() {
-        // Create pagination request
-        List<Transaction> transactions = transactionRepository.findAll();
-        List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0,0,0,0, HttpStatus.OK, "All transactions retrieved successfully");
+    public ApiListResponse<TransactionDtoResponse> getAllTransactions(PageDtoRequest pageDtoRequest) {
+        Page<Transaction> transactions = transactionRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
+        if (transactions.isEmpty()) {
+            throw new AppException(ErrorCode.TICKET_NOT_FOUND);
+        }
+        return apiResponseBuilder.buildResponse(
+                mapToDto(transactions),
+                transactions.getSize(),
+                transactions.getNumber(),
+                transactions.getTotalElements(),
+                transactions.getTotalPages(),
+                HttpStatus.OK,
+                null
+        );
     }
+
 
     @Override
     public ApiItemResponse<Transaction> updateTransactionStatus(UUID transactionId, Categorize status) throws AppException {
@@ -87,30 +99,44 @@ public class TransactionServiceImplement implements TransactionService {
     }
 
     @Override
-    public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername() {
+    public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername(PageDtoRequest pageDtoRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Get the username of the logged-in user
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+        String username = authentication.getName();
         User user = userService.getUserByName(username)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
-        List<Transaction> transactions = transactionRepository.findBySeller(user);
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
-        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0,0,0,0, HttpStatus.OK);
+        Page<Transaction> transactions = transactionRepository.findBySeller(user, pagingUtil.getPageable(pageDtoRequest));
+        List<TransactionDtoResponse> transactionDtoResponses = mapToDto(transactions);
+        return apiResponseBuilder.buildResponse(
+                transactionDtoResponses,
+                transactions.getSize(),
+                transactions.getNumber(),
+                transactions.getTotalElements(),
+                transactions.getTotalPages(),
+                HttpStatus.OK
+        );
     }
 
-    private TransactionDtoResponse mapToDto(Transaction transaction) {
-        TransactionDtoResponse dto = new TransactionDtoResponse();
-        dto.setId(transaction.getId());
-        dto.setOrderCode(transaction.getOrderCode());
-        dto.setUserName(transaction.getSeller().getUsername());
-        dto.setStatus(transaction.getStatus());
-        dto.setCreatedAt(transaction.getCreatedAt());
-        dto.setUpdatedAt(transaction.getUpdatedAt());
-        dto.setDescription("Thanh toán cho gói"
-                + " "
-                + transaction.getSubscription().getName());
-        return dto;
+
+
+    private List<TransactionDtoResponse> mapToDto(Page<Transaction> transactions) {
+        return transactions.getContent().stream()
+                .map(transaction -> {
+                    TransactionDtoResponse dto = new TransactionDtoResponse();
+                    dto.setId(transaction.getId());
+                    dto.setOrderCode(transaction.getOrderCode());
+                    dto.setUserName(transaction.getSeller().getUsername());
+                    dto.setStatus(transaction.getStatus());
+                    dto.setCreatedAt(transaction.getCreatedAt());
+                    dto.setUpdatedAt(transaction.getUpdatedAt());
+                    dto.setDescription(transaction.getDescription());
+                    return dto;
+                })
+                .toList();
     }
+
 }

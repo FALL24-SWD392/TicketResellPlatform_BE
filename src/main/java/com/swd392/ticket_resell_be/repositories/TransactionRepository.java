@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.repositories;
 
+import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.entities.Transaction;
 import com.swd392.ticket_resell_be.entities.User;
 import org.springframework.data.domain.Page;
@@ -13,5 +14,5 @@ import java.util.UUID;
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     Optional<Transaction> getTransactionByOrderCode(String orderCode);
 
-    List<Transaction> findBySeller(User user);
+    Page<Transaction> findBySeller(User user, Pageable pageable);
 }
