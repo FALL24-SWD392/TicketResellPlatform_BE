@@ -26,7 +26,7 @@ public class TransactionController {
     public ResponseEntity<ApiListResponse<TransactionDtoResponse>> getAllTransactions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page - 1);
         return ResponseEntity.ok(transactionService.getAllTransactions(pageDtoRequest));
     }
 
@@ -34,7 +34,7 @@ public class TransactionController {
     public ResponseEntity<ApiListResponse<TransactionDtoResponse>> getAllTransactionsByUsername(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page - 1 );
         return ResponseEntity.ok(transactionService.getAllTransactionsByUsername(pageDtoRequest));
     }
 
