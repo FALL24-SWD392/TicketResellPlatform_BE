@@ -61,6 +61,6 @@ public class Transaction {
 
     @NotNull
     @Length(max = 50)
-    @Column(name = "description", nullable = false, updatable = false, length = 100)
+    @Column(name = "description", nullable = false, updatable = false)
     private String description;
 }
