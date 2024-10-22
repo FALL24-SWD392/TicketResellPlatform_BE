@@ -53,7 +53,7 @@ public class ReportController {
             @RequestParam @Valid Categorize status,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page - 1);
         return ResponseEntity.ok(reportService.getReportByUserId(id, status, pageDtoRequest));
     }
 
@@ -63,7 +63,7 @@ public class ReportController {
             @RequestParam @Valid Categorize status,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page - 1);
         return ResponseEntity.ok(reportService.getAllReportsByStatus(status, pageDtoRequest));
     }
 }

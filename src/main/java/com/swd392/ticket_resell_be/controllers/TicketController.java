@@ -54,10 +54,11 @@ public class TicketController {
 
     @GetMapping
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketsByCategoryAndName(
-            @RequestParam @Valid Categorize category, String name,
+            @RequestParam(defaultValue = "ALL") Categorize category,
+            @RequestParam String name,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page - 1);
         return ResponseEntity.ok(ticketService.viewTicketsByCategoryAndName(pageDtoRequest, category, name));
     }
 
@@ -66,7 +67,7 @@ public class TicketController {
     public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewAllTicketsForAdmin(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
-        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page);
+        PageDtoRequest pageDtoRequest = new PageDtoRequest(size, page - 1);
         return ResponseEntity.ok(ticketService.viewAllTicketsForAdmin(pageDtoRequest));
     }
 
