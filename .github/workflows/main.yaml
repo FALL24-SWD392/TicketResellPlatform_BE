@@ -37,4 +37,3 @@ jobs:
     - name: Remove unused
       run: |
         docker system prune -a -f
-        docker volumn prune --all --force
