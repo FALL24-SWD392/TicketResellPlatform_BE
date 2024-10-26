@@ -28,26 +28,26 @@ public class TicketController {
     TicketService ticketService;
 
     @PostMapping
-    public ResponseEntity<ApiItemResponse<Ticket>> createTicket(
+    public ResponseEntity<ApiItemResponse<TicketDtoResponse>> createTicket(
             @RequestBody @Valid TicketDtoRequest ticketDtoRequest) {
         return ResponseEntity.ok(ticketService.createTicket(ticketDtoRequest));
     }
 
     @PutMapping
-    public ResponseEntity<ApiItemResponse<Ticket>> updateTicket(
+    public ResponseEntity<ApiItemResponse<TicketDtoResponse>> updateTicket(
             @RequestParam UUID id,
             @RequestBody @Valid TicketDtoRequest ticketDtoRequest) {
         return ResponseEntity.ok(ticketService.updateTicket(id, ticketDtoRequest));
     }
 
     @PutMapping("/process")
-    public ResponseEntity<ApiItemResponse<Ticket>> processTicket(
+    public ResponseEntity<ApiItemResponse<TicketDtoResponse>> processTicket(
             @RequestParam @Valid UUID id, Categorize status) {
         return ResponseEntity.ok(ticketService.processTicket(id, status));
     }
 
     @DeleteMapping
-    public ResponseEntity<ApiItemResponse<Ticket>> removeTicket(
+    public ResponseEntity<ApiItemResponse<TicketDtoResponse>> removeTicket(
             @RequestParam UUID id) {
         return ResponseEntity.ok(ticketService.removeTicket(id));
     }

@@ -2,9 +2,7 @@ package com.swd392.ticket_resell_be.dtos.requests;
 
 
 import com.swd392.ticket_resell_be.enums.Categorize;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -12,43 +10,35 @@ import java.util.Date;
 import java.util.UUID;
 
 public record TicketDtoRequest(
-        @NotEmpty(message = "SELLER_ID_EMPTY")
+        @NotNull(message = "SELLER_ID_MUST_NOT_BE_NULL")
         UUID seller_id,
 
-        @NotEmpty(message = "TITLE_EMPTY")
+        @NotBlank(message = "TITLE_EMPTY")
         String title,
 
-        @NotEmpty(message = "TICKET_EXPIRATION_EMPTY")
+        @NotNull(message = "TICKET_EXPIRATION_MUST_NOT_BE_NULL")
+        @Future(message = "Expiration date must be in the future")
         Date exp_date,
 
-        @NotEmpty(message = "TICKET_TYPE_EMPTY")
+        @NotNull(message = "TYPE_MUST_NOT_BE_NULL")
         Categorize type,
 
-        @NotEmpty(message = "SALE_PRICE_EMPTY")
+        @NotNull(message = "SALE_PRICE_MUST_NOT_BE_NULL")
         @DecimalMin(value = "0.0", inclusive = true, message = "SALE_PRICE_NEGATIVE")
         @DecimalMax(value = "1000000000.0", inclusive = true, message = "SALE_PRICE_TOO_HIGH")
         BigDecimal unit_price,
 
-        @NotEmpty(message = "QUANTITY_EMPTY")
-        int quantity,
+        @NotNull(message = "QUANTITY_MUST_NOT_BE_NULL")
+        @Positive(message = "Quantity must be greater than 0")
+        Integer quantity,
 
-        @NotEmpty(message = "DESCRIPTION_EMPTY")
+        @NotBlank(message = "DESCRIPTION_EMPTY")
         String description,
 
-        @NotEmpty(message = "IMAGE_EMPTY")
+        @NotBlank(message = "IMAGE_EMPTY")
         String image,
 
-        @NotEmpty(message = "STATUS_EMPTY")
-        Categorize status,
-
-        @NotEmpty(message = "CREATED_AT_EMPTY")
-        Date created_at,
-
-        @NotEmpty(message = "UPDATED_BY_EMPTY")
-        UUID updated_by,
-
-        @NotEmpty(message = "UPDATED_AT_EMPTY")
-        Date updated_at
+        Categorize status
 ) implements Serializable {
 }
 
