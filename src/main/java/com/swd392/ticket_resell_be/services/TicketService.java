@@ -14,13 +14,13 @@ import java.util.UUID;
 
 
 public interface TicketService {
-    ApiItemResponse<Ticket> createTicket(TicketDtoRequest ticketDtoRequest);
+    ApiItemResponse<TicketDtoResponse> createTicket(TicketDtoRequest ticketDtoRequest);
 
-    ApiItemResponse<Ticket> updateTicket(UUID id, TicketDtoRequest ticketDtoRequest);
+    ApiItemResponse<TicketDtoResponse> updateTicket(UUID id, TicketDtoRequest ticketDtoRequest);
 
-    ApiItemResponse<Ticket> processTicket(UUID id, Categorize status);
+    ApiItemResponse<TicketDtoResponse> processTicket(UUID id, Categorize status);
 
-    ApiItemResponse<Ticket> removeTicket(UUID id);
+    ApiItemResponse<TicketDtoResponse> removeTicket(UUID id);
 
     ApiListResponse<TicketDtoResponse> viewAllTicketsForAdmin(PageDtoRequest pageDtoRequest);
 
