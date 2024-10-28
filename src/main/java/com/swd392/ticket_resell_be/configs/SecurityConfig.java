@@ -38,6 +38,7 @@ public class SecurityConfig {
             "/api/auth/email/verify",
             "/api/tickets",
             "/api/tickets/categories",
+            "api/tickets/{id}",
             "/api/subscriptions",
             "/api/subscriptions/{id}",
             "/api/feedbacks",

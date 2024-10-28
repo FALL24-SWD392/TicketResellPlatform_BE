@@ -28,7 +28,7 @@ public class EmailUtil {
     @Async
     public void sendVerifyEmail(String email, String username, String token) throws MessagingException {
         String subject = "Verify your email";
-        String url = "https://api.ticketresell.thucnee.studio/api/auth/email/verify?token=" + token;
+        String url = "https://localhost:8081/api/auth/email/verify?token=" + token;
         String content = """
                 <div>
                   Dear %s,<br>

@@ -15,16 +15,16 @@ import java.util.UUID;
 
 
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
-    Page<Ticket> findTicketByStatus(Categorize status, Pageable pageable);
+    Page<Ticket> findByTitleContainingIgnoreCaseAndStatus(String name, Categorize status, Pageable pageable);
 
-    Page<Ticket> findTicketByTypeAndStatus(Categorize categorize, Categorize status, Pageable pageable);
+    Page<Ticket> findByTitleContainingIgnoreCaseAndTypeAndStatus(String name, Categorize type, Categorize status, Pageable page);
 
-    Page<Ticket> findTicketByTitleContainingAndStatus(String name, Categorize status, Pageable pageable);
+    Page<Ticket> findByTitleContainingIgnoreCaseAndType(String title, Categorize type, Pageable page);
+
+    Page<Ticket> findByTitleContainingIgnoreCase(String title, Pageable page);
 
     @Query("SELECT t FROM Ticket t JOIN FETCH t.seller WHERE t.id = :id")
     Ticket findTicketWithSellerById(@Param("id") UUID id);
-
-    Page<Ticket> findTicketByTypeAndStatusAndTitle(Categorize type, Categorize status, String name, Pageable page);
 
     int countBySellerAndStatus(@NotNull User seller, @NotNull Categorize status);
 }
