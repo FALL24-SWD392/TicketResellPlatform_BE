@@ -61,8 +61,8 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     public ApiListResponse<Subscription> getAllSubscriptions() {
         List<Subscription> subscriptions = subscriptionRepository.findAll();
 
-        return apiResponseBuilder.buildResponse(subscriptions,0,0,0,0,
-                 HttpStatus.OK, "All subscriptions retrieved");
+        return apiResponseBuilder.buildResponse(subscriptions, 0, 0, 0, 0,
+                HttpStatus.OK, "All subscriptions retrieved");
     }
 
     @Override

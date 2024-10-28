@@ -11,21 +11,19 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.TicketRepository;
+import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -33,65 +31,78 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class TicketServiceImplement implements TicketService {
     TicketRepository ticketRepository;
+    UserRepository userRepository;
     ApiResponseBuilder apiResponseBuilder;
     PagingUtil pagingUtil;
 
-    ModelMapper modelMapper;
-
-
     @Override
-    public ApiItemResponse<Ticket> createTicket(TicketDtoRequest ticketDtoRequest) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
-        Ticket ticket = modelMapper.map(ticketDtoRequest, Ticket.class);
+    public ApiItemResponse<TicketDtoResponse> createTicket(TicketDtoRequest ticketDtoRequest) {
+        Ticket ticket = new Ticket();
+        ticket = mapperHandmade(ticket, ticketDtoRequest);
         ticket.setStatus(Categorize.PENDING);
+        ticketRepository.save(ticket);
         return apiResponseBuilder.buildResponse(
-                ticketRepository.save(ticket),
+                parseToTicketDtoResponse(ticket),
                 HttpStatus.CREATED
         );
     }
 
     @Override
-    public ApiItemResponse<Ticket> updateTicket(UUID id, TicketDtoRequest ticketDtoRequest) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
-        Ticket existingTicket = ticketRepository.findTicketByIdIs(id);
+    public ApiItemResponse<TicketDtoResponse> updateTicket(UUID id, TicketDtoRequest ticketDtoRequest) {
+        Ticket existingTicket = ticketRepository.findTicketWithSellerById(id);
         if (existingTicket.getStatus() == Categorize.REMOVED)
             throw new AppException(ErrorCode.TICKET_NOT_FOUND);
-
-        modelMapper.map(ticketDtoRequest, existingTicket);
+        existingTicket = mapperHandmade(existingTicket, ticketDtoRequest);
+        existingTicket.setId(id);
         existingTicket.setStatus(Categorize.PENDING);
+        ticketRepository.save(existingTicket);
         return apiResponseBuilder.buildResponse(
-                ticketRepository.save(existingTicket),
+                parseToTicketDtoResponse(existingTicket),
                 HttpStatus.OK
         );
     }
 
-    @Override
-    public ApiItemResponse<Ticket> processTicket(UUID id, Categorize status) {
-        Ticket ticket = ticketRepository.findTicketByIdIs(id);
+    private Ticket mapperHandmade(Ticket ticket, TicketDtoRequest ticketDtoRequest) {
+        ticket.setSeller(userRepository.findById(ticketDtoRequest.seller_id()).get());
+        ticket.setTitle(ticketDtoRequest.title());
+        ticket.setExpDate(ticketDtoRequest.exp_date());
+        ticket.setType(ticketDtoRequest.type());
+        ticket.setUnitPrice(ticketDtoRequest.unit_price().floatValue());
+        ticket.setQuantity(ticketDtoRequest.quantity());
+        ticket.setDescription(ticketDtoRequest.description());
+        ticket.setImage(ticketDtoRequest.image());
+        ticket.setStatus(ticketDtoRequest.status());
 
+        return ticket;
+    }
+
+    @Override
+    public ApiItemResponse<TicketDtoResponse> processTicket(UUID id, Categorize status) {
+        Ticket ticket = ticketRepository.findTicketWithSellerById(id);
         if (ticket == null)
             throw new AppException(ErrorCode.TICKET_NOT_FOUND);
         else {
             ticket.setStatus(status);
             ticketRepository.save(ticket);
             return apiResponseBuilder.buildResponse(
-                    ticket,
+                    parseToTicketDtoResponse(ticket),
                     HttpStatus.OK
             );
         }
     }
 
     @Override
-    public ApiItemResponse<Ticket> removeTicket(UUID id) {
-        Ticket ticket = ticketRepository.findTicketByIdIs(id);
+    public ApiItemResponse<TicketDtoResponse> removeTicket(UUID id) {
+        Ticket ticket = ticketRepository.findTicketWithSellerById(id);
         ticket.setStatus(Categorize.REMOVED);
+        ticketRepository.save(ticket);
         return apiResponseBuilder.buildResponse(
-                ticketRepository.save(ticket),
+                parseToTicketDtoResponse(ticket),
                 HttpStatus.OK
         );
     }
 
-    private List<TicketDtoResponse> parseToTicketDtoResponse(Page<Ticket> tickets) {
+    private List<TicketDtoResponse> parseToTicketDtoResponses(Page<Ticket> tickets) {
         return tickets.getContent().stream()
                 .map(ticket -> new TicketDtoResponse(
                         ticket.getId(),
@@ -117,7 +128,7 @@ public class TicketServiceImplement implements TicketService {
             throw new AppException(ErrorCode.TICKET_NOT_FOUND);
         else
             return apiResponseBuilder.buildResponse(
-                    parseToTicketDtoResponse(tickets),
+                    parseToTicketDtoResponses(tickets),
                     tickets.getSize(),
                     tickets.getNumber(),
                     tickets.getTotalElements(),
@@ -132,19 +143,19 @@ public class TicketServiceImplement implements TicketService {
         Page<Ticket> tickets;
         Pageable page = pagingUtil.getPageable(pageDtoRequest);
 
-        if(category != Categorize.ALL){
-            if(name.isEmpty())
+        if (category != Categorize.ALL) {
+            if (name.isEmpty())
                 tickets = ticketRepository.findTicketByTypeAndStatus(category, Categorize.APPROVED, page);
             else
                 tickets = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name, page);
         } else {
-            if(name.isEmpty())
+            if (name.isEmpty())
                 tickets = ticketRepository.findTicketByStatus(Categorize.APPROVED, page);
             else
                 tickets = ticketRepository.findTicketByTitleContainingAndStatus(name, Categorize.APPROVED, page);
         }
 
-        List<TicketDtoResponse> returnTickets = parseToTicketDtoResponse(tickets);
+        List<TicketDtoResponse> returnTickets = parseToTicketDtoResponses(tickets);
 
         return apiResponseBuilder.buildResponse(
                 returnTickets,
@@ -171,6 +182,13 @@ public class TicketServiceImplement implements TicketService {
     @Override
     public ApiItemResponse<TicketDtoResponse> viewTicketById(UUID id) {
         Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
+        return apiResponseBuilder.buildResponse(
+                parseToTicketDtoResponse(ticket),
+                HttpStatus.OK
+        );
+    }
+
+    private TicketDtoResponse parseToTicketDtoResponse(Ticket ticket) {
         TicketDtoResponse ticketDtoResponse = new TicketDtoResponse();
         ticketDtoResponse.setId(ticket.getId());
         ticketDtoResponse.setSellerId(ticket.getSeller().getId());
@@ -185,10 +203,8 @@ public class TicketServiceImplement implements TicketService {
         ticketDtoResponse.setCreatedAt(ticket.getCreatedAt());
         ticketDtoResponse.setUpdatedBy(ticket.getUpdatedBy());
         ticketDtoResponse.setUpdatedAt(ticket.getUpdatedAt());
-        return apiResponseBuilder.buildResponse(
-                ticketDtoResponse,
-                HttpStatus.OK
-        );
+
+        return ticketDtoResponse;
     }
 
     @Override

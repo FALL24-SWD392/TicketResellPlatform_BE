@@ -28,9 +28,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody String token)
+    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginGoogle token)
             throws JOSEException {
-        return ResponseEntity.ok(userService.login(token));
+        return ResponseEntity.ok(userService.login(token.googleToken()));
     }
 
     @PostMapping("/register")
@@ -50,14 +50,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiItemResponse<String>> logout(@RequestBody String token) {
-        return ResponseEntity.ok(userService.logout(token));
+    public ResponseEntity<ApiItemResponse<String>> logout(@RequestBody @Valid LogoutRequest token) {
+        return ResponseEntity.ok(userService.logout(token.token()));
     }
 
     @PostMapping("/access-token")
-    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> getAccessToken(@RequestBody String token)
+    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> getAccessToken(@RequestBody @Valid GetAccessTokenRequest token)
             throws JOSEException {
-        return ResponseEntity.ok(userService.getAccessToken(token));
+        return ResponseEntity.ok(userService.getAccessToken(token.token()));
     }
 
     @PutMapping("/password/change")
@@ -66,9 +66,9 @@ public class AuthenticationController {
     }
 
     @PutMapping("/password/forgot")
-    public ResponseEntity<ApiItemResponse<String>> forgotPassword(@RequestBody String email)
+    public ResponseEntity<ApiItemResponse<String>> forgotPassword(@RequestBody @Valid ForgotPasswordRequest email)
             throws MessagingException, JOSEException {
-        return ResponseEntity.ok(userService.forgotPassword(email));
+        return ResponseEntity.ok(userService.forgotPassword(email.email()));
     }
 
     @PutMapping("/password/reset")

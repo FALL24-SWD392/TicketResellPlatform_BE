@@ -25,6 +25,7 @@ public enum ErrorCode {
     EMAIL_ALREADY_EXISTS("Email already exists", HttpStatus.CONFLICT),
     INVALID_TOKEN("Invalid token", HttpStatus.BAD_REQUEST),
     TOKEN_NOT_FOUND("Token not found", HttpStatus.NOT_FOUND),
+    GOOGLE_TOKEN_EMPTY("Google token not empty", HttpStatus.BAD_REQUEST),
     //Ticket's Error
     TICKET_NOT_FOUND("Ticket not found", HttpStatus.NOT_FOUND),
 

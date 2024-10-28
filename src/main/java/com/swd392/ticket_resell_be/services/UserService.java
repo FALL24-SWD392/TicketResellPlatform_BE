@@ -9,6 +9,7 @@ import com.swd392.ticket_resell_be.dtos.responses.UserDto;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
 
@@ -37,7 +38,7 @@ public interface UserService {
 
     ApiItemResponse<UserDto> getCurrentUser();
 
-    ApiListResponse<UserDto> getUsers(PageDtoRequest pageDtoRequest);
+    ApiListResponse<UserDto> getUsers(String search, int page, int size, Sort.Direction direction, String... properties);
 
     ApiItemResponse<UserDto> getUserByUsername(String username);
 

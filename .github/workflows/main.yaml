@@ -35,4 +35,5 @@ jobs:
       run: docker compose up --build -d
 
     - name: Remove unused
-      run: docker system prune -a -f
+      run: |
+        docker system prune -a -f

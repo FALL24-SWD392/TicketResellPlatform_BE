@@ -1,23 +1,21 @@
 package com.swd392.ticket_resell_be.dtos.requests;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
 public record ChatBoxDtoRequest(
-        @NotEmpty(message = "SELLER_ID_EMPTY")
+        @NotNull(message = "SELLER_ID_MUST_NOT_BE_NULL")
         UUID seller_id,
 
-        @NotEmpty(message = "BUYER_ID_EMPTY")
+        @NotNull(message = "BUYER_ID_MUST_NOT_BE_NULL")
         UUID buyer_id,
 
-        @NotEmpty(message = "TICKET_ID_EMPTY")
-        UUID ticket_id,
-
-        @NotEmpty(message = "CREATE_AT_EMPTY")
-        Date created_at
+        @NotNull(message = "TICKET_ID_MUST_NOT_BE_NULL")
+        UUID ticket_id
 ) implements Serializable {
 }
 

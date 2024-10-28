@@ -20,12 +20,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -193,8 +193,9 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public ApiListResponse<UserDto> getUsers(PageDtoRequest pageDtoRequest) {
-        Page<User> users = userRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
+    public ApiListResponse<UserDto> getUsers(String search, int page, int size, Sort.Direction direction, String... properties) {
+        Page<User> users = userRepository.findByUsernameContainsIgnoreCase(search, pagingUtil
+                .getPageable(User.class, page, size, direction, properties));
         //Parse to UserDto
         List<UserDto> list = users.getContent().stream()
                 .map(user -> new UserDto(user.getUsername(), user.getEmail(),
@@ -202,7 +203,7 @@ public class UserServiceImplement implements UserService {
                         user.getAvatar(), user.getRating(), user.getReputation(),
                         user.getCreatedBy(), user.getCreatedAt(), user.getUpdatedBy(), user.getUpdatedAt()))
                 .toList();
-        return apiResponseBuilder.buildResponse(list, users.getSize(), users.getNumber(),
+        return apiResponseBuilder.buildResponse(list, users.getSize(), users.getNumber() + 1,
                 users.getTotalElements(), users.getTotalPages(), HttpStatus.OK);
     }
 
