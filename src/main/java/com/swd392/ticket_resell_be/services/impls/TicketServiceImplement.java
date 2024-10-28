@@ -18,15 +18,12 @@ import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -65,7 +62,7 @@ public class TicketServiceImplement implements TicketService {
         );
     }
 
-    private Ticket mapperHandmade(Ticket ticket, TicketDtoRequest ticketDtoRequest){
+    private Ticket mapperHandmade(Ticket ticket, TicketDtoRequest ticketDtoRequest) {
         ticket.setSeller(userRepository.findById(ticketDtoRequest.seller_id()).get());
         ticket.setTitle(ticketDtoRequest.title());
         ticket.setExpDate(ticketDtoRequest.exp_date());
@@ -78,6 +75,7 @@ public class TicketServiceImplement implements TicketService {
 
         return ticket;
     }
+
     @Override
     public ApiItemResponse<TicketDtoResponse> processTicket(UUID id, Categorize status) {
         Ticket ticket = ticketRepository.findTicketWithSellerById(id);
@@ -145,13 +143,13 @@ public class TicketServiceImplement implements TicketService {
         Page<Ticket> tickets;
         Pageable page = pagingUtil.getPageable(pageDtoRequest);
 
-        if(category != Categorize.ALL){
-            if(name.isEmpty())
+        if (category != Categorize.ALL) {
+            if (name.isEmpty())
                 tickets = ticketRepository.findTicketByTypeAndStatus(category, Categorize.APPROVED, page);
             else
                 tickets = ticketRepository.findTicketByTypeAndStatusAndTitle(category, Categorize.APPROVED, name, page);
         } else {
-            if(name.isEmpty())
+            if (name.isEmpty())
                 tickets = ticketRepository.findTicketByStatus(Categorize.APPROVED, page);
             else
                 tickets = ticketRepository.findTicketByTitleContainingAndStatus(name, Categorize.APPROVED, page);

@@ -70,7 +70,7 @@ public class TransactionServiceImplement implements TransactionService {
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
-        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0,0,0,0, HttpStatus.OK, "All transactions retrieved successfully");
+        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0, 0, 0, 0, HttpStatus.OK, "All transactions retrieved successfully");
     }
 
     @Override
@@ -91,13 +91,13 @@ public class TransactionServiceImplement implements TransactionService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // Get the username of the logged-in user
         User user = userService.getUserByName(username)
-                .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         List<Transaction> transactions = transactionRepository.findBySeller(user);
 
         List<TransactionDtoResponse> transactionDtoResponses = transactions.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
-        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0,0,0,0, HttpStatus.OK);
+        return apiResponseBuilder.buildResponse(transactionDtoResponses, 0, 0, 0, 0, HttpStatus.OK);
     }
 
     private TransactionDtoResponse mapToDto(Transaction transaction) {
