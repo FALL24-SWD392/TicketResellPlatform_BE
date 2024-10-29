@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -19,7 +18,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -64,7 +62,7 @@ public class TicketServiceImplement implements TicketService {
     }
 
     private void mapperHandmade(Ticket ticket, TicketDtoRequest ticketDtoRequest) {
-        if(userRepository.findById(ticketDtoRequest.seller_id()).isPresent()){
+        if (userRepository.findById(ticketDtoRequest.seller_id()).isPresent()) {
             ticket.setSeller(userRepository.findById(ticketDtoRequest.seller_id()).get());
             ticket.setTitle(ticketDtoRequest.title());
             ticket.setExpDate(ticketDtoRequest.exp_date());
@@ -130,7 +128,7 @@ public class TicketServiceImplement implements TicketService {
                     .getPageable(Ticket.class, page, size, direction, properties));
         else
             tickets = ticketRepository.findByTitleContainingIgnoreCaseAndType(title, type, pagingUtil
-                .getPageable(Ticket.class, page, size, direction, properties));
+                    .getPageable(Ticket.class, page, size, direction, properties));
         if (tickets.isEmpty())
             throw new AppException(ErrorCode.TICKET_NOT_FOUND);
         else
@@ -148,7 +146,7 @@ public class TicketServiceImplement implements TicketService {
     @Override
     public ApiListResponse<TicketDtoResponse> viewTicketsByCategoryAndName(String name, Categorize type, int page, int size, Sort.Direction direction, String... properties) {
         Page<Ticket> tickets;
-        if(type.equals(Categorize.ALL))
+        if (type.equals(Categorize.ALL))
             tickets = ticketRepository.findByTitleContainingIgnoreCaseAndStatus(name, Categorize.APPROVED, pagingUtil
                     .getPageable(Ticket.class, page, size, direction, properties));
         else

@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.controllers;
 
+import com.swd392.ticket_resell_be.dtos.requests.DeleteUserRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.UserDto;
@@ -44,8 +45,8 @@ public class UserController {
 
     @DeleteMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    public ResponseEntity<ApiItemResponse<String>> deleteUser(@RequestBody String username) {
-        return ResponseEntity.ok(userService.deleteUser(username));
+    public ResponseEntity<ApiItemResponse<String>> deleteUser(@RequestBody DeleteUserRequest username) {
+        return ResponseEntity.ok(userService.deleteUser(username.username()));
     }
 
     @PostMapping

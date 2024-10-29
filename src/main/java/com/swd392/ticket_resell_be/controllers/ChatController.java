@@ -10,7 +10,6 @@ import com.swd392.ticket_resell_be.services.ChatBoxService;
 import com.swd392.ticket_resell_be.services.ChatMessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;

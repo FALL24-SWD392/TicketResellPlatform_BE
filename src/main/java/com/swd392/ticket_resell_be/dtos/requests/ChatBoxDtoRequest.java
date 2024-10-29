@@ -1,10 +1,8 @@
 package com.swd392.ticket_resell_be.dtos.requests;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.UUID;
 
 public record ChatBoxDtoRequest(

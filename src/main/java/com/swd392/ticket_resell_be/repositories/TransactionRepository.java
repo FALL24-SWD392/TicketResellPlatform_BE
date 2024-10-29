@@ -12,7 +12,9 @@ import java.util.UUID;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
     Optional<Transaction> getTransactionByOrderCode(String orderCode);
+
     Page<Transaction> findByDescriptionContainsIgnoreCase(String description, Pageable pageable);
+
     Page<Transaction> findByDescriptionContainsIgnoreCaseAndStatus(String description, Categorize status, Pageable pageable);
 
     Page<Transaction> findBySeller(User user, Pageable pageable);

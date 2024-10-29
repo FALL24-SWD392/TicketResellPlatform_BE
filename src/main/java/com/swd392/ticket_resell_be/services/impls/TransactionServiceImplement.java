@@ -68,7 +68,6 @@ public class TransactionServiceImplement implements TransactionService {
     }
 
 
-
     @Override
     public ApiListResponse<TransactionDtoResponse> getAllTransactions(String description, Categorize status, int page, int size, Sort.Direction direction, String... properties) {
         Page<Transaction> transactions;
@@ -102,9 +101,6 @@ public class TransactionServiceImplement implements TransactionService {
                 HttpStatus.OK
         );
     }
-
-
-
 
 
     @Override

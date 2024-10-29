@@ -29,7 +29,7 @@ public class TransactionController {
     public ResponseEntity<ApiListResponse<TransactionDtoResponse>>
     getAllTransactions(
             @RequestParam(defaultValue = "") String description,
-            @RequestParam(defaultValue = "")Categorize status,
+            @RequestParam(defaultValue = "") Categorize status,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
