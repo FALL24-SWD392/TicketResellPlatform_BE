@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TransactionDtoResponse;
@@ -19,6 +18,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -67,22 +67,44 @@ public class TransactionServiceImplement implements TransactionService {
         return apiResponseBuilder.buildResponse(transaction, HttpStatus.OK, "Transaction retrieved successfully");
     }
 
+
+
     @Override
-    public ApiListResponse<TransactionDtoResponse> getAllTransactions(PageDtoRequest pageDtoRequest) {
-        Page<Transaction> transactions = transactionRepository.findAll(pagingUtil.getPageable(pageDtoRequest));
-        if (transactions.isEmpty()) {
-            throw new AppException(ErrorCode.TICKET_NOT_FOUND);
+    public ApiListResponse<TransactionDtoResponse> getAllTransactions(String description, Categorize status, int page, int size, Sort.Direction direction, String... properties) {
+        Page<Transaction> transactions;
+
+        if (status == null) {
+            transactions = transactionRepository.findByDescriptionContainsIgnoreCase(
+                    description, pagingUtil.getPageable(Transaction.class, page, size, direction, properties)
+            );
+        } else {
+            transactions = transactionRepository.findByDescriptionContainsIgnoreCaseAndStatus(
+                    description, status, pagingUtil.getPageable(Transaction.class, page, size, direction, properties)
+            );
         }
+
+        List<TransactionDtoResponse> list = transactions.getContent().stream()
+                .map(transaction -> new TransactionDtoResponse(
+                        transaction.getOrderCode(),
+                        transaction.getStatus(),
+                        transaction.getCreatedAt(),
+                        transaction.getUpdatedAt(),
+                        transaction.getSeller().getUsername(),
+                        transaction.getDescription()
+                )).toList();
+
         return apiResponseBuilder.buildResponse(
-                mapToDto(transactions),
+                list,
                 transactions.getSize(),
-                transactions.getNumber(),
+                transactions.getNumber() + 1,
                 transactions.getTotalElements(),
                 transactions.getTotalPages(),
-                HttpStatus.OK,
-                null
+                HttpStatus.OK
         );
     }
+
+
+
 
 
     @Override
@@ -99,44 +121,38 @@ public class TransactionServiceImplement implements TransactionService {
     }
 
     @Override
-    public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUsername(PageDtoRequest pageDtoRequest) {
+    public ApiListResponse<TransactionDtoResponse> getAllTransactionsByUser(int page, int size, Sort.Direction direction, String... properties) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
+
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        Page<Transaction> transactions = transactionRepository.findBySeller(user, pagingUtil.getPageable(pageDtoRequest));
-        List<TransactionDtoResponse> transactionDtoResponses = mapToDto(transactions);
+        Page<Transaction> transactions = transactionRepository.findBySeller(user, pagingUtil
+                .getPageable(Transaction.class, page, size, direction, properties));
+
+        List<TransactionDtoResponse> list = transactions.getContent().stream()
+                .map(transaction -> new TransactionDtoResponse(
+                        transaction.getOrderCode(),
+                        transaction.getStatus(),
+                        transaction.getCreatedAt(),
+                        transaction.getUpdatedAt(),
+                        transaction.getSeller().getUsername(),
+                        transaction.getDescription()
+                )).toList();
+
         return apiResponseBuilder.buildResponse(
-                transactionDtoResponses,
+                list,
                 transactions.getSize(),
-                transactions.getNumber(),
+                transactions.getNumber() + 1,
                 transactions.getTotalElements(),
                 transactions.getTotalPages(),
                 HttpStatus.OK
         );
     }
 
-
-
-    private List<TransactionDtoResponse> mapToDto(Page<Transaction> transactions) {
-        return transactions.getContent().stream()
-                .map(transaction -> {
-                    TransactionDtoResponse dto = new TransactionDtoResponse();
-                    dto.setId(transaction.getId());
-                    dto.setOrderCode(transaction.getOrderCode());
-                    dto.setUserName(transaction.getSeller().getUsername());
-                    dto.setStatus(transaction.getStatus());
-                    dto.setCreatedAt(transaction.getCreatedAt());
-                    dto.setUpdatedAt(transaction.getUpdatedAt());
-                    dto.setDescription(transaction.getDescription());
-                    return dto;
-                })
-                .toList();
-    }
 
 }

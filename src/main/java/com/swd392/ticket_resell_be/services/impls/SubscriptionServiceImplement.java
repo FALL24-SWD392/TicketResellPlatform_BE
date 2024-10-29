@@ -105,7 +105,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         String orderInfo = "Thanh toán cho gói " + subscription.getName();
         VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo, request);
         transactionService.savePendingTransaction(subscription, user, orderResponse.orderCode());
-        return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK, "Purchase Successfully");
+        return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK, "Redirect to Purchase");
     }
 
 }

@@ -19,7 +19,7 @@ public class VNPayConfig {
 
     // Generate the return URL dynamically based on the request
     public static String getReturnUrl(HttpServletRequest request) {
-        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/payment/callback";
+        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/api/payment/callback";
     }
 
     public static String md5(String message) {
