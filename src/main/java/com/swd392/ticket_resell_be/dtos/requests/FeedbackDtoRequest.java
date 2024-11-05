@@ -15,7 +15,10 @@ public record FeedbackDtoRequest(
         UUID order_id,
 
         @NotEmpty(message = "FEEDBACK_DESCRIPTION_EMPTY")
-        String feedback_description,
+        String description,
+
+        @NotNull(message = "RATING_MUST_NOT_BE_NULL")
+        int rating,
 
         @NotNull(message = "STATUS_MUST_NOT_BE_NULL")
         Categorize status

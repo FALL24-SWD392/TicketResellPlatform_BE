@@ -14,10 +14,11 @@ public interface SubscriptionService {
 
     Optional<ApiItemResponse<Subscription>> getSubscriptionById(UUID uuid);
 
-
     ApiListResponse<Subscription> getAllSubscriptions();
 
     ApiItemResponse<Subscription> handleUpdateSubscription(UUID packageId, SubscriptionDtoRequest subscriptionDtoRequest);
 
     ApiItemResponse<String> purchaseSubscription(UUID subscriptionId, HttpServletRequest request);
+
+    Subscription getSubscriptionByName(String name);
 }

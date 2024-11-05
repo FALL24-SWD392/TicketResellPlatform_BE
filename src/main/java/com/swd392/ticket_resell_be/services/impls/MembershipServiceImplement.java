@@ -10,6 +10,7 @@ import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.MembershipRepository;
 import com.swd392.ticket_resell_be.services.MembershipService;
+import com.swd392.ticket_resell_be.services.SubscriptionService;
 import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
@@ -35,6 +36,7 @@ public class MembershipServiceImplement implements MembershipService {
     ApiResponseBuilder apiResponseBuilder;
     TicketService ticketService;
     UserService userService;
+    SubscriptionService subscriptionService;
 
     @Override
     public ApiItemResponse<Membership> createMembership(User user, Subscription subscription) {
@@ -107,6 +109,27 @@ public class MembershipServiceImplement implements MembershipService {
         return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.OK, "Membership retrieved successfully");
     }
 
+    @Override
+    public ApiItemResponse<MembershipDtoResponse> createFreeMembershipForLoggedInUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUserByName(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Subscription subscription = subscriptionService.getSubscriptionByName("Free");
+        Membership membership = new Membership();
+        membership.setSeller(user);
+        membership.setSubscriptionName(subscription.getName());
+        membership.setSaleRemain(subscription.getSaleLimit());
+        Date currentDate = new Date();
+        membership.setStartDate(currentDate);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        calendar.add(Calendar.DAY_OF_MONTH, 30);
+        membership.setEndDate(calendar.getTime());
+        Membership savedMembership = membershipRepository.save(membership);
+        MembershipDtoResponse membershipDtoResponse = mapToDto(savedMembership);
+        return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.CREATED);
+    }
+
     private MembershipDtoResponse mapToDto(Membership membership) {
         return MembershipDtoResponse.builder()
                 .id(membership.getId())
@@ -116,6 +139,5 @@ public class MembershipServiceImplement implements MembershipService {
                 .endDate(membership.getEndDate())
                 .build();
     }
-
 
 }

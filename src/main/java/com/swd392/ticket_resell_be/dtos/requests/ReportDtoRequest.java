@@ -16,10 +16,15 @@ public record ReportDtoRequest(
 
         @NotNull(message = "ORDER_ID_MUST_NOT_BE_NULL")
         UUID order_id,
-        @NotNull(message = "STATUS_MUST_NOT_BE_NULL")
-        Categorize status,
 
         @NotEmpty(message = "REPORT_DESCRIPTION_MUST_NOT_BE_NULL")
-        String description
+        String description,
+
+        @NotEmpty(message = "ATTACHMENT_MUST_NOT_BE_NULL")
+        String attachment,
+
+        @NotNull(message = "STATUS_MUST_NOT_BE_NULL")
+        Categorize status
+
 ) implements Serializable {
 }

@@ -2,25 +2,25 @@ package com.swd392.ticket_resell_be.services.impls;
 
 
 import com.swd392.ticket_resell_be.dtos.requests.FeedbackDtoRequest;
-import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.FeedbackDtoResponse;
 import com.swd392.ticket_resell_be.entities.Feedback;
+import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.FeedbackRepository;
-import com.swd392.ticket_resell_be.repositories.OrderRepository;
 import com.swd392.ticket_resell_be.services.FeedbackService;
+import com.swd392.ticket_resell_be.services.OrderService;
+import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -33,74 +33,60 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class FeedbackServiceImplement implements FeedbackService {
     FeedbackRepository feedbackRepository;
-    OrderRepository orderRepository;
+    UserService userService;
+    OrderService orderService;
 
     ApiResponseBuilder apiResponseBuilder;
-    ModelMapper modelMapper;
     PagingUtil pagingUtil;
 
 
     @Override
-    public ApiItemResponse<Feedback> createFeedback(FeedbackDtoRequest feedbackDtoRequest) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
-
-        Feedback feedback = modelMapper.map(feedbackDtoRequest, Feedback.class);
-        UUID orderId = feedbackDtoRequest.order_id();
-        boolean check = orderRepository.findByIdAndStatus(orderId, Categorize.APPROVED);
-        if (!check) {
-            throw new AppException(ErrorCode.USER_HAVE_NOT_BUY_YET);
-        }
+    public ApiItemResponse<FeedbackDtoResponse> createFeedback(FeedbackDtoRequest feedbackDtoRequest) {
+        Feedback feedback = new Feedback();
+        mapperHandmade(feedback, feedbackDtoRequest);
         feedback.setStatus(Categorize.PENDING);
+        feedbackRepository.save(feedback);
+
+        plusReputation(feedback.getOrder().getChatBox().getSender());
+        plusReputation(feedback.getOrder().getChatBox().getRecipient());
+
         return apiResponseBuilder.buildResponse(
-                feedbackRepository.save(feedback),
-                HttpStatus.CREATED,
-                null
+                parseToFeedbackDtoResponse(feedback),
+                HttpStatus.CREATED
         );
     }
 
-    @Override
-    public ApiItemResponse<Feedback> updateFeedback(UUID id, FeedbackDtoRequest feedbackDtoRequest) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
+    private void plusReputation(User seller) {
+        seller.setReputation(seller.getReputation() + 5);
+    }
 
-        Feedback existingFeedback = feedbackRepository.findFeedbackByIdIs(id);
-        if (existingFeedback.getStatus() == Categorize.REMOVED) {
-            throw new AppException(ErrorCode.FEEDBACK_NOT_FOUND);
+    private void mapperHandmade(Feedback feedback, FeedbackDtoRequest feedbackDtoRequest) {
+        boolean check_1 = orderService.findById(feedbackDtoRequest.order_id()).getChatBox().getSender() == userService.findById(feedbackDtoRequest.buyer_id());
+        boolean check_2 = orderService.findById(feedbackDtoRequest.order_id()).getChatBox().getRecipient() == userService.findById(feedbackDtoRequest.buyer_id());
+        if (check_1 || check_2) {
+            feedback.setBuyer(userService.findById(feedbackDtoRequest.buyer_id()));
+            feedback.setOrder(orderService.findById(feedbackDtoRequest.order_id()));
+            feedback.setDescription(feedbackDtoRequest.description());
+            feedback.setRating(feedbackDtoRequest.rating());
+            feedback.setStatus(feedbackDtoRequest.status());
         }
-        modelMapper.map(feedbackDtoRequest, existingFeedback);
-        existingFeedback.setStatus(Categorize.PENDING);
-        return apiResponseBuilder.buildResponse(
-                feedbackRepository.save(existingFeedback),
-                HttpStatus.OK,
-                null
-        );
     }
 
-    @Override
-    public ApiItemResponse<Feedback> removeFeedback(UUID id) {
-        Feedback feedback = feedbackRepository.findFeedbackByIdIs(id);
-        feedback.setStatus(Categorize.REMOVED);
-        return apiResponseBuilder.buildResponse(
-                feedbackRepository.save(feedback),
-                HttpStatus.OK,
-                null
-        );
+    private FeedbackDtoResponse parseToFeedbackDtoResponse(Feedback feedback) {
+        FeedbackDtoResponse feedbackDtoResponse = new FeedbackDtoResponse();
+        feedbackDtoResponse.setId(feedback.getId());
+        feedbackDtoResponse.setBuyerId(feedback.getBuyer().getId());
+        feedbackDtoResponse.setOrderId(feedback.getOrder().getId());
+        feedbackDtoResponse.setDescription(feedback.getDescription());
+        feedbackDtoResponse.setRating(feedback.getRating());
+        feedbackDtoResponse.setStatus(feedback.getStatus());
+        feedbackDtoResponse.setCreatedAt(feedback.getCreatedAt());
+        feedbackDtoResponse.setUpdatedAt(feedback.getUpdatedAt());
+
+        return feedbackDtoResponse;
     }
 
-    @Override
-    public ApiListResponse<FeedbackDtoResponse> findFeedbackByOrderId(UUID id, Categorize status, PageDtoRequest pageDtoRequest) {
-        Page<Feedback> feedbacks = feedbackRepository.findAllByOrderIdAndStatus(id, status, pagingUtil.getPageable(pageDtoRequest));
-        return apiResponseBuilder.buildResponse(
-                parseToFeedBack(feedbacks),
-                feedbacks.getSize(),
-                feedbacks.getNumber(),
-                feedbacks.getTotalElements(),
-                feedbacks.getTotalPages(),
-                HttpStatus.OK,
-                null
-        );
-    }
-
-    private List<FeedbackDtoResponse> parseToFeedBack(Page<Feedback> feedbacks) {
+    private List<FeedbackDtoResponse> parseToFeedbackDtoResponses(Page<Feedback> feedbacks) {
         return feedbacks.getContent().stream()
                 .map(feedback -> new FeedbackDtoResponse(
                         feedback.getId(),
@@ -112,5 +98,49 @@ public class FeedbackServiceImplement implements FeedbackService {
                         feedback.getCreatedAt(),
                         feedback.getUpdatedAt()))
                 .toList();
+    }
+
+    @Override
+    public ApiItemResponse<FeedbackDtoResponse> updateFeedback(UUID id, FeedbackDtoRequest feedbackDtoRequest) {
+        Feedback existingFeedback = feedbackRepository.findFeedbackByIdIs(id);
+        if (existingFeedback.getStatus() == Categorize.REMOVED)
+            throw new AppException(ErrorCode.FEEDBACK_NOT_FOUND);
+        mapperHandmade(existingFeedback, feedbackDtoRequest);
+        existingFeedback.setId(id);
+        existingFeedback.setStatus(Categorize.PENDING);
+        feedbackRepository.save(existingFeedback);
+        return apiResponseBuilder.buildResponse(
+                parseToFeedbackDtoResponse(existingFeedback),
+                HttpStatus.OK
+        );
+    }
+
+    @Override
+    public ApiItemResponse<FeedbackDtoResponse> removeFeedback(UUID id) {
+        Feedback feedback = feedbackRepository.findFeedbackByIdIs(id);
+        feedback.setStatus(Categorize.REMOVED);
+        feedbackRepository.save(feedback);
+        return apiResponseBuilder.buildResponse(
+                parseToFeedbackDtoResponse(feedback),
+                HttpStatus.OK
+        );
+    }
+
+    @Override
+    public ApiListResponse<FeedbackDtoResponse> findFeedbackByOrderId(UUID id, Categorize status, int page, int size, Sort.Direction direction, String... properties) {
+        Page<Feedback> feedbacks = feedbackRepository.findAllByOrderIdAndStatus(id, status, pagingUtil
+                .getPageable(Feedback.class, page, size, direction, properties));
+        if (feedbacks.isEmpty())
+            throw new AppException(ErrorCode.FEEDBACK_NOT_FOUND);
+        else
+            return apiResponseBuilder.buildResponse(
+                    parseToFeedbackDtoResponses(feedbacks),
+                    feedbacks.getSize(),
+                    feedbacks.getNumber() + 1,
+                    feedbacks.getTotalElements(),
+                    feedbacks.getTotalPages(),
+                    HttpStatus.OK,
+                    null
+            );
     }
 }

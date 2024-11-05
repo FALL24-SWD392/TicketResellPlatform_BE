@@ -44,7 +44,9 @@ public enum Categorize {
     COMPLETED("status"),
     CANCEL("status"),
     ACTIVE("status"),
-    INACTIVE("status");
+    INACTIVE("status"),
+    ONLINE("status"),
+    OFFLINE("status");
 
     private final String category;
 
