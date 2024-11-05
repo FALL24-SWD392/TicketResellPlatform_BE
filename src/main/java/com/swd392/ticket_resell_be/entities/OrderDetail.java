@@ -33,5 +33,4 @@ public class OrderDetail {
     @Positive
     @Column(name = "quantity", nullable = false, updatable = false)
     private int quantity;
-
 }

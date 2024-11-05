@@ -42,7 +42,7 @@ public class SecurityConfig {
             "/api/subscriptions",
             "/api/subscriptions/{id}",
             "/api/feedbacks",
-            "/api/users/{username}",
+            "/api/users/{username}"
     };
     private static final String[] PUBLIC_PUT_ENDPOINTS = {
             "/api/auth/password/forgot",

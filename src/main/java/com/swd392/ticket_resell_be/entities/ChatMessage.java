@@ -4,25 +4,28 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "chat_messages")
 @EntityListeners(AuditingEntityListener.class)
 public class ChatMessage {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+    private String id;
+
+    @Column(name = "chat_id", nullable = false, updatable = false)
+    private String chatId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -31,8 +34,8 @@ public class ChatMessage {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "chat_box_id", nullable = false, updatable = false)
-    private ChatBox chatBox;
+    @JoinColumn(nullable = false, updatable = false)
+    private User recipient;
 
     @NotEmpty
     @Length(max = 750)

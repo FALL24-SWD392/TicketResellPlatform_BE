@@ -2,16 +2,14 @@ package com.swd392.ticket_resell_be.services;
 
 import com.nimbusds.jose.JOSEException;
 import com.swd392.ticket_resell_be.dtos.requests.*;
-import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
-import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
-import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
-import com.swd392.ticket_resell_be.dtos.responses.UserDto;
+import com.swd392.ticket_resell_be.dtos.responses.*;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
     ApiItemResponse<LoginDtoResponse> login(LoginDtoRequest loginDtoRequest) throws JOSEException;
@@ -47,4 +45,12 @@ public interface UserService {
     ApiItemResponse<User> createUser(User user);
 
     Optional<User> getUserByName(String username) throws AppException;
+
+    void saveUser(User user);
+
+    void disconnect(User user);
+
+    ApiListResponse<UserDtoWebSocket> findConnectedUsers(int page, int size, Sort.Direction direction, String... properties);
+
+    User findById(UUID id);
 }

@@ -2,10 +2,7 @@ package com.swd392.ticket_resell_be.services.impls;
 
 import com.nimbusds.jose.JOSEException;
 import com.swd392.ticket_resell_be.dtos.requests.*;
-import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
-import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
-import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
-import com.swd392.ticket_resell_be.dtos.responses.UserDto;
+import com.swd392.ticket_resell_be.dtos.responses.*;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
@@ -251,6 +248,63 @@ public class UserServiceImplement implements UserService {
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void saveUser(User user) {
+        user.setStatus(Categorize.ONLINE);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void disconnect(User user) {
+        var storedUser = userRepository.findById(user.getId()).orElse(null);
+        if (storedUser != null) {
+            storedUser.setStatus(Categorize.OFFLINE);
+            userRepository.save(storedUser);
+        }
+    }
+
+    @Override
+    public ApiListResponse<UserDtoWebSocket> findConnectedUsers(int page, int size, Sort.Direction direction, String... properties) {
+        Page<User> users = userRepository.findAllByStatus(Categorize.ONLINE, pagingUtil
+                .getPageable(User.class, page, size, direction, properties));
+
+        return apiResponseBuilder.buildResponse(
+                parseToList(users),
+                users.getSize(),
+                users.getNumber() + 1,
+                users.getTotalElements(),
+                users.getTotalPages(),
+                HttpStatus.OK,
+                null
+        );
+    }
+
+    @Override
+    public User findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private List<UserDtoWebSocket> parseToList(Page<User> users) {
+        return users.getContent().stream()
+                .map(user -> new UserDtoWebSocket(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getPassword(),
+                        user.getEmail(),
+                        user.getRole(),
+                        user.getStatus(),
+                        user.getTypeRegister(),
+                        user.getAvatar(),
+                        user.getRating(),
+                        user.getReputation(),
+                        user.getCreatedBy(),
+                        user.getCreatedAt(),
+                        user.getUpdatedBy(),
+                        user.getUpdatedAt()
+                ))
+                .toList();
     }
 
     private User createRegisterUser(String username, String password, String email,
