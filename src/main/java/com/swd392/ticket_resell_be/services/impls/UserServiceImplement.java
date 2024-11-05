@@ -219,7 +219,7 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public ApiItemResponse<String> deleteUser(String username) {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndStatus(username, Categorize.ACTIVE)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setStatus(Categorize.REMOVED);
         userRepository.save(user);
