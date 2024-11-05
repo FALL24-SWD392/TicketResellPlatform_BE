@@ -10,8 +10,8 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.TicketRepository;
-import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.TicketService;
+import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
@@ -30,7 +30,7 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class TicketServiceImplement implements TicketService {
     TicketRepository ticketRepository;
-    UserRepository userRepository;
+    UserService userService;
     ApiResponseBuilder apiResponseBuilder;
     PagingUtil pagingUtil;
 
@@ -62,8 +62,8 @@ public class TicketServiceImplement implements TicketService {
     }
 
     private void mapperHandmade(Ticket ticket, TicketDtoRequest ticketDtoRequest) {
-        if (userRepository.findById(ticketDtoRequest.seller_id()).isPresent()) {
-            ticket.setSeller(userRepository.findById(ticketDtoRequest.seller_id()).get());
+        if (userService.findById(ticketDtoRequest.seller_id()) != null) {
+            ticket.setSeller(userService.findById(ticketDtoRequest.seller_id()));
             ticket.setTitle(ticketDtoRequest.title());
             ticket.setExpDate(ticketDtoRequest.exp_date());
             ticket.setType(ticketDtoRequest.type());
@@ -207,5 +207,24 @@ public class TicketServiceImplement implements TicketService {
     @Override
     public int getCountBySellerAndStatus(User seller, Categorize status) {
         return ticketRepository.countBySellerAndStatus(seller, status);
+    }
+
+    @Override
+    public Ticket getTicketById(UUID id) {
+        return ticketRepository.findTicketWithSellerById(id);
+    }
+
+    @Override
+    public void updateTicketStatus(UUID id, Categorize status) {
+        Ticket ticket = ticketRepository.findTicketWithSellerById(id);
+        ticket.setStatus(status);
+        ticketRepository.save(ticket);
+    }
+
+    @Override
+    public void updateTicketQuantity(UUID id, int quantity) {
+        Ticket ticket = ticketRepository.findTicketWithSellerById(id);
+        ticket.setQuantity(quantity);
+        ticketRepository.save(ticket);
     }
 }

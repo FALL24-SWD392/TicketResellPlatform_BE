@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-import com.swd392.ticket_resell_be.dtos.requests.PageDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.ReportDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -10,9 +9,9 @@ import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
-import com.swd392.ticket_resell_be.repositories.OrderRepository;
 import com.swd392.ticket_resell_be.repositories.ReportRepository;
 import com.swd392.ticket_resell_be.repositories.UserRepository;
+import com.swd392.ticket_resell_be.services.OrderService;
 import com.swd392.ticket_resell_be.services.ReportService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
@@ -20,9 +19,8 @@ import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -35,32 +33,26 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ReportServiceImplement implements ReportService {
     ReportRepository reportRepository;
-    OrderRepository orderRepository;
-    ModelMapper modelMapper;
+    OrderService orderService;
     ApiResponseBuilder apiResponseBuilder;
     UserRepository userRepository;
     UserService userService;
     PagingUtil pagingUtil;
 
     @Override
-    public ApiItemResponse<Report> createReport(ReportDtoRequest reportDtoRequest) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
-
-        Report report = modelMapper.map(reportDtoRequest, Report.class);
-        boolean check = orderRepository.findById(report.getOrder().getId());
-        if (!check) {
-            throw new AppException(ErrorCode.USER_HAVE_NOT_YET_TRANSACTED);
-        }
+    public ApiItemResponse<ReportDtoResponse> createReport(ReportDtoRequest reportDtoRequest) {
+        Report report = new Report();
+        mapperHandmade(report, reportDtoRequest);
         report.setStatus(Categorize.PENDING);
+        reportRepository.save(report);
         return apiResponseBuilder.buildResponse(
-                reportRepository.save(report),
-                HttpStatus.CREATED,
-                null
+                parseToReportDtoResponse(report),
+                HttpStatus.CREATED
         );
     }
 
     @Override
-    public ApiItemResponse<Report> processReport(UUID id, Categorize status) {
+    public ApiItemResponse<ReportDtoResponse> processReport(UUID id, Categorize status) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.REPORT_NOT_FOUND));
         if (!report.getStatus().equals(Categorize.PENDING))
@@ -73,8 +65,9 @@ public class ReportServiceImplement implements ReportService {
             report.setUpdatedBy(userService.getCurrentUser().data().username());
             report.setUpdatedAt(new Date());
 
+            reportRepository.save(report);
             return apiResponseBuilder.buildResponse(
-                    reportRepository.save(report),
+                    parseToReportDtoResponse(report),
                     HttpStatus.OK,
                     "Approved"
             );
@@ -86,8 +79,9 @@ public class ReportServiceImplement implements ReportService {
             report.setUpdatedBy(userService.getCurrentUser().data().username());
             report.setUpdatedAt(new Date());
 
+            reportRepository.save(report);
             return apiResponseBuilder.buildResponse(
-                    reportRepository.save(report),
+                    parseToReportDtoResponse(report),
                     HttpStatus.OK,
                     "Rejected"
             );
@@ -109,24 +103,25 @@ public class ReportServiceImplement implements ReportService {
     }
 
     @Override
-    public ApiItemResponse<Report> getById(UUID id) {
+    public ApiItemResponse<ReportDtoResponse> getById(UUID id) {
         return apiResponseBuilder.buildResponse(
-                reportRepository.findReportByIdIs(id),
+                parseToReportDtoResponse(reportRepository.findReportByIdIs(id)),
                 HttpStatus.OK,
                 null
         );
     }
 
     @Override
-    public ApiListResponse<ReportDtoResponse> getReportByUserId(UUID id, Categorize status, PageDtoRequest pageDtoRequest) {
-        Page<Report> reports = reportRepository.findReportByIdAndStatus(id, status, pagingUtil.getPageable(pageDtoRequest));
+    public ApiListResponse<ReportDtoResponse> getReportByUserId(UUID id, int page, int size, Sort.Direction direction, String... properties) {
+        Page<Report> reports = reportRepository.findReportById(id, pagingUtil
+                .getPageable(Report.class, page, size, direction, properties));
         if (reports.getTotalElements() > 0) {
             throw new AppException(ErrorCode.REPORT_NOT_FOUND);
         }
         return apiResponseBuilder.buildResponse(
-                parseToReport(reports),
+                parseToReportDtoResponses(reports),
                 reports.getSize(),
-                reports.getNumber(),
+                reports.getNumber() + 1,
                 reports.getTotalElements(),
                 reports.getTotalPages(),
                 HttpStatus.OK,
@@ -135,15 +130,16 @@ public class ReportServiceImplement implements ReportService {
     }
 
     @Override
-    public ApiListResponse<ReportDtoResponse> getAllReportsByStatus(Categorize status, PageDtoRequest pageDtoRequest) {
-        Page<Report> reports = reportRepository.findAllByStatus(status, pagingUtil.getPageable(pageDtoRequest));
+    public ApiListResponse<ReportDtoResponse> getAllReportsByStatus(Categorize status, int page, int size, Sort.Direction direction, String... properties) {
+        Page<Report> reports = reportRepository.findAllByStatus(status, pagingUtil
+                .getPageable(Report.class, page, size, direction, properties));
         if (reports.getTotalElements() > 0) {
             throw new AppException(ErrorCode.REPORT_NOT_FOUND);
         }
         return apiResponseBuilder.buildResponse(
-                parseToReport(reports),
+                parseToReportDtoResponses(reports),
                 reports.getSize(),
-                reports.getNumber(),
+                reports.getNumber() + 1,
                 reports.getTotalElements(),
                 reports.getTotalPages(),
                 HttpStatus.OK,
@@ -151,7 +147,37 @@ public class ReportServiceImplement implements ReportService {
         );
     }
 
-    private List<ReportDtoResponse> parseToReport(Page<Report> reports) {
+    private void mapperHandmade(Report report, ReportDtoRequest reportDtoRequest) {
+        boolean check_1 = orderService.findById(reportDtoRequest.order_id()).getChatBox().getSender() == userService.findById(reportDtoRequest.reporter_id());
+        boolean check_2 = orderService.findById(reportDtoRequest.order_id()).getChatBox().getRecipient() == userService.findById(reportDtoRequest.reported_id());
+        if (check_1 || check_2) {
+            report.setReporter(userService.findById(reportDtoRequest.reporter_id()));
+            report.setReported(userService.findById(reportDtoRequest.reported_id()));
+            report.setOrder(orderService.findById(reportDtoRequest.order_id()));
+            report.setDescription(reportDtoRequest.description());
+            report.setAttachment(reportDtoRequest.attachment());
+            report.setStatus(reportDtoRequest.status());
+        }
+    }
+
+    private ReportDtoResponse parseToReportDtoResponse(Report report) {
+        ReportDtoResponse reportDtoRequest = new ReportDtoResponse();
+        reportDtoRequest.setId(report.getId());
+        reportDtoRequest.setReporterId(report.getReporter().getId());
+        reportDtoRequest.setReportedId(report.getReported().getId());
+        reportDtoRequest.setOrderId(report.getOrder().getId());
+        reportDtoRequest.setDescription(report.getDescription());
+        reportDtoRequest.setAttachment(report.getAttachment());
+        reportDtoRequest.setStatus(report.getStatus());
+        reportDtoRequest.setCreatedBy(report.getCreatedBy());
+        reportDtoRequest.setCreatedAt(report.getCreatedAt());
+        reportDtoRequest.setUpdatedBy(report.getUpdatedBy());
+        reportDtoRequest.setUpdatedAt(report.getUpdatedAt());
+
+        return reportDtoRequest;
+    }
+
+    private List<ReportDtoResponse> parseToReportDtoResponses(Page<Report> reports) {
         return reports.getContent().stream()
                 .map(report -> new ReportDtoResponse(
                         report.getId(),

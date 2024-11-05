@@ -11,7 +11,7 @@ import java.util.UUID;
 
 
 public interface ReportRepository extends JpaRepository<Report, UUID> {
-    Page<Report> findReportByIdAndStatus(UUID id, Categorize status, Pageable page);
+    Page<Report> findReportById(UUID id, Pageable page);
 
     Report findReportByIdIs(UUID id);
 
