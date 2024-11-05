@@ -13,4 +13,6 @@ public interface MembershipService {
     ApiItemResponse<Membership> updateMembership(User user, Subscription subscriptionField);
 
     ApiItemResponse<MembershipDtoResponse> getMembershipForUser();
+
+    ApiItemResponse<MembershipDtoResponse> createFreeMembershipForLoggedInUser();
 }

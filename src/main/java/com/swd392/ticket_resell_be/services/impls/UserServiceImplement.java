@@ -18,7 +18,6 @@ import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -43,7 +42,6 @@ public class UserServiceImplement implements UserService {
     TokenUtil tokenUtil;
     EmailUtil emailUtil;
     PagingUtil pagingUtil;
-    private final ModelMapper modelMapper;
 
     @Override
     public ApiItemResponse<LoginDtoResponse> login(LoginDtoRequest loginDtoRequest) throws JOSEException {
@@ -251,6 +249,71 @@ public class UserServiceImplement implements UserService {
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean updateReputation(int reputation, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setReputation(reputation);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean updateRating(float rating, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setRating(rating);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public ApiItemResponse<UserDto> updateAvatar(String avatar) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setAvatar(avatar);
+        userRepository.save(user);
+        UserDto userDto = new UserDto(user.getUsername(), user.getEmail(), null, null, null,
+                user.getAvatar(), user.getRating(), user.getReputation(),
+                null, null, null, null);
+        return apiResponseBuilder.buildResponse(userDto, HttpStatus.OK);
+    }
+
+    @Override
+    public ApiItemResponse<User> updateUser(String username, User user) {
+        User userUpdate = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (!userUpdate.getUsername().equals(user.getUsername()) &&
+                userRepository.existsByUsername(user.getUsername())) {
+            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
+        }
+        if (!userUpdate.getEmail().equals(user.getEmail()) &&
+                userRepository.existsByEmail(user.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        userUpdate.setUsername(user.getUsername());
+        userUpdate.setPassword(passwordEncoder.encode(user.getPassword()));
+        userUpdate.setEmail(user.getEmail());
+        userUpdate.setRole(user.getRole());
+        userUpdate.setStatus(user.getStatus());
+        userUpdate.setTypeRegister(user.getTypeRegister());
+        userUpdate.setAvatar(user.getAvatar());
+        userUpdate.setRating(user.getRating());
+        userUpdate.setReputation(user.getReputation());
+        userRepository.save(userUpdate);
+        return apiResponseBuilder.buildResponse(userUpdate, HttpStatus.OK);
+    }
+
+    @Override
+    public ApiItemResponse<String> banUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setStatus(Categorize.BANNED);
+        userRepository.save(user);
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "User banned successfully!");
     }
 
     private User createRegisterUser(String username, String password, String email,

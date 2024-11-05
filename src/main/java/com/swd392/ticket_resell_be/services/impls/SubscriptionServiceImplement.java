@@ -108,4 +108,10 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK, "Redirect to Purchase");
     }
 
+    @Override
+    public Subscription getSubscriptionByName(String name) {
+        return subscriptionRepository.findByName(name)
+                .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
+    }
+
 }
