@@ -63,8 +63,8 @@ public class UserServiceImplement implements UserService {
     @Override
     public ApiItemResponse<LoginDtoResponse> login(String token)
             throws JOSEException {
-        String email = googleTokenUtil.getEmail(token);
-        User user = userRepository.findByEmailAndTypeRegisterAndStatus(email, Categorize.GOOGLE, Categorize.VERIFIED)
+            String email = googleTokenUtil.getEmail(token);
+            User user = userRepository.findByEmailAndTypeRegisterAndStatus(email, Categorize.GOOGLE, Categorize.VERIFIED)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         String refreshToken = tokenUtil.generateRefreshToken(user);
         //Save refresh-token to db
@@ -231,7 +231,6 @@ public class UserServiceImplement implements UserService {
         userRepository.save(user);
         return apiResponseBuilder.buildResponse(HttpStatus.OK, "User deleted successfully!");
     }
-
 
 
     @Override
