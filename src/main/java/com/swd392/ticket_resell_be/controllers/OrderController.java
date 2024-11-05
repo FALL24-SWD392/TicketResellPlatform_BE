@@ -62,27 +62,27 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
-    @PostMapping
+    @PostMapping("/details")
     public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> createOrderDetail(
             @RequestBody OrderDetailDtoRequest orderDetailDtoRequest) {
         return ResponseEntity.ok(orderDetailService.createOrderDetail(orderDetailDtoRequest));
     }
 
-    @PutMapping
+    @PutMapping("/details")
     public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> updateOrderDetail(
             @RequestParam UUID id,
             @RequestBody OrderDetailDtoRequest orderDetailDtoRequest) {
         return ResponseEntity.ok(orderDetailService.updateOrderDetail(id, orderDetailDtoRequest));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/details")
     public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> deleteOrderDetail(
             @RequestParam UUID id) {
         return ResponseEntity.ok(orderDetailService.removeOrderDetail(id));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
-    @GetMapping("/admin")
+    @GetMapping("/details/admin")
     public ResponseEntity<ApiListResponse<OrderDetailDtoResponse>> getAllOrderDetailsForAdmin(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -91,7 +91,7 @@ public class OrderController {
         return ResponseEntity.ok(orderDetailService.getAllOrderDetailsForAdmin(page - 1, size, direction, properties));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/details/{id}")
     public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> getOrderDetailById(
             @PathVariable("id") UUID id) {
         return ResponseEntity.ok(orderDetailService.getOrderDetailById(id));
