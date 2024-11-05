@@ -13,18 +13,18 @@ import java.util.Date;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "chat_messages")
 @EntityListeners(AuditingEntityListener.class)
 public class ChatMessage {
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private String id;
 
-    @Column(name = "chat_id", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private String chatId;
 
     @NotNull

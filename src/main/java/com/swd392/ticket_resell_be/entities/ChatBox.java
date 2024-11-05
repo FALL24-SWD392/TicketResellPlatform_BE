@@ -3,9 +3,7 @@ package com.swd392.ticket_resell_be.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -14,14 +12,17 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "chat_boxs")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "chat_boxes")
 @EntityListeners(AuditingEntityListener.class)
 public class ChatBox {
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private String id;
 
-    @Column(name = "chat_id", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private String chatId;
 
     @NotNull
@@ -46,13 +47,4 @@ public class ChatBox {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    @Builder
-    public ChatBox(String chatId, User sender, User recipient) {
-        this.chatId = chatId;
-        this.sender = sender;
-        this.recipient = recipient;
-    }
-
-    public ChatBox() {
-    }
 }

@@ -15,7 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class ChatNotification {
     @Id
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private String id;
 
     @NotNull
