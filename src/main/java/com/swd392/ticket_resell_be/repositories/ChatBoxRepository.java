@@ -10,4 +10,6 @@ import java.util.UUID;
 
 public interface ChatBoxRepository extends JpaRepository<ChatBox, UUID> {
     Optional<ChatBox> findBySenderIdAndRecipientId(UUID senderId, UUID recipientId);
+
+    ChatBox findById(String id);
 }

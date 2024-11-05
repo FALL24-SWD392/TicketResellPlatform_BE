@@ -5,6 +5,7 @@ import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
+import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import org.springframework.data.domain.Sort;
@@ -30,4 +31,10 @@ public interface TicketService {
     ApiItemResponse<TicketDtoResponse> viewTicketById(UUID id);
 
     int getCountBySellerAndStatus(User seller, Categorize status);
+
+    Ticket getTicketById(UUID id);
+
+    void updateTicketStatus(UUID id, Categorize status);
+
+    void updateTicketQuantity(UUID id, int quantity);
 }

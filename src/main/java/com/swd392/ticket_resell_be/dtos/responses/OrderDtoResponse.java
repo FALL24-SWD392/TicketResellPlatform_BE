@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDtoResponse {
-    Categorize status;
     private UUID id;
-    private UUID orderId;
+    private String chatBoxId;
+    private Categorize status;
 }

@@ -4,11 +4,10 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 public record OrderDtoRequest(
         @NotNull(message = "CHAT_BOX_ID_MUST_NOT_BE_NULL")
-        UUID chatBoxId,
+        String chatBoxId,
 
         @NotNull(message = "STATUS_MUST_NOT_BE_NULL")
         Categorize status

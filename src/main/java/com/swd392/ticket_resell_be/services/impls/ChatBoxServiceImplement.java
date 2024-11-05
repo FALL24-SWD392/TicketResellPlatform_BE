@@ -58,4 +58,8 @@ public class ChatBoxServiceImplement implements ChatBoxService {
 
         return chatId;
     }
+
+    public ChatBox findById(String id) {
+        return chatBoxRepository.findById(id);
+    }
 }
