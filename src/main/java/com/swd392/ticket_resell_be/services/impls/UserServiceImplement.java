@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -214,12 +215,19 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public ApiItemResponse<String> deleteUser(String username) {
-        User user = userRepository.findByUsername(username)
+        Optional<User> removedUser = userRepository.findByUsernameAndStatus(username, Categorize.REMOVED);
+        if (removedUser.isPresent()) {
+            throw new AppException(ErrorCode.USER_DELETED_BEFORE);
+        }
+        List<Categorize> validStatuses = Arrays.asList(Categorize.VERIFIED, Categorize.UNVERIFIED);
+        User user = userRepository.findByUsernameAndStatusIn(username, validStatuses)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         user.setStatus(Categorize.REMOVED);
         userRepository.save(user);
         return apiResponseBuilder.buildResponse(HttpStatus.OK, "User deleted successfully!");
     }
+
+
 
     @Override
     public ApiItemResponse<User> createUser(User user) {

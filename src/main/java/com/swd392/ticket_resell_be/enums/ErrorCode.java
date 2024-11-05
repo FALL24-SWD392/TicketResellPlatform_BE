@@ -14,6 +14,8 @@ public enum ErrorCode {
     UNDEFINED("Undefined error", HttpStatus.INTERNAL_SERVER_ERROR),
     //User errors
     USER_NOT_FOUND("User not found", HttpStatus.NOT_FOUND),
+    USER_DELETED_BEFORE("User are deleted before", HttpStatus.NOT_FOUND),
+
     WRONG_PASSWORD("Wrong password", HttpStatus.BAD_REQUEST),
     USERNAME_EMPTY("Username cannot be empty", HttpStatus.BAD_REQUEST),
     PASSWORD_EMPTY("Password cannot be empty", HttpStatus.BAD_REQUEST),
