@@ -46,6 +46,16 @@ public interface UserService {
 
     Optional<User> getUserByName(String username) throws AppException;
 
+    boolean updateReputation(int reputation, String username);
+
+    boolean updateRating(float rating, String username);
+
+    ApiItemResponse<UserDto> updateAvatar(String avatar);
+
+    ApiItemResponse<User> updateUser(String username, User user);
+
+    ApiItemResponse<String> banUser(String username);
+
     void saveUser(User user);
 
     void disconnect(User user);

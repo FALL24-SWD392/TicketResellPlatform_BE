@@ -1,6 +1,8 @@
 package com.swd392.ticket_resell_be.controllers;
 
+import com.swd392.ticket_resell_be.dtos.requests.BanUserRequest;
 import com.swd392.ticket_resell_be.dtos.requests.DeleteUserRequest;
+import com.swd392.ticket_resell_be.dtos.requests.UpdateAvatarRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.UserDto;
@@ -48,7 +50,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiItemResponse<String>> deleteUser(@RequestBody DeleteUserRequest username) {
         return ResponseEntity.ok(userService.deleteUser(username.username()));
     }
@@ -57,6 +59,23 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiItemResponse<User>> createUser(@RequestBody User user) {
         return ResponseEntity.ok(userService.createUser(user));
+    }
+
+    @PutMapping("/ban")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiItemResponse<String>> banUser(@RequestBody BanUserRequest username) {
+        return ResponseEntity.ok(userService.banUser(username.username()));
+    }
+
+    @PutMapping("/myInfo")
+    public ResponseEntity<ApiItemResponse<UserDto>> updateAvatar(@RequestBody UpdateAvatarRequest avatar) {
+        return ResponseEntity.ok(userService.updateAvatar(avatar.avatar()));
+    }
+
+    @PutMapping("/{username}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ApiItemResponse<User>> updateUser(@PathVariable String username, @RequestBody User user) {
+        return ResponseEntity.ok(userService.updateUser(username, user));
     }
 
     @MessageMapping("/user.addUser")
@@ -73,7 +92,7 @@ public class UserController {
         return user;
     }
 
-    @GetMapping("/users")
+    @GetMapping("/connected-users")
     public ResponseEntity<ApiListResponse<UserDtoWebSocket>> findConnectedUsers(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
