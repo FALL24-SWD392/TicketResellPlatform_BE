@@ -131,8 +131,14 @@ public class ReportServiceImplement implements ReportService {
 
     @Override
     public ApiListResponse<ReportDtoResponse> getAllReportsByStatus(Categorize status, int page, int size, Sort.Direction direction, String... properties) {
-        Page<Report> reports = reportRepository.findAllByStatus(status, pagingUtil
-                .getPageable(Report.class, page, size, direction, properties));
+        Page<Report> reports;
+        if(status.equals(Categorize.ALL)){
+            reports = reportRepository.findAll(pagingUtil
+                    .getPageable(Report.class, page, size, direction, properties));
+        } else {
+            reports = reportRepository.findAllByStatus(status, pagingUtil
+                    .getPageable(Report.class, page, size, direction, properties));
+        }
         if (reports.getTotalElements() > 0) {
             throw new AppException(ErrorCode.REPORT_NOT_FOUND);
         }
