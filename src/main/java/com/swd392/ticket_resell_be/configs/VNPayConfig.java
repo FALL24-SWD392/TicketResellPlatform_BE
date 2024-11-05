@@ -17,14 +17,20 @@ public class VNPayConfig {
     public static String secretKey = "QOGLYTLKC9YJ2JFERFK5ACGTGUNM3GB2";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
-    // Generate the return URL dynamically based on the request
     public static String getReturnUrl(HttpServletRequest request) {
-        return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/api/payment/callback";
+        String scheme = request.getScheme(); // Lấy scheme (http hoặc https)
+        String serverName = request.getServerName(); // Lấy tên server
+        int serverPort = request.getServerPort(); // Lấy cổng server
+        String contextPath = "/api/payment/callback"; // Đường dẫn callback
+
+        // Chỉ thêm cổng nếu không phải là cổng mặc định (80 cho HTTP và 443 cho HTTPS)
+        String portString = (serverPort == 80 && "http".equals(scheme)) || (serverPort == 443 && "https".equals(scheme))
+                ? ""
+                : ":" + serverPort;
+
+        return scheme + "://" + serverName + portString + contextPath;
     }
 
-    public static String md5(String message) {
-        return hashMessage("MD5", message);
-    }
 
     public static String sha256(String message) {
         return hashMessage("SHA-256", message);
