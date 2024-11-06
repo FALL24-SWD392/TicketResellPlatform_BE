@@ -48,7 +48,7 @@ public class TransactionServiceImplement implements TransactionService {
         transaction.setOrderCode(orderCode);
         transaction.setSubscription(subscription);
         transaction.setSeller(user);
-        transaction.setDescription("Thanh toán cho gói: " + subscription.getName());
+        transaction.setDescription("Payment for Subscription: " + subscription.getName());
         transaction.setStatus(Categorize.PENDING);
         transaction.setCreatedAt(new Date());
         transaction.setUpdatedAt(new Date());

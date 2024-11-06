@@ -102,7 +102,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
             throw new AppException(ErrorCode.INSUFFICIENT_REPUTATION);
         }
         long orderTotal = (long) subscription.getPrice();
-        String orderInfo = "Thanh toán cho gói " + subscription.getName();
+        String orderInfo = "Payment for subscription: " + subscription.getName();
         VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo, request);
         transactionService.savePendingTransaction(subscription, user, orderResponse.orderCode());
         return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK, "Redirect to Purchase");
