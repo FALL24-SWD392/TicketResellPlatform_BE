@@ -60,7 +60,15 @@ public enum ErrorCode {
     PAYMENT_FAILED("Payment failed", HttpStatus.BAD_REQUEST),
 
     USER_SUBSCRIPTION_NOT_FOUND("User or Subscription not found", HttpStatus.NOT_FOUND),
-    INSUFFICIENT_REPUTATION("You do not have enough reputation points to purchase this subscription.", HttpStatus.BAD_REQUEST);
+    INSUFFICIENT_REPUTATION("You do not have enough reputation points to purchase this subscription.", HttpStatus.BAD_REQUEST),
+
+    //Chat error
+    CHAT_BOX_DOES_NOT_EXIST("Chat Box not found", HttpStatus.NOT_FOUND),
+
+    //Order error
+    ORDER_DOES_NOT_EXIST("Order not found", HttpStatus.NOT_FOUND),
+    ORDER_DETAIL_DOES_NOT_EXIST("Order detail not found", HttpStatus.NOT_FOUND);
+
     String message;
     HttpStatus status;
 }

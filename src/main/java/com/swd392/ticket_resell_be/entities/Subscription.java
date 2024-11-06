@@ -3,6 +3,7 @@ package com.swd392.ticket_resell_be.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -33,7 +34,7 @@ public class Subscription {
     @Column(name = "description", nullable = false, length = 500)
     private String description;
 
-    @Positive
+    @PositiveOrZero
     @Column(name = "point_required", nullable = false)
     private int pointRequired;
 

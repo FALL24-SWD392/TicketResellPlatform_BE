@@ -2,10 +2,7 @@ package com.swd392.ticket_resell_be.services.impls;
 
 import com.nimbusds.jose.JOSEException;
 import com.swd392.ticket_resell_be.dtos.requests.*;
-import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
-import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
-import com.swd392.ticket_resell_be.dtos.responses.LoginDtoResponse;
-import com.swd392.ticket_resell_be.dtos.responses.UserDto;
+import com.swd392.ticket_resell_be.dtos.responses.*;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
@@ -18,7 +15,6 @@ import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -44,7 +40,6 @@ public class UserServiceImplement implements UserService {
     TokenUtil tokenUtil;
     EmailUtil emailUtil;
     PagingUtil pagingUtil;
-    private final ModelMapper modelMapper;
 
     @Override
     public ApiItemResponse<LoginDtoResponse> login(LoginDtoRequest loginDtoRequest) throws JOSEException {
@@ -61,11 +56,18 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public ApiItemResponse<LoginDtoResponse> login(String token)
-            throws JOSEException {
-            String email = googleTokenUtil.getEmail(token);
-            User user = userRepository.findByEmailAndTypeRegisterAndStatus(email, Categorize.GOOGLE, Categorize.VERIFIED)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    public ApiItemResponse<LoginDtoResponse> login(String token) throws JOSEException {
+        String email = googleTokenUtil.getEmail(token);
+        User user;
+        if(!userRepository.existsByEmail(email)){
+            user = createRegisterUser(email.substring(0,5), UUID.randomUUID().toString(), email, Categorize.VERIFIED,
+                    Categorize.GOOGLE, "default");
+            userRepository.save(user);
+        }
+        else {
+            user = userRepository.findByEmailAndTypeRegisterAndStatus(email, Categorize.GOOGLE, Categorize.VERIFIED)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        }
         String refreshToken = tokenUtil.generateRefreshToken(user);
         //Save refresh-token to db
         tokenService.save(tokenUtil.createTokenEntity(refreshToken, Categorize.ACTIVE));
@@ -258,6 +260,128 @@ public class UserServiceImplement implements UserService {
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean updateReputation(int reputation, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setReputation(reputation);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean updateRating(float rating, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setRating(rating);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public ApiItemResponse<UserDto> updateAvatar(String avatar) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setAvatar(avatar);
+        userRepository.save(user);
+        UserDto userDto = new UserDto(user.getUsername(), user.getEmail(), null, null, null,
+                user.getAvatar(), user.getRating(), user.getReputation(),
+                null, null, null, null);
+        return apiResponseBuilder.buildResponse(userDto, HttpStatus.OK);
+    }
+
+    @Override
+    public ApiItemResponse<User> updateUser(String username, User user) {
+        User userUpdate = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (!userUpdate.getUsername().equals(user.getUsername()) &&
+                userRepository.existsByUsername(user.getUsername())) {
+            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
+        }
+        if (!userUpdate.getEmail().equals(user.getEmail()) &&
+                userRepository.existsByEmail(user.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+        userUpdate.setUsername(user.getUsername());
+        userUpdate.setPassword(passwordEncoder.encode(user.getPassword()));
+        userUpdate.setEmail(user.getEmail());
+        userUpdate.setRole(user.getRole());
+        userUpdate.setStatus(user.getStatus());
+        userUpdate.setTypeRegister(user.getTypeRegister());
+        userUpdate.setAvatar(user.getAvatar());
+        userUpdate.setRating(user.getRating());
+        userUpdate.setReputation(user.getReputation());
+        userRepository.save(userUpdate);
+        return apiResponseBuilder.buildResponse(userUpdate, HttpStatus.OK);
+    }
+
+    @Override
+    public ApiItemResponse<String> banUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setStatus(Categorize.BANNED);
+        userRepository.save(user);
+        return apiResponseBuilder.buildResponse(HttpStatus.OK, "User banned successfully!");
+    }
+
+    @Override
+    public void saveUser(User user) {
+        user.setStatus(Categorize.ONLINE);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void disconnect(User user) {
+        var storedUser = userRepository.findById(user.getId()).orElse(null);
+        if (storedUser != null) {
+            storedUser.setStatus(Categorize.OFFLINE);
+            userRepository.save(storedUser);
+        }
+    }
+
+    @Override
+    public ApiListResponse<UserDtoWebSocket> findConnectedUsers(int page, int size, Sort.Direction direction, String... properties) {
+        Page<User> users = userRepository.findAllByStatus(Categorize.ONLINE, pagingUtil
+                .getPageable(User.class, page, size, direction, properties));
+
+        return apiResponseBuilder.buildResponse(
+                parseToList(users),
+                users.getSize(),
+                users.getNumber() + 1,
+                users.getTotalElements(),
+                users.getTotalPages(),
+                HttpStatus.OK,
+                null
+        );
+    }
+
+    @Override
+    public User findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    private List<UserDtoWebSocket> parseToList(Page<User> users) {
+        return users.getContent().stream()
+                .map(user -> new UserDtoWebSocket(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getPassword(),
+                        user.getEmail(),
+                        user.getRole(),
+                        user.getStatus(),
+                        user.getTypeRegister(),
+                        user.getAvatar(),
+                        user.getRating(),
+                        user.getReputation(),
+                        user.getCreatedBy(),
+                        user.getCreatedAt(),
+                        user.getUpdatedBy(),
+                        user.getUpdatedAt()
+                ))
+                .toList();
     }
 
     private User createRegisterUser(String username, String password, String email,

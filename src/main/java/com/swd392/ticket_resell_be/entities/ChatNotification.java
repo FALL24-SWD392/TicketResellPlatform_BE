@@ -1,31 +1,22 @@
 package com.swd392.ticket_resell_be.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.util.Date;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "chat_messages")
+@Table(name = "chat_notifications")
 @EntityListeners(AuditingEntityListener.class)
-public class ChatMessage {
+public class ChatNotification {
     @Id
     @Column(nullable = false, updatable = false)
     private String id;
-
-    @Column(nullable = false, updatable = false)
-    private String chatId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -37,15 +28,7 @@ public class ChatMessage {
     @JoinColumn(nullable = false, updatable = false)
     private User recipient;
 
-    @NotEmpty
-    @Length(max = 750)
-    @Column(name = "message", length = 750)
-    private String message;
-
-    @CreatedDate
     @NotNull
-    @PastOrPresent
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Date createdAt;
+    @Column(name = "content", nullable = false, updatable = false)
+    private String content;
 }

@@ -3,34 +3,37 @@ package com.swd392.ticket_resell_be.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "chat_boxs")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "chat_boxes")
 @EntityListeners(AuditingEntityListener.class)
 public class ChatBox {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", nullable = false, updatable = false)
-    private UUID id;
+    @Column(nullable = false, updatable = false)
+    private String id;
+
+    @Column(nullable = false, updatable = false)
+    private String chatId;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false, updatable = false)
-    private User seller;
+    private User sender;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false, updatable = false)
-    private User buyer;
+    private User recipient;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -43,4 +46,5 @@ public class ChatBox {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
+
 }

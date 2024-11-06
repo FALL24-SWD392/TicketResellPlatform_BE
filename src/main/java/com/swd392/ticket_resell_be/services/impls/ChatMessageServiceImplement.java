@@ -1,17 +1,19 @@
 package com.swd392.ticket_resell_be.services.impls;
 
-import com.swd392.ticket_resell_be.dtos.requests.ChatMessageDtoRequest;
-import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.entities.ChatMessage;
+import com.swd392.ticket_resell_be.enums.ErrorCode;
+import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.ChatMessageRepository;
+import com.swd392.ticket_resell_be.services.ChatBoxService;
 import com.swd392.ticket_resell_be.services.ChatMessageService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
+import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -22,50 +24,47 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ChatMessageServiceImplement implements ChatMessageService {
-
     ChatMessageRepository chatMessageRepository;
-    ApiResponseBuilder apiResponseBuilder;
-
-    ModelMapper modelMapper;
+    ChatBoxService chatBoxService;
+    PagingUtil pagingUtil;
+    private final ApiResponseBuilder apiResponseBuilder;
 
     @Override
-    public ApiItemResponse<ChatMessage> createChatMessage(ChatMessageDtoRequest chatMessageDtoRequest) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT).setSkipNullEnabled(true);
-        ChatMessage chatMessage = modelMapper.map(chatMessageDtoRequest, ChatMessage.class);
-        return apiResponseBuilder.buildResponse(
-                chatMessageRepository.save(chatMessage),
-                HttpStatus.CREATED,
-                null
-        );
+    public ChatMessage save(ChatMessage chatMessage) {
+        var chatId = chatBoxService.getChatRoomId(
+                chatMessage.getSender().getId(),
+                chatMessage.getRecipient().getId(),
+                true
+        ).orElseThrow(() -> new AppException(ErrorCode.CHAT_BOX_DOES_NOT_EXIST));
+        chatMessage.setChatId(chatId);
+        chatMessageRepository.save(chatMessage);
+        return chatMessage;
     }
 
-    @Override
-    public ApiListResponse<ChatMessage> viewAllChatMessage() {
-        List<ChatMessage> chatMessageList = chatMessageRepository.findAll();
-        return apiResponseBuilder.buildResponse(
-                chatMessageList,
-                0,
-                0,
-                0,
-                0,
-                HttpStatus.OK,
-                null
-        );
-    }
-
-    @Override
-    public ApiListResponse<ChatMessage> viewAllChatMessageByChatBox(UUID chatBoxId) {
-        List<UUID> uuidList = chatMessageRepository.findAllByChatBoxId(chatBoxId)
-                .stream()
-                .map(ChatMessage::getId)
+    private List<ChatMessage> parseToList(Page<ChatMessage> chatMessages) {
+        return chatMessages.getContent().stream()
+                .map(chatMessage -> new ChatMessage(
+                        chatMessage.getId(),
+                        chatMessage.getChatId(),
+                        chatMessage.getSender(),
+                        chatMessage.getRecipient(),
+                        chatMessage.getMessage(),
+                        chatMessage.getCreatedAt()
+                ))
                 .toList();
-        List<ChatMessage> chatMessageList = chatMessageRepository.findAllById(uuidList);
+    }
+
+    @Override
+    public ApiListResponse<ChatMessage> findChatMessages(UUID senderId, UUID recipientId, int page, int size, Sort.Direction direction, String... properties) {
+        var chatId = chatBoxService.getChatRoomId(senderId, recipientId, false);
+        Page<ChatMessage> chatMessages = chatMessageRepository.findByChatId(chatId.get(), pagingUtil
+                .getPageable(ChatMessage.class, page, size, direction, properties));
         return apiResponseBuilder.buildResponse(
-                chatMessageList,
-                0,
-                0,
-                0,
-                0,
+                parseToList(chatMessages),
+                chatMessages.getSize(),
+                chatMessages.getNumber() + 1,
+                chatMessages.getTotalElements(),
+                chatMessages.getTotalPages(),
                 HttpStatus.OK,
                 null
         );
