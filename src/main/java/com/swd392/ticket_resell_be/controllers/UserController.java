@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ApiListResponse<UserDto>>
     getUsers(@RequestParam(defaultValue = "") String search,
              @RequestParam(defaultValue = "1") int page,
@@ -42,6 +42,17 @@ public class UserController {
              @RequestParam(defaultValue = "ASC") Sort.Direction direction,
              @RequestParam(defaultValue = "id") String... properties) {
         return ResponseEntity.ok(userService.getUsers(search, page - 1, size, direction, properties));
+    }
+
+    @GetMapping("/staff")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<ApiListResponse<UserDto>>
+    getUsersForStaff(@RequestParam(defaultValue = "") String search,
+             @RequestParam(defaultValue = "1") int page,
+             @RequestParam(defaultValue = "20") int size,
+             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+             @RequestParam(defaultValue = "id") String... properties) {
+        return ResponseEntity.ok(userService.getUsersForStaff(search, page - 1, size, direction, properties));
     }
 
     @GetMapping("/{username}")
