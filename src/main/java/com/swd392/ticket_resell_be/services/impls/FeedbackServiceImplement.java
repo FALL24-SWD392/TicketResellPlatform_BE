@@ -48,7 +48,7 @@ public class FeedbackServiceImplement implements FeedbackService {
     public ApiItemResponse<FeedbackDtoResponse> createFeedback(FeedbackDtoRequest feedbackDtoRequest) {
         Feedback feedback = new Feedback();
         mapperHandmade(feedback, feedbackDtoRequest);
-        feedback.setStatus(Categorize.PENDING);
+        feedback.setStatus(Categorize.APPROVED);
         feedbackRepository.save(feedback);
 
         plusReputation(feedback.getOrder().getChatBox().getSender());

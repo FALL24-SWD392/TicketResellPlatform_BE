@@ -45,7 +45,6 @@ public class FeedbackController {
         return ResponseEntity.ok(feedbackService.removeFeedback(id));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     @GetMapping
     public ResponseEntity<ApiListResponse<FeedbackDtoResponse>> getFeedbackByUserId(
             @RequestParam @Valid UUID orderId,
