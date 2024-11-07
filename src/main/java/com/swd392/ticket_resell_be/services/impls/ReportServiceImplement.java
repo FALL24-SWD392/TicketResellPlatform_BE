@@ -113,9 +113,10 @@ public class ReportServiceImplement implements ReportService {
 
     @Override
     public ApiListResponse<ReportDtoResponse> getReportByUserId(UUID id, int page, int size, Sort.Direction direction, String... properties) {
-        Page<Report> reports = reportRepository.findReportById(id, pagingUtil
+        User user = userService.findById(id);
+        Page<Report> reports = reportRepository.findByReportedOrReporter(user, user, pagingUtil
                 .getPageable(Report.class, page, size, direction, properties));
-        if (reports.getTotalElements() > 0) {
+        if (reports.getTotalElements() == 0) {
             throw new AppException(ErrorCode.REPORT_NOT_FOUND);
         }
         return apiResponseBuilder.buildResponse(
