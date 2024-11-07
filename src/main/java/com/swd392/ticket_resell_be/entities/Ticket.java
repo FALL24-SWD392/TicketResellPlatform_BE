@@ -52,7 +52,7 @@ public class Ticket {
     @Column(name = "unit_price", nullable = false)
     private float unitPrice;
 
-    @Positive
+    @PositiveOrZero
     @Column(name = "quantity", nullable = false)
     private int quantity;
 
