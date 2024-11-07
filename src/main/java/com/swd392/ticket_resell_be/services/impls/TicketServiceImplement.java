@@ -10,6 +10,8 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.TicketRepository;
+import com.swd392.ticket_resell_be.services.MembershipService;
+import com.swd392.ticket_resell_be.services.SubscriptionService;
 import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
@@ -17,6 +19,7 @@ import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -31,19 +34,31 @@ import java.util.UUID;
 public class TicketServiceImplement implements TicketService {
     TicketRepository ticketRepository;
     UserService userService;
+    MembershipService membershipService;
+
     ApiResponseBuilder apiResponseBuilder;
     PagingUtil pagingUtil;
 
     @Override
     public ApiItemResponse<TicketDtoResponse> createTicket(TicketDtoRequest ticketDtoRequest) {
-        Ticket ticket = new Ticket();
-        mapperHandmade(ticket, ticketDtoRequest);
-        ticket.setStatus(Categorize.PENDING);
-        ticketRepository.save(ticket);
-        return apiResponseBuilder.buildResponse(
-                parseToTicketDtoResponse(ticket),
-                HttpStatus.CREATED
-        );
+        if (checkSaleRemain(ticketDtoRequest))
+            throw new AppException(ErrorCode.YOU_SELL_MAXIMUM_TICKET);
+        else {
+            Ticket ticket = new Ticket();
+            mapperHandmade(ticket, ticketDtoRequest);
+            ticket.setStatus(Categorize.PENDING);
+            ticketRepository.save(ticket);
+            return apiResponseBuilder.buildResponse(
+                    parseToTicketDtoResponse(ticket),
+                    HttpStatus.CREATED
+            );
+        }
+    }
+
+    private boolean checkSaleRemain(TicketDtoRequest ticketDtoRequest){
+        User user = userService.findById(ticketDtoRequest.seller_id());
+        int countTicket = getCountBySellerAndStatus(user, Categorize.APPROVED) + getCountBySellerAndStatus(user, Categorize.PENDING);
+        return membershipService.getMembershipForLoggedInUser(user).getSaleRemain() - countTicket <= 0;
     }
 
     @Override
@@ -93,12 +108,17 @@ public class TicketServiceImplement implements TicketService {
     @Override
     public ApiItemResponse<TicketDtoResponse> removeTicket(UUID id) {
         Ticket ticket = ticketRepository.findTicketWithSellerById(id);
-        ticket.setStatus(Categorize.REMOVED);
-        ticketRepository.save(ticket);
-        return apiResponseBuilder.buildResponse(
-                parseToTicketDtoResponse(ticket),
-                HttpStatus.OK
-        );
+
+        if(ticket.getStatus().equals(Categorize.REMOVED))
+            throw new AppException(ErrorCode.TICKET_ALREADY_REMOVED);
+        else {
+            ticket.setStatus(Categorize.REMOVED);
+            ticketRepository.save(ticket);
+            return apiResponseBuilder.buildResponse(
+                    parseToTicketDtoResponse(ticket),
+                    HttpStatus.OK
+            );
+        }
     }
 
     private List<TicketDtoResponse> parseToTicketDtoResponses(Page<Ticket> tickets) {
@@ -226,5 +246,21 @@ public class TicketServiceImplement implements TicketService {
         Ticket ticket = ticketRepository.findTicketWithSellerById(id);
         ticket.setQuantity(quantity);
         ticketRepository.save(ticket);
+    }
+
+    @Override
+    public ApiListResponse<TicketDtoResponse> viewTicketByUserId(UUID userId, int page, int size, Sort.Direction direction, String[] properties) {
+        Page<Ticket> tickets = ticketRepository.findBySeller(userService.findById(userId) ,pagingUtil
+                    .getPageable(Ticket.class, page, size, direction, properties));
+        List<TicketDtoResponse> returnTickets = parseToTicketDtoResponses(tickets);
+
+        return apiResponseBuilder.buildResponse(
+                returnTickets,
+                tickets.getSize(),
+                tickets.getNumber() + 1,
+                tickets.getTotalElements(),
+                tickets.getTotalPages(),
+                HttpStatus.OK
+        );
     }
 }
