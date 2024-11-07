@@ -46,9 +46,15 @@ public class FeedbackServiceImplement implements FeedbackService {
 
     @Override
     public ApiItemResponse<FeedbackDtoResponse> createFeedback(FeedbackDtoRequest feedbackDtoRequest) {
+        Order selectedOrder = orderService.findById(feedbackDtoRequest.order_id());
+        User buyer = userService.findById(feedbackDtoRequest.buyer_id());
+
+        if(feedbackRepository.findByOrderAndBuyer(selectedOrder, buyer) != null)
+            throw new AppException(ErrorCode.USER_ALREADY_FEEDBACK_THIS_ORDER);
+
         Feedback feedback = new Feedback();
         mapperHandmade(feedback, feedbackDtoRequest);
-        feedback.setStatus(Categorize.APPROVED);
+        feedback.setStatus(Categorize.COMPLETED);
         feedbackRepository.save(feedback);
 
         plusReputation(feedback.getOrder().getChatBox().getSender());
