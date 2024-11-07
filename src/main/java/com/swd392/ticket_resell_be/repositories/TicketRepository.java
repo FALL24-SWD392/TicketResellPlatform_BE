@@ -27,4 +27,6 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     Ticket findTicketWithSellerById(@Param("id") UUID id);
 
     int countBySellerAndStatus(@NotNull User seller, @NotNull Categorize status);
+
+    Page<Ticket> findBySeller(User seller, Pageable page);
 }
