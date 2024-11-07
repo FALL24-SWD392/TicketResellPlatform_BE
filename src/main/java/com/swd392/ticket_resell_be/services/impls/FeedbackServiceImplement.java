@@ -189,7 +189,7 @@ public class FeedbackServiceImplement implements FeedbackService {
 
     @Override
     public ApiListResponse<FeedbackDtoResponse> findFeedbackByOrderId(UUID id, Categorize status, int page, int size, Sort.Direction direction, String... properties) {
-        Page<Feedback> feedbacks = feedbackRepository.findAllByOrderIdAndStatus(id, status, pagingUtil
+        Page<Feedback> feedbacks = feedbackRepository.findByOrderChatBoxRecipient(id, pagingUtil
                 .getPageable(Feedback.class, page, size, direction, properties));
         if (feedbacks.isEmpty())
             throw new AppException(ErrorCode.FEEDBACK_NOT_FOUND);

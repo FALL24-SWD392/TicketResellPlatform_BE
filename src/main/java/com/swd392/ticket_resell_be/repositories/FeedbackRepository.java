@@ -8,6 +8,8 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
@@ -19,4 +21,11 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
     Page<Feedback> findAllByOrderIdAndStatus(UUID id, Categorize status, Pageable page);
 
     Feedback findByOrderAndBuyer(Order order, User buyer);
+    @Query("SELECT f FROM Feedback f " +
+            "JOIN f.order o " +
+            "JOIN o.chatBox c " +
+            "JOIN c.recipient u " +
+            "WHERE u.id = :recipientId")
+    Page<Feedback> findByOrderChatBoxRecipient(@Param("recipientId") UUID recipientId, Pageable pageable);
+
 }
