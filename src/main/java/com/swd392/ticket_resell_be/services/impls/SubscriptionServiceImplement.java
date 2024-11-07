@@ -119,8 +119,6 @@ public class SubscriptionServiceImplement implements SubscriptionService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
     }
 
-
-
     public ApiListResponse<SubscriptionDtoResponse> getCurrentSubscriptionForLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

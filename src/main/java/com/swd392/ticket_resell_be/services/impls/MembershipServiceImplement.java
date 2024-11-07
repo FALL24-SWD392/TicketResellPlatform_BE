@@ -34,7 +34,6 @@ public class MembershipServiceImplement implements MembershipService {
 
     MembershipRepository membershipRepository;
     ApiResponseBuilder apiResponseBuilder;
-    TicketService ticketService;
     UserService userService;
     SubscriptionService subscriptionService;
 
@@ -45,8 +44,7 @@ public class MembershipServiceImplement implements MembershipService {
         }
         Optional<Membership> existingMembership = membershipRepository.findMembershipBySeller(user);
         Membership membership;
-        int ticketCount = ticketService.getCountBySellerAndStatus(user, Categorize.APPROVED);
-        int saleRemain = subscription.getSaleLimit() - ticketCount;
+        int saleRemain = subscription.getSaleLimit();
 
         if (existingMembership.isPresent()) {
             membership = existingMembership.get();
@@ -110,6 +108,11 @@ public class MembershipServiceImplement implements MembershipService {
         return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.CREATED);
     }
 
+    @Override
+    public Membership getMembershipForLoggedInUser(User user) {
+        return membershipRepository.findMembershipBySeller(user).get();
+    }
+
     private MembershipDtoResponse mapToDto(Membership membership) {
         return MembershipDtoResponse.builder()
                 .id(membership.getId())
@@ -119,5 +122,7 @@ public class MembershipServiceImplement implements MembershipService {
                 .endDate(membership.getEndDate())
                 .build();
     }
+
+
 
 }

@@ -37,4 +37,6 @@ public interface TicketService {
     void updateTicketStatus(UUID id, Categorize status);
 
     void updateTicketQuantity(UUID id, int quantity);
+
+    ApiListResponse<TicketDtoResponse> viewTicketByUserId(UUID userId, int i, int size, Sort.Direction direction, String[] properties);
 }
