@@ -139,7 +139,7 @@ public class ReportServiceImplement implements ReportService {
             reports = reportRepository.findAllByStatus(status, pagingUtil
                     .getPageable(Report.class, page, size, direction, properties));
         }
-        if (reports.getTotalElements() > 0) {
+        if (reports.getTotalElements() == 0) {
             throw new AppException(ErrorCode.REPORT_NOT_FOUND);
         }
         return apiResponseBuilder.buildResponse(

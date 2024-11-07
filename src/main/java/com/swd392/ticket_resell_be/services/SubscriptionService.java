@@ -3,9 +3,11 @@ package com.swd392.ticket_resell_be.services;
 import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.SubscriptionDtoResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,4 +23,7 @@ public interface SubscriptionService {
     ApiItemResponse<String> purchaseSubscription(UUID subscriptionId, HttpServletRequest request);
 
     Subscription getSubscriptionByName(String name);
+
+    ApiListResponse<SubscriptionDtoResponse> getCurrentSubscriptionForLoggedInUser();
+
 }
