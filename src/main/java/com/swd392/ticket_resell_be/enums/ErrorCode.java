@@ -67,7 +67,10 @@ public enum ErrorCode {
 
     //Order error
     ORDER_DOES_NOT_EXIST("Order not found", HttpStatus.NOT_FOUND),
-    ORDER_DETAIL_DOES_NOT_EXIST("Order detail not found", HttpStatus.NOT_FOUND);
+    ORDER_DETAIL_DOES_NOT_EXIST("Order detail not found", HttpStatus.NOT_FOUND),
+
+    //feedback error
+    USER_ALREADY_FEEDBACK_THIS_ORDER("Already feedback this order", HttpStatus.CONFLICT);
 
     String message;
     HttpStatus status;
