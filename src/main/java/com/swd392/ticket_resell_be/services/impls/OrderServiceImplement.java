@@ -4,6 +4,7 @@ import com.swd392.ticket_resell_be.dtos.requests.OrderDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.OrderDtoResponse;
+import com.swd392.ticket_resell_be.entities.ChatBox;
 import com.swd392.ticket_resell_be.entities.Order;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
@@ -132,5 +133,10 @@ public class OrderServiceImplement implements OrderService {
     @Override
     public Order findById(UUID id) {
         return orderRepository.findById(id);
+    }
+
+    @Override
+    public Order findByChatBox(ChatBox chatBox) {
+        return orderRepository.findByChatBox(chatBox).orElse(null);
     }
 }

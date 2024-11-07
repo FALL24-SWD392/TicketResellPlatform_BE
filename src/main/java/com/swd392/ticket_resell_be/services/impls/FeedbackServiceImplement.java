@@ -5,12 +5,15 @@ import com.swd392.ticket_resell_be.dtos.requests.FeedbackDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.FeedbackDtoResponse;
+import com.swd392.ticket_resell_be.entities.ChatBox;
 import com.swd392.ticket_resell_be.entities.Feedback;
+import com.swd392.ticket_resell_be.entities.Order;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.FeedbackRepository;
+import com.swd392.ticket_resell_be.services.ChatBoxService;
 import com.swd392.ticket_resell_be.services.FeedbackService;
 import com.swd392.ticket_resell_be.services.OrderService;
 import com.swd392.ticket_resell_be.services.UserService;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +39,7 @@ public class FeedbackServiceImplement implements FeedbackService {
     FeedbackRepository feedbackRepository;
     UserService userService;
     OrderService orderService;
-
+    ChatBoxService chatBoxService;
     ApiResponseBuilder apiResponseBuilder;
     PagingUtil pagingUtil;
 
@@ -50,6 +54,28 @@ public class FeedbackServiceImplement implements FeedbackService {
         plusReputation(feedback.getOrder().getChatBox().getSender());
         plusReputation(feedback.getOrder().getChatBox().getRecipient());
 
+        User ratedUser = userService
+                .findById(orderService
+                        .findById(feedbackDtoRequest.order_id())
+                        .getChatBox().getRecipient().getId());
+        float currentRate = ratedUser.getRating();
+
+        List<ChatBox> chatMessages = chatBoxService.findChatBoxesByRecipient(ratedUser);
+
+        List<Order> orders = new ArrayList<>();
+
+        chatMessages.forEach(chat -> {
+            Order order = orderService.findByChatBox(chat);
+            if (order != null)
+                orders.add(order);
+        });
+
+        int numberOfOrders = orders.size();
+
+        userService.updateRating(
+                (currentRate * (numberOfOrders - 1) + feedbackDtoRequest.rating()) / numberOfOrders,
+                ratedUser.getUsername());
+
         return apiResponseBuilder.buildResponse(
                 parseToFeedbackDtoResponse(feedback),
                 HttpStatus.CREATED
@@ -57,7 +83,12 @@ public class FeedbackServiceImplement implements FeedbackService {
     }
 
     private void plusReputation(User seller) {
-        seller.setReputation(seller.getReputation() + 5);
+        int repu = seller.getReputation();
+        if (repu <= 95)
+            repu += 5;
+        else if (repu < 100)
+            repu += 1;
+        userService.updateReputation(repu, seller.getUsername());
     }
 
     private void mapperHandmade(Feedback feedback, FeedbackDtoRequest feedbackDtoRequest) {
@@ -105,6 +136,30 @@ public class FeedbackServiceImplement implements FeedbackService {
         Feedback existingFeedback = feedbackRepository.findFeedbackByIdIs(id);
         if (existingFeedback.getStatus() == Categorize.REMOVED)
             throw new AppException(ErrorCode.FEEDBACK_NOT_FOUND);
+
+        User ratedUser = userService
+                .findById(orderService
+                        .findById(feedbackDtoRequest.order_id())
+                        .getChatBox().getRecipient().getId());
+        float currentRate = ratedUser.getRating();
+
+        List<ChatBox> chatMessages = chatBoxService.findChatBoxesByRecipient(ratedUser);
+
+        List<Order> orders = new ArrayList<>();
+
+        chatMessages.forEach(chat -> {
+            Order order = orderService.findByChatBox(chat);
+            if (order != null)
+                orders.add(order);
+        });
+
+        int numberOfOrders = orders.size();
+
+        userService.updateRating(
+                (currentRate * numberOfOrders - existingFeedback.getRating() + feedbackDtoRequest.rating())
+                        / numberOfOrders,
+                ratedUser.getUsername());
+
         mapperHandmade(existingFeedback, feedbackDtoRequest);
         existingFeedback.setId(id);
         existingFeedback.setStatus(Categorize.PENDING);

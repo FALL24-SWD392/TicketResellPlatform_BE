@@ -39,26 +39,6 @@ public class MembershipServiceImplement implements MembershipService {
     SubscriptionService subscriptionService;
 
     @Override
-    public ApiItemResponse<Membership> createMembership(User user, Subscription subscription) {
-        if (user == null || subscription == null) {
-            throw new AppException(ErrorCode.USER_SUBSCRIPTION_NOT_FOUND);
-        }
-        Membership membership = new Membership();
-        membership.setId(UUID.randomUUID());
-        membership.setSeller(user);
-        membership.setSubscriptionName(subscription.getName());
-        Date currentDate = new Date();
-        membership.setStartDate(currentDate);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 30);
-        Date endDate = calendar.getTime();
-        membership.setEndDate(endDate);
-        Membership savedMembership = membershipRepository.save(membership);
-        return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.CREATED, "Membership created successfully");
-    }
-
-    @Override
     public ApiItemResponse<Membership> updateMembership(User user, Subscription subscription) {
         if (user == null || subscription == null) {
             throw new AppException(ErrorCode.USER_SUBSCRIPTION_NOT_FOUND);
