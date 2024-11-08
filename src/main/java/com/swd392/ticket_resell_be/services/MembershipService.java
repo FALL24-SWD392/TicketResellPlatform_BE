@@ -15,4 +15,8 @@ public interface MembershipService {
     ApiItemResponse<MembershipDtoResponse> createFreeMembershipForLoggedInUser();
 
     Membership getMembershipForLoggedInUser(User user);
+
+    void createInitialMembership();
+
+    void updateExpiredMembership();
 }

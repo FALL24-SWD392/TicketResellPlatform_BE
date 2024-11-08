@@ -23,6 +23,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -260,5 +262,13 @@ public class TicketServiceImplement implements TicketService {
                 tickets.getTotalPages(),
                 HttpStatus.OK
         );
+    }
+
+    @Override
+    public void updateExpiredTicket() {
+        List<Ticket> tickets = ticketRepository.findByStatusAndExpDateBefore(Categorize.APPROVED,
+                Date.from(Instant.now()));
+        tickets.forEach(ticket -> ticket.setStatus(Categorize.EXPIRED));
+        ticketRepository.saveAll(tickets);
     }
 }

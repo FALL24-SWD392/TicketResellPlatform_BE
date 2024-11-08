@@ -24,6 +24,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -150,5 +152,12 @@ public class TransactionServiceImplement implements TransactionService {
         );
     }
 
+    @Override
+    public void updatePendingToFailed() {
+        List<Transaction> transactions = transactionRepository.findByStatusAndUpdatedAtBefore(Categorize.PENDING,
+                Date.from(Instant.now().minus(5, ChronoUnit.MINUTES)));
+        transactions.forEach(transaction -> transaction.setStatus(Categorize.FAILED));
+        transactionRepository.saveAll(transactions);
+    }
 
 }

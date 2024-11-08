@@ -1,7 +1,9 @@
 package com.swd392.ticket_resell_be.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -34,12 +36,10 @@ public class Membership {
     private int saleRemain;
 
     @NotNull
-    @PastOrPresent
     @Column(name = "start_date", nullable = false)
     private Date startDate;
 
     @NotNull
-    @FutureOrPresent
     @Column(name = "end_date", nullable = false)
     private Date endDate;
 

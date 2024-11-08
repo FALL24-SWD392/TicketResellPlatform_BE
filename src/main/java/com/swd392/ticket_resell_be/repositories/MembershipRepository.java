@@ -5,10 +5,14 @@ import com.swd392.ticket_resell_be.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
     Optional<Membership> findMembershipBySeller(User user);
+
+    List<Membership> findByEndDateBefore(Date endDate);
 }

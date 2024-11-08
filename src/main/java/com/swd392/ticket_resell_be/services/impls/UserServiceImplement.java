@@ -21,11 +21,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -395,6 +395,20 @@ public class UserServiceImplement implements UserService {
     @Override
     public User findById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional
+    public void deleteUnverifiedUser() {
+        userRepository.deleteByStatusAndUpdatedAtBefore(Categorize.UNVERIFIED,
+                Date.from(Instant.now().minus(10, ChronoUnit.MINUTES)));
+    }
+
+    @Override
+    public List<User> findByIdNotIn(List<UUID> ids) {
+        if (ids.isEmpty())
+            return userRepository.findByStatus(Categorize.VERIFIED);
+        return userRepository.findByIdNotInAndStatus(ids, Categorize.VERIFIED);
     }
 
     private List<UserDtoWebSocket> parseToList(Page<User> users) {

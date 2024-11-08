@@ -11,4 +11,6 @@ public interface TokenService {
     void inactive(UUID id);
 
     boolean existsByIdAndStatus(UUID id, Categorize status);
+
+    void deleteExpiredToken();
 }

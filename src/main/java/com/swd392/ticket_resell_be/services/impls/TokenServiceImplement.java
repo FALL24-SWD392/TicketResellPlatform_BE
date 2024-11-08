@@ -10,7 +10,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -35,5 +37,11 @@ public class TokenServiceImplement implements TokenService {
     @Override
     public boolean existsByIdAndStatus(UUID id, Categorize status) {
         return tokenRepository.existsByIdAndStatus(id, status);
+    }
+
+    @Override
+    @Transactional
+    public void deleteExpiredToken() {
+        tokenRepository.removeByExpAtBefore(new Date());
     }
 }

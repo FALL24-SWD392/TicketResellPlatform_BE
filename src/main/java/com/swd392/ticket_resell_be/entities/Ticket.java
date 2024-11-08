@@ -38,7 +38,6 @@ public class Ticket {
     @Column(name = "image")
     private String image;
 
-    @Future
     @NotNull
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "exp_date", nullable = false)

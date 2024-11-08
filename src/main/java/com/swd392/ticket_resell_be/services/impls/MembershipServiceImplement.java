@@ -20,10 +20,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -91,24 +90,54 @@ public class MembershipServiceImplement implements MembershipService {
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Subscription subscription = subscriptionService.getSubscriptionByName("Free");
-        Membership membership = new Membership();
-        membership.setSeller(user);
-        membership.setSubscriptionName(subscription.getName());
-        membership.setSaleRemain(subscription.getSaleLimit());
-        Date currentDate = new Date();
-        membership.setStartDate(currentDate);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 30);
-        membership.setEndDate(calendar.getTime());
-        Membership savedMembership = membershipRepository.save(membership);
-        MembershipDtoResponse membershipDtoResponse = mapToDto(savedMembership);
+        Membership membership = membershipRepository.findMembershipBySeller(user)
+                .orElse(null);
+        if (membership == null) {
+            membership = new Membership();
+            membership.setSeller(user);
+            membership.setSubscriptionName(subscription.getName());
+            membership.setSaleRemain(subscription.getSaleLimit());
+            membership.setStartDate(new Date());
+            membership.setEndDate(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)));
+            membership = membershipRepository.save(membership);
+        }
+        MembershipDtoResponse membershipDtoResponse = mapToDto(membership);
         return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.CREATED);
     }
 
     @Override
     public Membership getMembershipForLoggedInUser(User user) {
         return membershipRepository.findMembershipBySeller(user).get();
+    }
+
+    @Override
+    public void createInitialMembership() {
+        List<UUID> ids = new ArrayList<>();
+        membershipRepository.findAll().forEach(membership -> ids.add(membership.getSeller().getId()));
+        List<User> users = userService.findByIdNotIn(ids);
+        Subscription subscription = subscriptionService.getSubscriptionByName("Free");
+        users.forEach(user -> {
+            Membership membership = new Membership();
+            membership.setSubscriptionName(subscription.getName());
+            membership.setSaleRemain(subscription.getSaleLimit());
+            membership.setStartDate(new Date());
+            membership.setEndDate(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)));
+            membership.setSeller(user);
+            membershipRepository.save(membership);
+        });
+    }
+
+    @Override
+    public void updateExpiredMembership() {
+        List<Membership> memberships = membershipRepository.findByEndDateBefore(new Date());
+        Subscription subscription = subscriptionService.getSubscriptionByName("Free");
+        memberships.forEach(membership -> {
+            membership.setSubscriptionName(subscription.getName());
+            membership.setSaleRemain(subscription.getSaleLimit());
+            membership.setStartDate(new Date());
+            membership.setEndDate(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)));
+            membershipRepository.save(membership);
+        });
     }
 
     private MembershipDtoResponse mapToDto(Membership membership) {
@@ -120,6 +149,5 @@ public class MembershipServiceImplement implements MembershipService {
                 .endDate(membership.getEndDate())
                 .build();
     }
-
 
 }

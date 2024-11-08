@@ -8,6 +8,7 @@ import com.swd392.ticket_resell_be.exceptions.AppException;
 import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,4 +67,8 @@ public interface UserService {
     ApiListResponse<UserDtoWebSocket> findConnectedUsers(int page, int size, Sort.Direction direction, String... properties);
 
     User findById(UUID id);
+
+    void deleteUnverifiedUser();
+
+    List<User> findByIdNotIn(List<UUID> ids);
 }

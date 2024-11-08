@@ -23,4 +23,6 @@ public interface TransactionService {
     ApiItemResponse<Transaction> updateTransactionStatus(UUID transactionId, Categorize status) throws AppException;
 
     ApiListResponse<TransactionDtoResponse> getAllTransactionsByUser(int page, int size, Sort.Direction direction, String... properties);
+
+    void updatePendingToFailed();
 }

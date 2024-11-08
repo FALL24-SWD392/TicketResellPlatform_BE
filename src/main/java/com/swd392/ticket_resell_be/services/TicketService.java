@@ -39,4 +39,7 @@ public interface TicketService {
     void updateTicketQuantity(UUID id, int quantity);
 
     ApiListResponse<TicketDtoResponse> viewTicketByUserId(UUID userId, int i, int size, Sort.Direction direction, String[] properties);
+
+    void updateExpiredTicket();
+
 }
