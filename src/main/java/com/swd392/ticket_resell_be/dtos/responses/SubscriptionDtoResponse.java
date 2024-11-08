@@ -19,6 +19,4 @@ public class SubscriptionDtoResponse {
     private String description;
     private int pointRequired;
     private float price;
-    private boolean isCurrentSubscription;
-    private String message;
 }

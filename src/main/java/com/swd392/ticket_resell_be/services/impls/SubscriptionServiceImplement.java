@@ -101,10 +101,6 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Optional<Membership> currentMembershipOpt = membershipRepository.findMembershipBySeller(user);
-        if (currentMembershipOpt.isPresent() && currentMembershipOpt.get().getSaleRemain() > 0) {
-            throw new AppException(ErrorCode.REMAINING_SALES_PRESENT); // Custom error code for this case
-        }
         Subscription subscription = getSubscriptionById(subscriptionId)
                 .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND)).data();
         if (user.getReputation() < subscription.getPointRequired()) {
@@ -129,20 +125,10 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Optional<Membership> currentMembershipOpt = membershipRepository.findMembershipBySeller(user);
-        boolean isBuyDisabled = currentMembershipOpt.map(membership -> membership.getSaleRemain() > 0).orElse(false);
-        String currentSubscriptionName = currentMembershipOpt
-                .map(Membership::getSubscriptionName)
-                .orElse(null);
         List<Subscription> subscriptions = subscriptionRepository.findAll();
         List<SubscriptionDtoResponse> subscriptionDtoResponses = subscriptions.stream()
                 .map(subscription -> {
-                    String message;
-                    if (subscription.getName().equals(currentSubscriptionName)) {
-                        message = "This is your current subscription";
-                    } else  {
-                        message = "You still have remaining sales on your current membership. Upgrade to Premium when finished.";
-                    }
+
                     return SubscriptionDtoResponse.builder()
                             .id(subscription.getId())
                             .name(subscription.getName())
@@ -150,8 +136,6 @@ public class SubscriptionServiceImplement implements SubscriptionService {
                             .description(subscription.getDescription())
                             .pointRequired(subscription.getPointRequired())
                             .price(subscription.getPrice())
-                            .isCurrentSubscription(subscription.getName().equals(currentSubscriptionName))
-                            .message(message)
                             .build();
                 })
                 .collect(Collectors.toList());
