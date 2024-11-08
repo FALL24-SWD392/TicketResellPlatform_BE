@@ -163,6 +163,7 @@ public class TicketServiceImplement implements TicketService {
                         ticket.getImage(),
                         ticket.getStatus(),
                         ticket.getCreatedAt(),
+                        ticket.getSeller().getUsername(),
                         ticket.getUpdatedBy(),
                         ticket.getUpdatedAt()))
                 .toList();

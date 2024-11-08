@@ -25,6 +25,7 @@ public class TicketDtoResponse {
     private String image;
     private Categorize status;
     private Date createdAt;
+    private String createBy;
     private String updatedBy;
     private Date updatedAt;
 }
