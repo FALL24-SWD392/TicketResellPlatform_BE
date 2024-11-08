@@ -113,6 +113,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK, "Redirect to Purchase");
     }
 
+
     @Override
     public Subscription getSubscriptionByName(String name) {
         return subscriptionRepository.findByName(name)
@@ -124,23 +125,28 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Optional<Membership> currentMembershipOpt = membershipRepository.findMembershipBySeller(user);
-        String currentSubscriptionName = currentMembershipOpt.map(Membership::getSubscriptionName).orElse(null);
         List<Subscription> subscriptions = subscriptionRepository.findAll();
         List<SubscriptionDtoResponse> subscriptionDtoResponses = subscriptions.stream()
-                .map(subscription -> SubscriptionDtoResponse.builder()
-                        .id(subscription.getId())
-                        .name(subscription.getName())
-                        .saleLimit(subscription.getSaleLimit())
-                        .description(subscription.getDescription())
-                        .pointRequired(subscription.getPointRequired())
-                        .price(subscription.getPrice())
-                        .isCurrentSubscription(subscription.getName().equals(currentSubscriptionName)) // Đánh dấu gói hiện tại
-                        .build())
+                .map(subscription -> {
+
+                    return SubscriptionDtoResponse.builder()
+                            .id(subscription.getId())
+                            .name(subscription.getName())
+                            .saleLimit(subscription.getSaleLimit())
+                            .description(subscription.getDescription())
+                            .pointRequired(subscription.getPointRequired())
+                            .price(subscription.getPrice())
+                            .build();
+                })
                 .collect(Collectors.toList());
 
-        // Trả về phản hồi
-        return apiResponseBuilder.buildResponse(subscriptionDtoResponses,0, 0, 0, 0,
-                HttpStatus.OK, "All subscriptions retrieved");
+        // Return the response
+        return apiResponseBuilder.buildResponse(
+                subscriptionDtoResponses,
+                0, 0, 0, 0,
+                HttpStatus.OK,
+                "All subscriptions retrieved"
+        );
     }
+
 }

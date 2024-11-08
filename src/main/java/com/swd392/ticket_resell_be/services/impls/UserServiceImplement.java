@@ -210,6 +210,42 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
+    public ApiListResponse<UserDto> getUsersForStaff(String search, int page, int size, Sort.Direction direction, String... properties) {
+        Page<User> users = userRepository.findByUsernameContainsIgnoreCaseAndRole(
+                search,
+                Categorize.MEMBER,
+                pagingUtil.getPageable(User.class, page, size, direction, properties)
+        );
+        List<UserDto> userDtoList = users.getContent().stream()
+                .map(user -> new UserDto(
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getRole(),
+                        user.getStatus(),
+                        user.getTypeRegister(),
+                        user.getAvatar(),
+                        user.getRating(),
+                        user.getReputation(),
+                        user.getCreatedBy(),
+                        user.getCreatedAt(),
+                        user.getUpdatedBy(),
+                        user.getUpdatedAt()
+                )).toList();
+
+        // Build response with pagination details
+        return apiResponseBuilder.buildResponse(
+                userDtoList,
+                users.getSize(),
+                users.getNumber() + 1,
+                users.getTotalElements(),
+                users.getTotalPages(),
+                HttpStatus.OK
+        );
+    }
+
+
+
+    @Override
     public ApiItemResponse<UserDto> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));

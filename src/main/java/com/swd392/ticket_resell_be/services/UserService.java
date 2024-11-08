@@ -38,6 +38,9 @@ public interface UserService {
 
     ApiListResponse<UserDto> getUsers(String search, int page, int size, Sort.Direction direction, String... properties);
 
+    ApiListResponse<UserDto> getUsersForStaff(String search, int page, int size, Sort.Direction direction, String... properties);
+
+
     ApiItemResponse<UserDto> getUserByUsername(String username);
 
     ApiItemResponse<String> deleteUser(String username);
