@@ -26,7 +26,7 @@ public record TicketDtoRequest(
         @NotNull(message = "SALE_PRICE_MUST_NOT_BE_NULL")
         @DecimalMin(value = "0.0", inclusive = true, message = "SALE_PRICE_NEGATIVE")
         @DecimalMax(value = "1000000000.0", inclusive = true, message = "SALE_PRICE_TOO_HIGH")
-        BigDecimal unit_price,
+        BigDecimal unitPrice,
 
         @NotNull(message = "QUANTITY_MUST_NOT_BE_NULL")
         @Positive(message = "Quantity must be greater than 0")
