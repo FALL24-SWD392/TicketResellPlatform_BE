@@ -15,9 +15,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReportDtoResponse {
     private UUID id;
-    private UUID reporterId;
-    private UUID reportedId;
-    private UUID orderId;
+    private String reporterName;
+    private String reportedName;
+    private String ticketName;
     private String description;
     private String attachment;
     private Categorize status;

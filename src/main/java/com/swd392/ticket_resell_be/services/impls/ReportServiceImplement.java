@@ -10,9 +10,11 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.ReportRepository;
+import com.swd392.ticket_resell_be.repositories.TicketRepository;
 import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.OrderService;
 import com.swd392.ticket_resell_be.services.ReportService;
+import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
@@ -38,6 +40,7 @@ public class ReportServiceImplement implements ReportService {
     UserRepository userRepository;
     UserService userService;
     PagingUtil pagingUtil;
+    private final TicketRepository ticketRepository;
 
     @Override
     public ApiItemResponse<ReportDtoResponse> createReport(ReportDtoRequest reportDtoRequest) {
@@ -170,9 +173,9 @@ public class ReportServiceImplement implements ReportService {
     private ReportDtoResponse parseToReportDtoResponse(Report report) {
         ReportDtoResponse reportDtoRequest = new ReportDtoResponse();
         reportDtoRequest.setId(report.getId());
-        reportDtoRequest.setReporterId(report.getReporter().getId());
-        reportDtoRequest.setReportedId(report.getReported().getId());
-        reportDtoRequest.setOrderId(report.getOrder().getId());
+        reportDtoRequest.setReporterName(report.getReporter().getUsername());
+        reportDtoRequest.setReportedName(report.getReported().getUsername());
+        reportDtoRequest.setTicketName(report.getOrder().getChatBox().getTicket().getTitle());
         reportDtoRequest.setDescription(report.getDescription());
         reportDtoRequest.setAttachment(report.getAttachment());
         reportDtoRequest.setStatus(report.getStatus());
@@ -188,9 +191,9 @@ public class ReportServiceImplement implements ReportService {
         return reports.getContent().stream()
                 .map(report -> new ReportDtoResponse(
                         report.getId(),
-                        report.getReporter().getId(),
-                        report.getReported().getId(),
-                        report.getOrder().getId(),
+                        report.getReporter().getUsername(),
+                        report.getReported().getUsername(),
+                        report.getOrder().getChatBox().getTicket().getTitle(),
                         report.getDescription(),
                         report.getAttachment(),
                         report.getStatus(),
