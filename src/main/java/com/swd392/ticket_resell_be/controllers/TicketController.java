@@ -3,6 +3,7 @@ package com.swd392.ticket_resell_be.controllers;
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.TicketDtoIdResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.TicketService;
@@ -81,7 +82,7 @@ public class TicketController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiItemResponse<TicketDtoResponse>> viewTicketById(
+    public ResponseEntity<ApiItemResponse<TicketDtoIdResponse>> viewTicketById(
             @PathVariable("id") UUID id) {
         return ResponseEntity.ok(ticketService.viewTicketById(id));
     }

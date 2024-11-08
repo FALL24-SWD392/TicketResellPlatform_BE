@@ -4,6 +4,7 @@ package com.swd392.ticket_resell_be.services;
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.TicketDtoIdResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
 import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.entities.User;
@@ -28,7 +29,7 @@ public interface TicketService {
 
     ApiListResponse<Categorize> getAllCategory();
 
-    ApiItemResponse<TicketDtoResponse> viewTicketById(UUID id);
+    ApiItemResponse<TicketDtoIdResponse> viewTicketById(UUID id);
 
     int getCountBySellerAndStatus(User seller, Categorize status);
 

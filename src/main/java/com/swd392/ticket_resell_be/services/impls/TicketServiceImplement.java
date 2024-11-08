@@ -3,6 +3,7 @@ package com.swd392.ticket_resell_be.services.impls;
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.TicketDtoIdResponse;
 import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
 import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.entities.User;
@@ -197,11 +198,33 @@ public class TicketServiceImplement implements TicketService {
     }
 
     @Override
-    public ApiItemResponse<TicketDtoResponse> viewTicketById(UUID id) {
-        Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
+    public ApiItemResponse<TicketDtoIdResponse> viewTicketById(UUID id) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
         return apiResponseBuilder.buildResponse(
-                parseToTicketDtoResponse(ticket),
+                parseToTicketDtoIdResponse(ticket),
                 HttpStatus.OK
+        );
+    }
+
+    private TicketDtoIdResponse parseToTicketDtoIdResponse(Ticket ticket) {
+        return new TicketDtoIdResponse(
+                ticket.getId(),
+                ticket.getSeller().getId(),
+                ticket.getSeller().getAvatar(),
+                ticket.getSeller().getUsername(),
+                ticket.getSeller().getRating(),
+                ticket.getTitle(),
+                ticket.getExpDate(),
+                ticket.getType(),
+                ticket.getUnitPrice(),
+                ticket.getQuantity(),
+                ticket.getDescription(),
+                ticket.getImage(),
+                ticket.getStatus(),
+                ticket.getCreatedAt(),
+                ticket.getUpdatedBy(),
+                ticket.getUpdatedAt()
         );
     }
 
