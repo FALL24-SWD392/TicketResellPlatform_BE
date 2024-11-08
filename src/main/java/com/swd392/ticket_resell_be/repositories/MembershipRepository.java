@@ -11,6 +11,4 @@ import java.util.UUID;
 @Repository
 public interface MembershipRepository extends JpaRepository<Membership, UUID> {
     Optional<Membership> findMembershipBySeller(User user);
-
-
 }

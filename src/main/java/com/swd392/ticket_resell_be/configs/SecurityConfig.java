@@ -31,6 +31,8 @@ public class SecurityConfig {
             "/api/auth/login/google",
             "/api/auth/access-token",
             "/api/packages/payment-callback",
+            "/api/subscriptions/purchase-subscription",
+            "/api/auth/logout"
     };
     private static final String[] PUBLIC_GET_ENDPOINTS = {
             "/swagger-ui/**",
@@ -38,11 +40,14 @@ public class SecurityConfig {
             "/api/auth/email/verify",
             "/api/tickets",
             "/api/tickets/categories",
-            "api/tickets/{id}",
+            "/api/tickets/{id}",
             "/api/subscriptions",
             "/api/subscriptions/{id}",
             "/api/feedbacks",
-            "/api/users/{username}"
+            "/api/users/{username}",
+            "/api/payment/callback",
+            "/api/subscriptions",
+            "/api/subscriptions/{id}",
     };
     private static final String[] PUBLIC_PUT_ENDPOINTS = {
             "/api/auth/password/forgot",

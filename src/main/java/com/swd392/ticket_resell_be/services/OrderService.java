@@ -4,6 +4,7 @@ import com.swd392.ticket_resell_be.dtos.requests.OrderDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.OrderDtoResponse;
+import com.swd392.ticket_resell_be.entities.ChatBox;
 import com.swd392.ticket_resell_be.entities.Order;
 import org.springframework.data.domain.Sort;
 
@@ -21,4 +22,6 @@ public interface OrderService {
     ApiItemResponse<OrderDtoResponse> getOrderById(UUID id);
 
     Order findById(UUID id);
+
+    Order findByChatBox(ChatBox chatBox);
 }

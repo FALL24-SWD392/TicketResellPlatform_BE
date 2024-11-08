@@ -47,7 +47,7 @@ public class TokenUtil {
                 .subject(user.getUsername())
                 .claim("id", user.getId().toString())
                 .claim("email", user.getEmail())
-                .claim("avatar", user.getAvatar())
+                .claim("avatar", user.getAvatar() != null ? user.getAvatar() : "")
                 .claim("rating", user.getRating())
                 .claim("reputation", user.getReputation())
                 .claim("scope", user.getRole().name())

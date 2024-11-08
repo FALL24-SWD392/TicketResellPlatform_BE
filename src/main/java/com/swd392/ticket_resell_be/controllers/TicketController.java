@@ -85,4 +85,14 @@ public class TicketController {
             @PathVariable("id") UUID id) {
         return ResponseEntity.ok(ticketService.viewTicketById(id));
     }
+
+    @GetMapping("/user")
+    public  ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketByUserId(
+            @RequestParam UUID userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @RequestParam(defaultValue = "id") String... properties) {
+        return ResponseEntity.ok(ticketService.viewTicketByUserId(userId, page - 1, size, direction, properties));
+    }
 }

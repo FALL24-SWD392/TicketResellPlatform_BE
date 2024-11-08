@@ -10,9 +10,11 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.ReportRepository;
+import com.swd392.ticket_resell_be.repositories.TicketRepository;
 import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.OrderService;
 import com.swd392.ticket_resell_be.services.ReportService;
+import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
@@ -38,6 +40,7 @@ public class ReportServiceImplement implements ReportService {
     UserRepository userRepository;
     UserService userService;
     PagingUtil pagingUtil;
+    private final TicketRepository ticketRepository;
 
     @Override
     public ApiItemResponse<ReportDtoResponse> createReport(ReportDtoRequest reportDtoRequest) {
@@ -113,9 +116,10 @@ public class ReportServiceImplement implements ReportService {
 
     @Override
     public ApiListResponse<ReportDtoResponse> getReportByUserId(UUID id, int page, int size, Sort.Direction direction, String... properties) {
-        Page<Report> reports = reportRepository.findReportById(id, pagingUtil
+        User user = userService.findById(id);
+        Page<Report> reports = reportRepository.findByReportedOrReporter(user, user, pagingUtil
                 .getPageable(Report.class, page, size, direction, properties));
-        if (reports.getTotalElements() > 0) {
+        if (reports.getTotalElements() == 0) {
             throw new AppException(ErrorCode.REPORT_NOT_FOUND);
         }
         return apiResponseBuilder.buildResponse(
@@ -132,14 +136,14 @@ public class ReportServiceImplement implements ReportService {
     @Override
     public ApiListResponse<ReportDtoResponse> getAllReportsByStatus(Categorize status, int page, int size, Sort.Direction direction, String... properties) {
         Page<Report> reports;
-        if(status.equals(Categorize.ALL)){
+        if (status.equals(Categorize.ALL)) {
             reports = reportRepository.findAll(pagingUtil
                     .getPageable(Report.class, page, size, direction, properties));
         } else {
             reports = reportRepository.findAllByStatus(status, pagingUtil
                     .getPageable(Report.class, page, size, direction, properties));
         }
-        if (reports.getTotalElements() > 0) {
+        if (reports.getTotalElements() == 0) {
             throw new AppException(ErrorCode.REPORT_NOT_FOUND);
         }
         return apiResponseBuilder.buildResponse(
@@ -167,29 +171,31 @@ public class ReportServiceImplement implements ReportService {
     }
 
     private ReportDtoResponse parseToReportDtoResponse(Report report) {
-        ReportDtoResponse reportDtoRequest = new ReportDtoResponse();
-        reportDtoRequest.setId(report.getId());
-        reportDtoRequest.setReporterId(report.getReporter().getId());
-        reportDtoRequest.setReportedId(report.getReported().getId());
-        reportDtoRequest.setOrderId(report.getOrder().getId());
-        reportDtoRequest.setDescription(report.getDescription());
-        reportDtoRequest.setAttachment(report.getAttachment());
-        reportDtoRequest.setStatus(report.getStatus());
-        reportDtoRequest.setCreatedBy(report.getCreatedBy());
-        reportDtoRequest.setCreatedAt(report.getCreatedAt());
-        reportDtoRequest.setUpdatedBy(report.getUpdatedBy());
-        reportDtoRequest.setUpdatedAt(report.getUpdatedAt());
+        ReportDtoResponse reportDtoResponse = new ReportDtoResponse();
+        reportDtoResponse.setId(report.getId());
+        reportDtoResponse.setReporterName(report.getReporter().getUsername());
+        reportDtoResponse.setReportedName(report.getReported().getUsername());
+        reportDtoResponse.setTicketId(report.getOrder().getChatBox().getTicket().getId());
+        reportDtoResponse.setTicketName(report.getOrder().getChatBox().getTicket().getTitle());
+        reportDtoResponse.setDescription(report.getDescription());
+        reportDtoResponse.setAttachment(report.getAttachment());
+        reportDtoResponse.setStatus(report.getStatus());
+        reportDtoResponse.setCreatedBy(report.getCreatedBy());
+        reportDtoResponse.setCreatedAt(report.getCreatedAt());
+        reportDtoResponse.setUpdatedBy(report.getUpdatedBy());
+        reportDtoResponse.setUpdatedAt(report.getUpdatedAt());
 
-        return reportDtoRequest;
+        return reportDtoResponse;
     }
 
     private List<ReportDtoResponse> parseToReportDtoResponses(Page<Report> reports) {
         return reports.getContent().stream()
                 .map(report -> new ReportDtoResponse(
                         report.getId(),
-                        report.getReporter().getId(),
-                        report.getReported().getId(),
-                        report.getOrder().getId(),
+                        report.getReporter().getUsername(),
+                        report.getReported().getUsername(),
+                        report.getOrder().getChatBox().getTicket().getId(),
+                        report.getOrder().getChatBox().getTicket().getTitle(),
                         report.getDescription(),
                         report.getAttachment(),
                         report.getStatus(),

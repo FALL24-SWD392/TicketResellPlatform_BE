@@ -1,6 +1,7 @@
 package com.swd392.ticket_resell_be.controllers;
 
 import com.swd392.ticket_resell_be.dtos.requests.ReportDtoRequest;
+import com.swd392.ticket_resell_be.dtos.requests.UpdateReportDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ReportDtoResponse;
@@ -16,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -35,8 +35,8 @@ public class ReportController {
     @PutMapping("/process")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ApiItemResponse<ReportDtoResponse>> processReport(
-            @RequestBody @Valid UUID id, Categorize status) {
-        return ResponseEntity.ok(reportService.processReport(id, status));
+            @RequestBody @Valid UpdateReportDtoRequest updateReportDtoRequest) {
+        return ResponseEntity.ok(reportService.processReport(updateReportDtoRequest.id(), updateReportDtoRequest.status()));
     }
 
     @GetMapping("/{id}")
@@ -56,7 +56,7 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getReportByUserId(id, page - 1, size, direction, properties));
     }
 
-    @GetMapping("/status")
+    @GetMapping()
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ApiListResponse<ReportDtoResponse>> getReportByStatus(
             @RequestParam(defaultValue = "All") Categorize status,

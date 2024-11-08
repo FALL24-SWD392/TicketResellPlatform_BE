@@ -3,11 +3,14 @@ package com.swd392.ticket_resell_be.services.impls;
 import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.SubscriptionDtoResponse;
 import com.swd392.ticket_resell_be.dtos.responses.VNPayOrderResponse;
+import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
+import com.swd392.ticket_resell_be.repositories.MembershipRepository;
 import com.swd392.ticket_resell_be.repositories.SubscriptionRepository;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
 import com.swd392.ticket_resell_be.services.TransactionService;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +41,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
     VNPayServiceImplement vnPayService;
     UserService userService;
     TransactionService transactionService;
+    MembershipRepository membershipRepository;
 
     @Override
     public ApiItemResponse<Subscription> createSubscription(SubscriptionDtoRequest subscriptionDtoRequest) {
@@ -102,7 +107,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
             throw new AppException(ErrorCode.INSUFFICIENT_REPUTATION);
         }
         long orderTotal = (long) subscription.getPrice();
-        String orderInfo = "Thanh toán cho gói " + subscription.getName();
+        String orderInfo = "Payment for subscription: " + subscription.getName();
         VNPayOrderResponse orderResponse = vnPayService.createOrder(orderTotal, orderInfo, request);
         transactionService.savePendingTransaction(subscription, user, orderResponse.orderCode());
         return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK, "Redirect to Purchase");
@@ -114,4 +119,28 @@ public class SubscriptionServiceImplement implements SubscriptionService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
     }
 
+    public ApiListResponse<SubscriptionDtoResponse> getCurrentSubscriptionForLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByName(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Optional<Membership> currentMembershipOpt = membershipRepository.findMembershipBySeller(user);
+        String currentSubscriptionName = currentMembershipOpt.map(Membership::getSubscriptionName).orElse(null);
+        List<Subscription> subscriptions = subscriptionRepository.findAll();
+        List<SubscriptionDtoResponse> subscriptionDtoResponses = subscriptions.stream()
+                .map(subscription -> SubscriptionDtoResponse.builder()
+                        .id(subscription.getId())
+                        .name(subscription.getName())
+                        .saleLimit(subscription.getSaleLimit())
+                        .description(subscription.getDescription())
+                        .pointRequired(subscription.getPointRequired())
+                        .price(subscription.getPrice())
+                        .isCurrentSubscription(subscription.getName().equals(currentSubscriptionName)) // Đánh dấu gói hiện tại
+                        .build())
+                .collect(Collectors.toList());
+
+        // Trả về phản hồi
+        return apiResponseBuilder.buildResponse(subscriptionDtoResponses,0, 0, 0, 0,
+                HttpStatus.OK, "All subscriptions retrieved");
+    }
 }

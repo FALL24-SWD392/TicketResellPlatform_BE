@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,5 +62,10 @@ public class ChatBoxServiceImplement implements ChatBoxService {
 
     public ChatBox findById(String id) {
         return chatBoxRepository.findById(id);
+    }
+
+    @Override
+    public List<ChatBox> findChatBoxesByRecipient(User user) {
+        return chatBoxRepository.findByRecipient(user);
     }
 }

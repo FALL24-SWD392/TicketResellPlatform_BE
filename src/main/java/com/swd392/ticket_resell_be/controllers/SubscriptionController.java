@@ -3,6 +3,7 @@ package com.swd392.ticket_resell_be.controllers;
 import com.swd392.ticket_resell_be.dtos.requests.SubscriptionDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
+import com.swd392.ticket_resell_be.dtos.responses.SubscriptionDtoResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,6 +40,11 @@ public class SubscriptionController {
     @GetMapping
     public ResponseEntity<ApiListResponse<Subscription>> getAllSubscriptions() {
         return ResponseEntity.ok(subscriptionService.getAllSubscriptions());
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<ApiListResponse<SubscriptionDtoResponse>> getAllSubscriptionsForUser() {
+        return ResponseEntity.ok(subscriptionService.getCurrentSubscriptionForLoggedInUser());
     }
 
     @PutMapping("/{id}")

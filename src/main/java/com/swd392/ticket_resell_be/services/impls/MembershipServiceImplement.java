@@ -34,29 +34,8 @@ public class MembershipServiceImplement implements MembershipService {
 
     MembershipRepository membershipRepository;
     ApiResponseBuilder apiResponseBuilder;
-    TicketService ticketService;
     UserService userService;
     SubscriptionService subscriptionService;
-
-    @Override
-    public ApiItemResponse<Membership> createMembership(User user, Subscription subscription) {
-        if (user == null || subscription == null) {
-            throw new AppException(ErrorCode.USER_SUBSCRIPTION_NOT_FOUND);
-        }
-        Membership membership = new Membership();
-        membership.setId(UUID.randomUUID());
-        membership.setSeller(user);
-        membership.setSubscriptionName(subscription.getName());
-        Date currentDate = new Date();
-        membership.setStartDate(currentDate);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(currentDate);
-        calendar.add(Calendar.DAY_OF_MONTH, 30);
-        Date endDate = calendar.getTime();
-        membership.setEndDate(endDate);
-        Membership savedMembership = membershipRepository.save(membership);
-        return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.CREATED, "Membership created successfully");
-    }
 
     @Override
     public ApiItemResponse<Membership> updateMembership(User user, Subscription subscription) {
@@ -65,8 +44,7 @@ public class MembershipServiceImplement implements MembershipService {
         }
         Optional<Membership> existingMembership = membershipRepository.findMembershipBySeller(user);
         Membership membership;
-        int ticketCount = ticketService.getCountBySellerAndStatus(user, Categorize.APPROVED);
-        int saleRemain = subscription.getSaleLimit() - ticketCount;
+        int saleRemain = subscription.getSaleLimit();
 
         if (existingMembership.isPresent()) {
             membership = existingMembership.get();
@@ -130,6 +108,11 @@ public class MembershipServiceImplement implements MembershipService {
         return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.CREATED);
     }
 
+    @Override
+    public Membership getMembershipForLoggedInUser(User user) {
+        return membershipRepository.findMembershipBySeller(user).get();
+    }
+
     private MembershipDtoResponse mapToDto(Membership membership) {
         return MembershipDtoResponse.builder()
                 .id(membership.getId())
@@ -139,5 +122,7 @@ public class MembershipServiceImplement implements MembershipService {
                 .endDate(membership.getEndDate())
                 .build();
     }
+
+
 
 }
