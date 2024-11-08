@@ -101,6 +101,10 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Optional<Membership> currentMembershipOpt = membershipRepository.findMembershipBySeller(user);
+        if (currentMembershipOpt.isPresent() && currentMembershipOpt.get().getSaleRemain() > 0) {
+            throw new AppException(ErrorCode.REMAINING_SALES_PRESENT); // Custom error code for this case
+        }
         Subscription subscription = getSubscriptionById(subscriptionId)
                 .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND)).data();
         if (user.getReputation() < subscription.getPointRequired()) {
@@ -112,6 +116,7 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         transactionService.savePendingTransaction(subscription, user, orderResponse.orderCode());
         return apiResponseBuilder.buildResponse(orderResponse.vnPayUrl(), HttpStatus.OK, "Redirect to Purchase");
     }
+
 
     @Override
     public Subscription getSubscriptionByName(String name) {
@@ -125,22 +130,39 @@ public class SubscriptionServiceImplement implements SubscriptionService {
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Optional<Membership> currentMembershipOpt = membershipRepository.findMembershipBySeller(user);
-        String currentSubscriptionName = currentMembershipOpt.map(Membership::getSubscriptionName).orElse(null);
+        boolean isBuyDisabled = currentMembershipOpt.map(membership -> membership.getSaleRemain() > 0).orElse(false);
+        String currentSubscriptionName = currentMembershipOpt
+                .map(Membership::getSubscriptionName)
+                .orElse(null);
         List<Subscription> subscriptions = subscriptionRepository.findAll();
         List<SubscriptionDtoResponse> subscriptionDtoResponses = subscriptions.stream()
-                .map(subscription -> SubscriptionDtoResponse.builder()
-                        .id(subscription.getId())
-                        .name(subscription.getName())
-                        .saleLimit(subscription.getSaleLimit())
-                        .description(subscription.getDescription())
-                        .pointRequired(subscription.getPointRequired())
-                        .price(subscription.getPrice())
-                        .isCurrentSubscription(subscription.getName().equals(currentSubscriptionName)) // Đánh dấu gói hiện tại
-                        .build())
+                .map(subscription -> {
+                    String message;
+                    if (subscription.getName().equals(currentSubscriptionName)) {
+                        message = "This is your current subscription";
+                    } else  {
+                        message = "You still have remaining sales on your current membership. Upgrade to Premium when finished.";
+                    }
+                    return SubscriptionDtoResponse.builder()
+                            .id(subscription.getId())
+                            .name(subscription.getName())
+                            .saleLimit(subscription.getSaleLimit())
+                            .description(subscription.getDescription())
+                            .pointRequired(subscription.getPointRequired())
+                            .price(subscription.getPrice())
+                            .isCurrentSubscription(subscription.getName().equals(currentSubscriptionName))
+                            .message(message)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
-        // Trả về phản hồi
-        return apiResponseBuilder.buildResponse(subscriptionDtoResponses,0, 0, 0, 0,
-                HttpStatus.OK, "All subscriptions retrieved");
+        // Return the response
+        return apiResponseBuilder.buildResponse(
+                subscriptionDtoResponses,
+                0, 0, 0, 0,
+                HttpStatus.OK,
+                "All subscriptions retrieved"
+        );
     }
+
 }

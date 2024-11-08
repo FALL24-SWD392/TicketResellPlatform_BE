@@ -54,6 +54,7 @@ public enum ErrorCode {
     //Subscription's Error
     SUBSCRIPTION_NOT_FOUND("Subscription not found", HttpStatus.NOT_FOUND),
     INVALID_SUBSCRIPTION("Invalid package", HttpStatus.BAD_REQUEST),
+    ALREADY_HAVE_SALE_REMAIN("Please post all tickets before buy new subscriptions", HttpStatus.CONFLICT),
     //Membership's Error
     MEMBERSHIP_NOT_FOUND("Membership not found", HttpStatus.NOT_FOUND),
     //Payment's Error
@@ -74,7 +75,8 @@ public enum ErrorCode {
 
     //membership
     YOU_SELL_MAXIMUM_TICKET("You sell maximum ticket", HttpStatus.CONFLICT),
-    TICKET_ALREADY_REMOVED("Ticket already removed", HttpStatus.CONFLICT);
+    TICKET_ALREADY_REMOVED("Ticket already removed", HttpStatus.CONFLICT),
+    REMAINING_SALES_PRESENT("Cannot purchase a new subscription while there are remaining sales on the current subscription", HttpStatus.CONFLICT);
 
     String message;
     HttpStatus status;

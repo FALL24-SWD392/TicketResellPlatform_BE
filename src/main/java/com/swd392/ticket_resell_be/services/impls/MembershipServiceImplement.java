@@ -5,13 +5,11 @@ import com.swd392.ticket_resell_be.dtos.responses.MembershipDtoResponse;
 import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
-import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.MembershipRepository;
 import com.swd392.ticket_resell_be.services.MembershipService;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
-import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import lombok.AccessLevel;
@@ -45,11 +43,11 @@ public class MembershipServiceImplement implements MembershipService {
         Optional<Membership> existingMembership = membershipRepository.findMembershipBySeller(user);
         Membership membership;
         int saleRemain = subscription.getSaleLimit();
-
         if (existingMembership.isPresent()) {
             membership = existingMembership.get();
             membership.setSubscriptionName(subscription.getName());
-            membership.setSaleRemain(saleRemain);
+            int ticketRemain = saleRemain + membership.getSaleRemain();
+            membership.setSaleRemain(ticketRemain);
             Date currentDate = new Date();
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(currentDate);
