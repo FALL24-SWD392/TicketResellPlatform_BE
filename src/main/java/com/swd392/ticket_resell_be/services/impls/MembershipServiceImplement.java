@@ -5,11 +5,13 @@ import com.swd392.ticket_resell_be.dtos.responses.MembershipDtoResponse;
 import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
+import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.MembershipRepository;
 import com.swd392.ticket_resell_be.services.MembershipService;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
+import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import lombok.AccessLevel;
@@ -33,7 +35,6 @@ public class MembershipServiceImplement implements MembershipService {
     ApiResponseBuilder apiResponseBuilder;
     UserService userService;
     SubscriptionService subscriptionService;
-
     @Override
     public ApiItemResponse<Membership> updateMembership(User user, Subscription subscription) {
         if (user == null || subscription == null) {
@@ -71,18 +72,7 @@ public class MembershipServiceImplement implements MembershipService {
         return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.OK, "Membership updated successfully");
     }
 
-    @Override
-    public ApiItemResponse<MembershipDtoResponse> getMembershipForUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User user = userService.getUserByName(username)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        Membership membership = membershipRepository.findMembershipBySeller(user)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBERSHIP_NOT_FOUND));
-        MembershipDtoResponse membershipDtoResponse = mapToDto(membership);
 
-        return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.OK, "Membership retrieved successfully");
-    }
 
     @Override
     public ApiItemResponse<MembershipDtoResponse> createFreeMembershipForLoggedInUser() {
@@ -139,6 +129,13 @@ public class MembershipServiceImplement implements MembershipService {
             membershipRepository.save(membership);
         });
     }
+
+    @Override
+    public Optional<Membership> findMembershipBySeller(User user) {
+        return membershipRepository.findMembershipBySeller(user);
+    }
+
+
 
     private MembershipDtoResponse mapToDto(Membership membership) {
         return MembershipDtoResponse.builder()
