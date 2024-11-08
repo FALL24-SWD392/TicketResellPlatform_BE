@@ -22,9 +22,6 @@ public class ChatBox {
     @Column(nullable = false, updatable = false)
     private String id;
 
-    @Column(nullable = false, updatable = false)
-    private String chatId;
-
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false, updatable = false)

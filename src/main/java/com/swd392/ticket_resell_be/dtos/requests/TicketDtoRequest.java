@@ -17,7 +17,7 @@ public record TicketDtoRequest(
         String title,
 
         @NotNull(message = "TICKET_EXPIRATION_MUST_NOT_BE_NULL")
-        @Future(message = "Expiration date must be in the future")
+        @Future(message = "EXPIRATION_DATE_MUST_BE_IN_THE_FUTURE")
         Date expDate,
 
         @NotNull(message = "TYPE_MUST_NOT_BE_NULL")

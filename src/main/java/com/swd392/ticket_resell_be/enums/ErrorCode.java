@@ -76,8 +76,37 @@ public enum ErrorCode {
     //membership
     YOU_SELL_MAXIMUM_TICKET("You sell maximum ticket", HttpStatus.CONFLICT),
     TICKET_ALREADY_REMOVED("Ticket already removed", HttpStatus.CONFLICT),
-    REMAINING_SALES_PRESENT("Cannot purchase a new subscription while there are remaining sales on the current subscription", HttpStatus.CONFLICT);
+    REMAINING_SALES_PRESENT("Cannot purchase a new subscription while there are remaining sales on the current subscription", HttpStatus.CONFLICT),
 
+    //DTO Request
+    REPORTED_BY_ID_MUST_NOT_BE_NULL("Reported Id is empty", HttpStatus.BAD_REQUEST),
+    TOKEN_EMPTY("Token is empty", HttpStatus.BAD_REQUEST),
+    REPORTED_ID_MUST_NOT_BE_NULL("Reporter Id is empty", HttpStatus.BAD_REQUEST),
+    CHAT_BOX_ID_MUST_NOT_BE_NULL("Chat Box id is empty", HttpStatus.BAD_REQUEST),
+    BUYER_ID_MUST_NOT_BE_NULL("Buyer id is empty", HttpStatus.BAD_REQUEST),
+    ORDER_ID_MUST_NOT_BE_NULL("Order id is empty", HttpStatus.BAD_REQUEST),
+    FEEDBACK_DESCRIPTION_EMPTY("Feedback description is empty", HttpStatus.BAD_REQUEST),
+    RATING_MUST_NOT_BE_NULL("Rating is empty", HttpStatus.BAD_REQUEST),
+    STATUS_MUST_NOT_BE_NULL("Status is empty", HttpStatus.BAD_REQUEST),
+    SENDER_EMPTY("Sender is empty", HttpStatus.BAD_REQUEST),
+    RECIPIENT_EMPTY("Recipient is empty", HttpStatus.BAD_REQUEST),
+    TICKET_EMPTY("Ticket is empty", HttpStatus.BAD_REQUEST),
+    TICKET_ID_EMPTY("Ticket id is empty", HttpStatus.BAD_REQUEST),
+    QUANTITY_MUST_NOT_BE_NULL("Quantity is empty", HttpStatus.BAD_REQUEST),
+    QUANTITY_MUST_BE_GREATER_THAN_0("Quantity must be greater than 0", HttpStatus.BAD_REQUEST),
+    REPORT_DESCRIPTION_MUST_NOT_BE_NULL("Report description is empty", HttpStatus.BAD_REQUEST),
+    ATTACHMENT_MUST_NOT_BE_NULL("Attachment description is empty", HttpStatus.BAD_REQUEST),
+    SELLER_ID_MUST_NOT_BE_NULL("Seller id is empty", HttpStatus.BAD_REQUEST),
+    TITLE_EMPTY("Title is empty", HttpStatus.BAD_REQUEST),
+    TICKET_EXPIRATION_MUST_NOT_BE_NULL("Ticket expiration time is empty", HttpStatus.BAD_REQUEST),
+    EXPIRATION_DATE_MUST_BE_IN_THE_FUTURE("Expiration Date is empty", HttpStatus.BAD_REQUEST),
+    TYPE_MUST_NOT_BE_NULL("Type is empty", HttpStatus.BAD_REQUEST),
+    SALE_PRICE_MUST_NOT_BE_NULL("Sale price is empty", HttpStatus.BAD_REQUEST),
+    SALE_PRICE_NEGATIVE("Sale price is negative", HttpStatus.BAD_REQUEST),
+    SALE_PRICE_TOO_HIGH("Sale price is too high", HttpStatus.BAD_REQUEST),
+    DESCRIPTION_EMPTY("Description is empty", HttpStatus.BAD_REQUEST),
+    IMAGE_EMPTY("Image is empty", HttpStatus.BAD_REQUEST),
+    ;
     String message;
     HttpStatus status;
 }

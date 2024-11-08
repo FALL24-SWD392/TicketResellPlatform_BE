@@ -1,12 +1,10 @@
 package com.swd392.ticket_resell_be.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.UUID;
 
@@ -25,10 +23,9 @@ public class OrderDetail {
     @JoinColumn(nullable = false, updatable = false)
     private Order order;
 
-    @NotEmpty
-    @Length(max = 50)
-    @Column(name = "ticket_title", nullable = false, updatable = false, length = 50)
-    private String ticketTitle;
+    @NotNull
+    @Column(name = "ticket_id", nullable = false, updatable = false)
+    private UUID ticketId;
 
     @Positive
     @Column(name = "quantity", nullable = false, updatable = false)
