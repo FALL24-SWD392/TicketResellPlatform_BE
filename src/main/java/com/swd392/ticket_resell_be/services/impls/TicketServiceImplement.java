@@ -82,7 +82,7 @@ public class TicketServiceImplement implements TicketService {
             ticket.setTitle(ticketDtoRequest.title());
             ticket.setExpDate(ticketDtoRequest.exp_date());
             ticket.setType(ticketDtoRequest.type());
-            ticket.setUnitPrice(ticketDtoRequest.unit_price().floatValue());
+            ticket.setUnitPrice(ticketDtoRequest.unitPrice().floatValue());
             ticket.setQuantity(ticketDtoRequest.quantity());
             ticket.setDescription(ticketDtoRequest.description());
             ticket.setImage(ticketDtoRequest.image());
