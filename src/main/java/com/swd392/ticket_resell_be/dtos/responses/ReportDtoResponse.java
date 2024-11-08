@@ -17,6 +17,7 @@ public class ReportDtoResponse {
     private UUID id;
     private String reporterName;
     private String reportedName;
+    private UUID ticketId;
     private String ticketName;
     private String description;
     private String attachment;

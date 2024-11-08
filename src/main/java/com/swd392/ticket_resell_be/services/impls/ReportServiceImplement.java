@@ -171,20 +171,21 @@ public class ReportServiceImplement implements ReportService {
     }
 
     private ReportDtoResponse parseToReportDtoResponse(Report report) {
-        ReportDtoResponse reportDtoRequest = new ReportDtoResponse();
-        reportDtoRequest.setId(report.getId());
-        reportDtoRequest.setReporterName(report.getReporter().getUsername());
-        reportDtoRequest.setReportedName(report.getReported().getUsername());
-        reportDtoRequest.setTicketName(report.getOrder().getChatBox().getTicket().getTitle());
-        reportDtoRequest.setDescription(report.getDescription());
-        reportDtoRequest.setAttachment(report.getAttachment());
-        reportDtoRequest.setStatus(report.getStatus());
-        reportDtoRequest.setCreatedBy(report.getCreatedBy());
-        reportDtoRequest.setCreatedAt(report.getCreatedAt());
-        reportDtoRequest.setUpdatedBy(report.getUpdatedBy());
-        reportDtoRequest.setUpdatedAt(report.getUpdatedAt());
+        ReportDtoResponse reportDtoResponse = new ReportDtoResponse();
+        reportDtoResponse.setId(report.getId());
+        reportDtoResponse.setReporterName(report.getReporter().getUsername());
+        reportDtoResponse.setReportedName(report.getReported().getUsername());
+        reportDtoResponse.setTicketId(report.getOrder().getChatBox().getTicket().getId());
+        reportDtoResponse.setTicketName(report.getOrder().getChatBox().getTicket().getTitle());
+        reportDtoResponse.setDescription(report.getDescription());
+        reportDtoResponse.setAttachment(report.getAttachment());
+        reportDtoResponse.setStatus(report.getStatus());
+        reportDtoResponse.setCreatedBy(report.getCreatedBy());
+        reportDtoResponse.setCreatedAt(report.getCreatedAt());
+        reportDtoResponse.setUpdatedBy(report.getUpdatedBy());
+        reportDtoResponse.setUpdatedAt(report.getUpdatedAt());
 
-        return reportDtoRequest;
+        return reportDtoResponse;
     }
 
     private List<ReportDtoResponse> parseToReportDtoResponses(Page<Report> reports) {
@@ -193,6 +194,7 @@ public class ReportServiceImplement implements ReportService {
                         report.getId(),
                         report.getReporter().getUsername(),
                         report.getReported().getUsername(),
+                        report.getOrder().getChatBox().getTicket().getId(),
                         report.getOrder().getChatBox().getTicket().getTitle(),
                         report.getDescription(),
                         report.getAttachment(),
