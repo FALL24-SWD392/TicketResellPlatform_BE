@@ -27,7 +27,6 @@ public class Token {
     private UUID id;
 
     @NotNull
-    @FutureOrPresent
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "exp_at", nullable = false, updatable = false)
     private Date expAt;

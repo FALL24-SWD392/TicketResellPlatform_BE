@@ -42,7 +42,6 @@ public class ChatBox {
 
     @CreatedDate
     @NotNull
-    @PastOrPresent
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
