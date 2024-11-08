@@ -17,11 +17,7 @@ public class MembershipController {
 
     MembershipService membershipService;
 
-    @GetMapping("/user")
-    @ResponseStatus(HttpStatus.OK)
-    public ApiItemResponse<MembershipDtoResponse> getMembershipForLoggedInUser() {
-        return membershipService.getMembershipForUser();
-    }
+
 
     @PostMapping("/user")
     @ResponseStatus(HttpStatus.OK)

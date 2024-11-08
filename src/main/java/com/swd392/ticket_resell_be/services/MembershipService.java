@@ -6,11 +6,12 @@ import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
 
+import java.util.Optional;
+
 public interface MembershipService {
 
     ApiItemResponse<Membership> updateMembership(User user, Subscription subscriptionField);
 
-    ApiItemResponse<MembershipDtoResponse> getMembershipForUser();
 
     ApiItemResponse<MembershipDtoResponse> createFreeMembershipForLoggedInUser();
 
@@ -19,4 +20,6 @@ public interface MembershipService {
     void createInitialMembership();
 
     void updateExpiredMembership();
+
+    Optional<Membership> findMembershipBySeller(User user);
 }

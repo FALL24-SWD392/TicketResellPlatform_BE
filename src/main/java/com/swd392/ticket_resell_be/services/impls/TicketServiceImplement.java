@@ -1,10 +1,8 @@
 package com.swd392.ticket_resell_be.services.impls;
 
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
-import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
-import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
-import com.swd392.ticket_resell_be.dtos.responses.TicketDtoIdResponse;
-import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
+import com.swd392.ticket_resell_be.dtos.responses.*;
+import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.Categorize;
@@ -22,6 +20,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -59,9 +59,36 @@ public class TicketServiceImplement implements TicketService {
     private boolean checkSaleRemain(TicketDtoRequest ticketDtoRequest) {
         User user = userService.findById(ticketDtoRequest.sellerId());
         int countTicket = getCountBySellerAndStatus(user, Categorize.APPROVED) + getCountBySellerAndStatus(user, Categorize.PENDING);
-        return membershipService.getMembershipForLoggedInUser(user).getSaleRemain() - countTicket <= 0;
+        int count = membershipService.getMembershipForLoggedInUser(user).getSaleRemain();
+        return count - countTicket <= 0;
     }
 
+
+    @Override
+    public ApiItemResponse<MembershipDtoResponse> getMembershipForUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserByName(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Membership membership = membershipService.findMembershipBySeller(user)
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBERSHIP_NOT_FOUND));
+        MembershipDtoResponse membershipDtoResponse = mapToDto(membership);
+        return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.OK, "Membership retrieved successfully");
+    }
+    private MembershipDtoResponse mapToDto(Membership membership) {
+        User user = membership.getSeller();
+        int countTicket = getCountBySellerAndStatus(user, Categorize.APPROVED)
+                + getCountBySellerAndStatus(user, Categorize.PENDING);
+        int adjustedSaleRemain = membership.getSaleRemain() - countTicket;
+
+        return MembershipDtoResponse.builder()
+                .id(membership.getId())
+                .subscriptionName(membership.getSubscriptionName())
+                .saleRemain(adjustedSaleRemain)
+                .startDate(membership.getStartDate())
+                .endDate(membership.getEndDate())
+                .build();
+    }
     @Override
     public ApiItemResponse<TicketDtoResponse> updateTicket(UUID id, TicketDtoRequest ticketDtoRequest) {
         Ticket existingTicket = ticketRepository.findTicketWithSellerById(id);

@@ -1,10 +1,7 @@
 package com.swd392.ticket_resell_be.controllers;
 
 import com.swd392.ticket_resell_be.dtos.requests.TicketDtoRequest;
-import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
-import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
-import com.swd392.ticket_resell_be.dtos.responses.TicketDtoIdResponse;
-import com.swd392.ticket_resell_be.dtos.responses.TicketDtoResponse;
+import com.swd392.ticket_resell_be.dtos.responses.*;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.services.TicketService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -95,5 +93,11 @@ public class TicketController {
             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
             @RequestParam(defaultValue = "id") String... properties) {
         return ResponseEntity.ok(ticketService.viewTicketByUserId(userId, page - 1, size, direction, properties));
+    }
+
+    @GetMapping("/user-membership")
+    @ResponseStatus(HttpStatus.OK)
+    public ApiItemResponse<MembershipDtoResponse> getMembershipForLoggedInUser() {
+        return ticketService.getMembershipForUser();
     }
 }
