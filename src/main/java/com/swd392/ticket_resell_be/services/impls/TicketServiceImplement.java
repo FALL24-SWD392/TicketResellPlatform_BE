@@ -11,7 +11,6 @@ import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.TicketRepository;
 import com.swd392.ticket_resell_be.services.MembershipService;
-import com.swd392.ticket_resell_be.services.SubscriptionService;
 import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
@@ -19,7 +18,6 @@ import com.swd392.ticket_resell_be.utils.PagingUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.java.Log;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -55,8 +53,8 @@ public class TicketServiceImplement implements TicketService {
         }
     }
 
-    private boolean checkSaleRemain(TicketDtoRequest ticketDtoRequest){
-        User user = userService.findById(ticketDtoRequest.seller_id());
+    private boolean checkSaleRemain(TicketDtoRequest ticketDtoRequest) {
+        User user = userService.findById(ticketDtoRequest.sellerId());
         int countTicket = getCountBySellerAndStatus(user, Categorize.APPROVED) + getCountBySellerAndStatus(user, Categorize.PENDING);
         return membershipService.getMembershipForLoggedInUser(user).getSaleRemain() - countTicket <= 0;
     }
@@ -77,10 +75,10 @@ public class TicketServiceImplement implements TicketService {
     }
 
     private void mapperHandmade(Ticket ticket, TicketDtoRequest ticketDtoRequest) {
-        if (userService.findById(ticketDtoRequest.seller_id()) != null) {
-            ticket.setSeller(userService.findById(ticketDtoRequest.seller_id()));
+        if (userService.findById(ticketDtoRequest.sellerId()) != null) {
+            ticket.setSeller(userService.findById(ticketDtoRequest.sellerId()));
             ticket.setTitle(ticketDtoRequest.title());
-            ticket.setExpDate(ticketDtoRequest.exp_date());
+            ticket.setExpDate(ticketDtoRequest.expDate());
             ticket.setType(ticketDtoRequest.type());
             ticket.setUnitPrice(ticketDtoRequest.unitPrice().floatValue());
             ticket.setQuantity(ticketDtoRequest.quantity());
@@ -109,7 +107,7 @@ public class TicketServiceImplement implements TicketService {
     public ApiItemResponse<TicketDtoResponse> removeTicket(UUID id) {
         Ticket ticket = ticketRepository.findTicketWithSellerById(id);
 
-        if(ticket.getStatus().equals(Categorize.REMOVED))
+        if (ticket.getStatus().equals(Categorize.REMOVED))
             throw new AppException(ErrorCode.TICKET_ALREADY_REMOVED);
         else {
             ticket.setStatus(Categorize.REMOVED);
@@ -250,8 +248,8 @@ public class TicketServiceImplement implements TicketService {
 
     @Override
     public ApiListResponse<TicketDtoResponse> viewTicketByUserId(UUID userId, int page, int size, Sort.Direction direction, String[] properties) {
-        Page<Ticket> tickets = ticketRepository.findBySeller(userService.findById(userId) ,pagingUtil
-                    .getPageable(Ticket.class, page, size, direction, properties));
+        Page<Ticket> tickets = ticketRepository.findBySeller(userService.findById(userId), pagingUtil
+                .getPageable(Ticket.class, page, size, direction, properties));
         List<TicketDtoResponse> returnTickets = parseToTicketDtoResponses(tickets);
 
         return apiResponseBuilder.buildResponse(

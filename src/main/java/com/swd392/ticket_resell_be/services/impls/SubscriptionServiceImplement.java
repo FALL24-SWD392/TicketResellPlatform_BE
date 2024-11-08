@@ -5,7 +5,6 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.SubscriptionDtoResponse;
 import com.swd392.ticket_resell_be.dtos.responses.VNPayOrderResponse;
-import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;

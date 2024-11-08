@@ -11,14 +11,14 @@ import java.util.UUID;
 
 public record TicketDtoRequest(
         @NotNull(message = "SELLER_ID_MUST_NOT_BE_NULL")
-        UUID seller_id,
+        UUID sellerId,
 
         @NotBlank(message = "TITLE_EMPTY")
         String title,
 
         @NotNull(message = "TICKET_EXPIRATION_MUST_NOT_BE_NULL")
         @Future(message = "Expiration date must be in the future")
-        Date exp_date,
+        Date expDate,
 
         @NotNull(message = "TYPE_MUST_NOT_BE_NULL")
         Categorize type,

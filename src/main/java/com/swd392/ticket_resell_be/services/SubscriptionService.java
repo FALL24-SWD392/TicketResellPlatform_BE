@@ -7,7 +7,6 @@ import com.swd392.ticket_resell_be.dtos.responses.SubscriptionDtoResponse;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

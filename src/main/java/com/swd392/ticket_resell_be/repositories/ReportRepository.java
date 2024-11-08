@@ -15,7 +15,6 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
     Page<Report> findByReportedOrReporter(User reported, User reporter, Pageable page);
 
 
-
     Report findReportByIdIs(UUID id);
 
     Page<Report> findAllByStatus(Categorize status, Pageable page);

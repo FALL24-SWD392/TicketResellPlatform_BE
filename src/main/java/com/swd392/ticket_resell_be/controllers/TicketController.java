@@ -87,7 +87,7 @@ public class TicketController {
     }
 
     @GetMapping("/user")
-    public  ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketByUserId(
+    public ResponseEntity<ApiListResponse<TicketDtoResponse>> viewTicketByUserId(
             @RequestParam UUID userId,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,

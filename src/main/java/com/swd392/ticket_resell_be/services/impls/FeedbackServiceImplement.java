@@ -49,7 +49,7 @@ public class FeedbackServiceImplement implements FeedbackService {
         Order selectedOrder = orderService.findById(feedbackDtoRequest.order_id());
         User buyer = userService.findById(feedbackDtoRequest.buyer_id());
 
-        if(feedbackRepository.findByOrderAndBuyer(selectedOrder, buyer) != null)
+        if (feedbackRepository.findByOrderAndBuyer(selectedOrder, buyer) != null)
             throw new AppException(ErrorCode.USER_ALREADY_FEEDBACK_THIS_ORDER);
 
         Feedback feedback = new Feedback();

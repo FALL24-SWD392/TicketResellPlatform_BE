@@ -14,7 +14,6 @@ import com.swd392.ticket_resell_be.repositories.TicketRepository;
 import com.swd392.ticket_resell_be.repositories.UserRepository;
 import com.swd392.ticket_resell_be.services.OrderService;
 import com.swd392.ticket_resell_be.services.ReportService;
-import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;

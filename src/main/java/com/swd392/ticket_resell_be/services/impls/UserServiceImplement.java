@@ -244,7 +244,6 @@ public class UserServiceImplement implements UserService {
     }
 
 
-
     @Override
     public ApiItemResponse<UserDto> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username)

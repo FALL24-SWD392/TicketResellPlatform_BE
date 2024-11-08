@@ -48,10 +48,10 @@ public class UserController {
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
     public ResponseEntity<ApiListResponse<UserDto>>
     getUsersForStaff(@RequestParam(defaultValue = "") String search,
-             @RequestParam(defaultValue = "1") int page,
-             @RequestParam(defaultValue = "20") int size,
-             @RequestParam(defaultValue = "ASC") Sort.Direction direction,
-             @RequestParam(defaultValue = "id") String... properties) {
+                     @RequestParam(defaultValue = "1") int page,
+                     @RequestParam(defaultValue = "20") int size,
+                     @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+                     @RequestParam(defaultValue = "id") String... properties) {
         return ResponseEntity.ok(userService.getUsersForStaff(search, page - 1, size, direction, properties));
     }
 

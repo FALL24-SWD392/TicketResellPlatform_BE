@@ -21,6 +21,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
     Page<Feedback> findAllByOrderIdAndStatus(UUID id, Categorize status, Pageable page);
 
     Feedback findByOrderAndBuyer(Order order, User buyer);
+
     @Query("SELECT f FROM Feedback f " +
             "JOIN f.order o " +
             "JOIN o.chatBox c " +
