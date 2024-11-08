@@ -66,7 +66,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
 
     private void mapperHandmade(OrderDetail orderDetail, OrderDetailDtoRequest orderDetailDtoRequest) {
         orderDetail.setOrder(orderService.findById(orderDetailDtoRequest.orderId()));
-        orderDetail.setTicketTitle(orderDetailDtoRequest.ticketTitle());
+        orderDetail.setId(orderDetailDtoRequest.ticketId());
         orderDetail.setQuantity(orderDetailDtoRequest.quantity());
     }
 
@@ -74,7 +74,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
         OrderDetailDtoResponse orderDetailDtoResponse = new OrderDetailDtoResponse();
         orderDetailDtoResponse.setId(orderDetail.getId());
         orderDetailDtoResponse.setOrderId(orderDetail.getOrder().getId());
-        orderDetailDtoResponse.setTicketTitle(orderDetail.getTicketTitle());
+        orderDetailDtoResponse.setTicketId(orderDetail.getTicketId());
         orderDetailDtoResponse.setQuantity(orderDetail.getQuantity());
 
         return orderDetailDtoResponse;
@@ -85,7 +85,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
                 .map(orderDetail -> new OrderDetailDtoResponse(
                         orderDetail.getId(),
                         orderDetail.getOrder().getId(),
-                        orderDetail.getTicketTitle(),
+                        orderDetail.getTicketId(),
                         orderDetail.getQuantity()))
                 .toList();
     }

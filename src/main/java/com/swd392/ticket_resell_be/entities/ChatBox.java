@@ -22,29 +22,25 @@ public class ChatBox {
     @Column(nullable = false, updatable = false)
     private String id;
 
-    @Column(nullable = false, updatable = false)
-    private String chatId;
-
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, updatable = false)
+    @JoinColumn(updatable = false)
     private User sender;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, updatable = false)
+    @JoinColumn(updatable = false)
     private User recipient;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false, updatable = false)
+    @JoinColumn(updatable = false)
     private Ticket ticket;
 
     @CreatedDate
-    @NotNull
     @PastOrPresent
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
     private Date createdAt;
 
 }

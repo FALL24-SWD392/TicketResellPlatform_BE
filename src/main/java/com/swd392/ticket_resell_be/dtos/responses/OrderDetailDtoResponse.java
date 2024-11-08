@@ -14,6 +14,6 @@ import java.util.UUID;
 public class OrderDetailDtoResponse {
     private UUID id;
     private UUID orderId;
-    private String ticketTitle;
+    private UUID ticketId;
     private int quantity;
 }

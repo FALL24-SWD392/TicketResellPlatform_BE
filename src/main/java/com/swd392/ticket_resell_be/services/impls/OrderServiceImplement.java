@@ -37,6 +37,7 @@ public class OrderServiceImplement implements OrderService {
 
     @Override
     public ApiItemResponse<OrderDtoResponse> createOrder(OrderDtoRequest orderDtoRequest) {
+        ChatBox chatBox = chatBoxService.createChatBox(orderDtoRequest.chatBoxId(), orderDtoRequest.senderId(), orderDtoRequest.recipientId(), orderDtoRequest.ticketId());
         Order order = new Order();
         mapperHandmade(order, orderDtoRequest);
         order.setStatus(Categorize.COMPLETED);
@@ -49,10 +50,8 @@ public class OrderServiceImplement implements OrderService {
     }
 
     private void mapperHandmade(Order order, OrderDtoRequest orderDtoRequest) {
-        if (chatBoxService.findById(orderDtoRequest.chatBoxId()) != null) {
+        if (chatBoxService.findById(orderDtoRequest.chatBoxId()) != null)
             order.setChatBox(chatBoxService.findById(orderDtoRequest.chatBoxId()));
-            order.setStatus(orderDtoRequest.status());
-        }
     }
 
     private OrderDtoResponse parseToOrderDtoResponse(Order order) {
