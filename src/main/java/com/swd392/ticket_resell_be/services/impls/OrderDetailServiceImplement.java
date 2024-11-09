@@ -101,7 +101,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
                     orderDetails.getTotalElements(),
                     orderDetails.getTotalPages(),
                     HttpStatus.OK,
-                    null
+                    "Get order details for admin successfully"
             );
     }
 
@@ -113,7 +113,8 @@ public class OrderDetailServiceImplement implements OrderDetailService {
         else
             return apiResponseBuilder.buildResponse(
                     parseToOrderDetailDtoResponse(orderDetail),
-                    HttpStatus.OK
+                    HttpStatus.OK,
+                    "Get order detail by id successfully"
             );
     }
 
@@ -131,7 +132,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
                     orderDetails.getTotalElements(),
                     orderDetails.getTotalPages(),
                     HttpStatus.OK,
-                    null
+                    "Get order details for order successfully"
             );
     }
 

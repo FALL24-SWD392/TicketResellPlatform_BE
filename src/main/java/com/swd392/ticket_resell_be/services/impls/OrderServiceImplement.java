@@ -56,12 +56,14 @@ public class OrderServiceImplement implements OrderService {
         if(orderDetailService.createOrderDetail(orderDetailDtoRequest)){
             return apiResponseBuilder.buildResponse(
                     parseToOrderDtoResponse(order),
-                    HttpStatus.CREATED
+                    HttpStatus.CREATED,
+                    "Create order successfully"
             );
         } else {
             return apiResponseBuilder.buildResponse(
                     null,
-                    HttpStatus.CONFLICT
+                    HttpStatus.CONFLICT,
+                    "Create order failed"
             );
         }
     }
@@ -90,7 +92,8 @@ public class OrderServiceImplement implements OrderService {
 
         return apiResponseBuilder.buildResponse(
                 parseToOrderDtoResponse(order),
-                HttpStatus.OK
+                HttpStatus.OK,
+                "Remove order successfully"
         );
     }
 
@@ -108,7 +111,7 @@ public class OrderServiceImplement implements OrderService {
                     orders.getTotalElements(),
                     orders.getTotalPages(),
                     HttpStatus.OK,
-                    null
+                    "Get all orders successfully"
             );
     }
 
@@ -132,7 +135,8 @@ public class OrderServiceImplement implements OrderService {
         else
             return apiResponseBuilder.buildResponse(
                     parseToOrderDtoResponse(order),
-                    HttpStatus.OK
+                    HttpStatus.OK,
+                    "Get order by id successfully"
             );
     }
 
@@ -163,7 +167,7 @@ public class OrderServiceImplement implements OrderService {
                     orders.getTotalElements(),
                     orders.getTotalPages(),
                     HttpStatus.OK,
-                    null
+                    "Get all orders for user successfully"
             );
         }
 
