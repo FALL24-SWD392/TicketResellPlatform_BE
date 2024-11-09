@@ -11,8 +11,8 @@ import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.OrderDetailRepository;
+import com.swd392.ticket_resell_be.repositories.OrderRepository;
 import com.swd392.ticket_resell_be.services.OrderDetailService;
-import com.swd392.ticket_resell_be.services.OrderService;
 import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
@@ -32,29 +32,26 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class OrderDetailServiceImplement implements OrderDetailService {
     OrderDetailRepository orderDetailRepository;
-    OrderService orderService;
+    OrderRepository orderRepository;
     TicketService ticketService;
     ApiResponseBuilder apiResponseBuilder;
     PagingUtil pagingUtil;
 
-
-    @Override
-    public ApiItemResponse<OrderDetailDtoResponse> createOrderDetail(OrderDetailDtoRequest orderDetailDtoRequest) {
+    public boolean createOrderDetail(OrderDetailDtoRequest orderDetailDtoRequest) {
         OrderDetail orderDetail = new OrderDetail();
         mapperHandmade(orderDetail, orderDetailDtoRequest);
-
-        minusTicketQuantity(orderDetail);
-
-        orderDetailRepository.save(orderDetail);
-        return apiResponseBuilder.buildResponse(
-                parseToOrderDetailDtoResponse(orderDetail),
-                HttpStatus.CREATED
-        );
+        Ticket ticket = ticketService.getTicketById(orderDetail.getOrder().getChatBox().getTicket().getId());
+        if(ticket.getQuantity() < orderDetail.getQuantity())
+            return false;
+        else{
+            int newQuantity = ticket.getQuantity() - orderDetail.getQuantity();
+            minusTicketQuantity(newQuantity, ticket);
+            orderDetailRepository.save(orderDetail);
+            return true;
+        }
     }
 
-    private void minusTicketQuantity(OrderDetail orderDetail) {
-        Ticket ticket = ticketService.getTicketById(orderDetail.getOrder().getChatBox().getTicket().getId());
-        int newQuantity = ticket.getQuantity() - orderDetail.getQuantity();
+    private void minusTicketQuantity(int newQuantity, Ticket ticket) {
         if (newQuantity == 0) {
             ticketService.updateTicketQuantity(ticket.getId(), 0);
             ticketService.updateTicketStatus(ticket.getId(), Categorize.SOLD);
@@ -65,8 +62,8 @@ public class OrderDetailServiceImplement implements OrderDetailService {
     }
 
     private void mapperHandmade(OrderDetail orderDetail, OrderDetailDtoRequest orderDetailDtoRequest) {
-        orderDetail.setOrder(orderService.findById(orderDetailDtoRequest.orderId()));
-        orderDetail.setId(orderDetailDtoRequest.ticketId());
+        orderDetail.setOrder(orderRepository.findById(orderDetailDtoRequest.orderId()));
+        orderDetail.setTicketId(orderDetailDtoRequest.ticketId());
         orderDetail.setQuantity(orderDetailDtoRequest.quantity());
     }
 
@@ -88,32 +85,6 @@ public class OrderDetailServiceImplement implements OrderDetailService {
                         orderDetail.getTicketId(),
                         orderDetail.getQuantity()))
                 .toList();
-    }
-
-    @Override
-    public ApiItemResponse<OrderDetailDtoResponse> updateOrderDetail(UUID id, OrderDetailDtoRequest orderDetailDtoRequest) {
-        OrderDetail existingOrderDetail = orderDetailRepository.findById(id);
-        if (existingOrderDetail == null)
-            throw new AppException(ErrorCode.ORDER_DETAIL_DOES_NOT_EXIST);
-        mapperHandmade(existingOrderDetail, orderDetailDtoRequest);
-        existingOrderDetail.setId(id);
-        orderDetailRepository.save(existingOrderDetail);
-
-        return apiResponseBuilder.buildResponse(
-                parseToOrderDetailDtoResponse(existingOrderDetail),
-                HttpStatus.OK
-        );
-    }
-
-    @Override
-    public ApiItemResponse<OrderDetailDtoResponse> removeOrderDetail(UUID id) {
-        OrderDetail orderDetail = orderDetailRepository.findById(id);
-        orderDetailRepository.delete(orderDetail);
-
-        return apiResponseBuilder.buildResponse(
-                parseToOrderDetailDtoResponse(orderDetail),
-                HttpStatus.OK
-        );
     }
 
     @Override
@@ -145,4 +116,24 @@ public class OrderDetailServiceImplement implements OrderDetailService {
                     HttpStatus.OK
             );
     }
+
+    @Override
+    public ApiListResponse<OrderDetailDtoResponse> getAllOrderDetailsForOrder(UUID orderId, int page, int size, Sort.Direction direction, String... properties) {
+        Page<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId, pagingUtil
+                .getPageable(OrderDetail.class, page, size, direction, properties));
+        if (orderDetails.isEmpty())
+            throw new AppException(ErrorCode.ORDER_DOES_NOT_EXIST);
+        else
+            return apiResponseBuilder.buildResponse(
+                    parseToOrderDtoResponses(orderDetails),
+                    orderDetails.getSize(),
+                    orderDetails.getNumber() + 1,
+                    orderDetails.getTotalElements(),
+                    orderDetails.getTotalPages(),
+                    HttpStatus.OK,
+                    null
+            );
+    }
+
+
 }
