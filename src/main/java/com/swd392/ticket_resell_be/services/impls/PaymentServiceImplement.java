@@ -35,8 +35,8 @@ public class PaymentServiceImplement implements PaymentService {
         ApiItemResponse<Transaction> transactionResponse = transactionService.findTransactionByOrderId(vnpTxnRef);
         Transaction transaction = transactionResponse.data();
 
-        String successRedirectUrl = "http://localhost:3000/success";
-        String failureRedirectUrl = "http://localhost:3000/failed";
+        String successRedirectUrl = "https://ticketresell.thucnee.studio/success";
+        String failureRedirectUrl = "https://ticketresell.thucnee.studio/fail";
 
         try {
             if ("00".equalsIgnoreCase(responseCode) && "00".equalsIgnoreCase(transactionStatus)) {
