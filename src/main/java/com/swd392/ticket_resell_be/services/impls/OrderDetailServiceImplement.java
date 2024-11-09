@@ -71,7 +71,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
         OrderDetailDtoResponse orderDetailDtoResponse = new OrderDetailDtoResponse();
         orderDetailDtoResponse.setId(orderDetail.getId());
         orderDetailDtoResponse.setOrderId(orderDetail.getOrder().getId());
-        orderDetailDtoResponse.setTicketId(orderDetail.getTicketId());
+        orderDetailDtoResponse.setTicket(ticketService.getTicketById(orderDetail.getTicketId()));
         orderDetailDtoResponse.setQuantity(orderDetail.getQuantity());
 
         return orderDetailDtoResponse;
@@ -82,7 +82,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
                 .map(orderDetail -> new OrderDetailDtoResponse(
                         orderDetail.getId(),
                         orderDetail.getOrder().getId(),
-                        orderDetail.getTicketId(),
+                        ticketService.getTicketById(orderDetail.getTicketId()),
                         orderDetail.getQuantity()))
                 .toList();
     }
@@ -122,7 +122,7 @@ public class OrderDetailServiceImplement implements OrderDetailService {
         Page<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(orderId, pagingUtil
                 .getPageable(OrderDetail.class, page, size, direction, properties));
         if (orderDetails.isEmpty())
-            throw new AppException(ErrorCode.ORDER_DOES_NOT_EXIST);
+            throw new AppException(ErrorCode.ORDER_DETAIL_DOES_NOT_EXIST);
         else
             return apiResponseBuilder.buildResponse(
                     parseToOrderDtoResponses(orderDetails),
@@ -135,5 +135,11 @@ public class OrderDetailServiceImplement implements OrderDetailService {
             );
     }
 
-
+    public OrderDetail getAllOrderDetailsForOrderToDto(UUID orderId) {
+        OrderDetail orderDetail = orderDetailRepository.findByOrderId(orderId);
+        if (orderDetail == null)
+            throw new AppException(ErrorCode.ORDER_DETAIL_DOES_NOT_EXIST);
+        else
+            return orderDetail;
+    }
 }
