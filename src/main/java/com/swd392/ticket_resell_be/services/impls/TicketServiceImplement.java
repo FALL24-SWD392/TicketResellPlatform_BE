@@ -81,6 +81,8 @@ public class TicketServiceImplement implements TicketService {
                 + getCountBySellerAndStatus(user, Categorize.PENDING);
         int adjustedSaleRemain = membership.getSaleRemain() - countTicket;
 
+        adjustedSaleRemain = Math.max(adjustedSaleRemain, 0);
+
         return MembershipDtoResponse.builder()
                 .id(membership.getId())
                 .subscriptionName(membership.getSubscriptionName())
