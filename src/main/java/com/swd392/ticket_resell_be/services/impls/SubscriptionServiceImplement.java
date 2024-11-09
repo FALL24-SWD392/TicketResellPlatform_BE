@@ -5,6 +5,7 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.SubscriptionDtoResponse;
 import com.swd392.ticket_resell_be.dtos.responses.VNPayOrderResponse;
+import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
@@ -25,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -119,15 +121,25 @@ public class SubscriptionServiceImplement implements SubscriptionService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBSCRIPTION_NOT_FOUND));
     }
 
+
     public ApiListResponse<SubscriptionDtoResponse> getCurrentSubscriptionForLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = userService.getUserByName(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Get the user's current membership, if any
+        Optional<Membership> currentMembership = membershipRepository.findMembershipBySeller(user);
+
+        // Get all subscriptions
         List<Subscription> subscriptions = subscriptionRepository.findAll();
+
+        // Create the list of subscription responses with 'canPurchase' status
         List<SubscriptionDtoResponse> subscriptionDtoResponses = subscriptions.stream()
                 .map(subscription -> {
-
+                    Date currentDate = new Date();
+                    boolean canPurchase = currentMembership.isEmpty() || // User has no current membership
+                            (currentMembership.get().getSaleRemain() <= 0 || currentMembership.get().getEndDate().before(currentDate));
                     return SubscriptionDtoResponse.builder()
                             .id(subscription.getId())
                             .name(subscription.getName())
@@ -135,11 +147,12 @@ public class SubscriptionServiceImplement implements SubscriptionService {
                             .description(subscription.getDescription())
                             .pointRequired(subscription.getPointRequired())
                             .price(subscription.getPrice())
+                            .canPurchase(canPurchase)
                             .build();
                 })
                 .collect(Collectors.toList());
 
-        // Return the response
+        // Return the response with the list of subscriptions and their canPurchase status
         return apiResponseBuilder.buildResponse(
                 subscriptionDtoResponses,
                 0, 0, 0, 0,
@@ -147,5 +160,4 @@ public class SubscriptionServiceImplement implements SubscriptionService {
                 "All subscriptions retrieved"
         );
     }
-
 }
