@@ -57,14 +57,14 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public ApiItemResponse<LoginDtoResponse> login(LoginGoogle google) throws JOSEException {
-        String result = googleTokenUtil.getEmailUsernameAvatar(google.googleToken());
+//        String result = googleTokenUtil.getEmailUsernameAvatar(google.googleToken());
         User user;
-        if (!userRepository.existsByEmail(result)) {
-            user = createRegisterUser(google.username(), UUID.randomUUID().toString(), result, Categorize.VERIFIED,
+        if (!userRepository.existsByEmail(google.email())) {
+            user = createRegisterUser(google.username(), UUID.randomUUID().toString(), google.email(), Categorize.VERIFIED,
                     Categorize.GOOGLE, google.avatar());
             userRepository.save(user);
         } else {
-            user = userRepository.findByEmailAndTypeRegisterAndStatus(result, Categorize.GOOGLE, Categorize.VERIFIED)
+            user = userRepository.findByEmailAndTypeRegisterAndStatus(google.email(), Categorize.GOOGLE, Categorize.VERIFIED)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         }
         String refreshToken = tokenUtil.generateRefreshToken(user);
