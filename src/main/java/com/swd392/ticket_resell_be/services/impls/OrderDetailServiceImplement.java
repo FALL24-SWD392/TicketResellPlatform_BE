@@ -41,9 +41,9 @@ public class OrderDetailServiceImplement implements OrderDetailService {
         OrderDetail orderDetail = new OrderDetail();
         mapperHandmade(orderDetail, orderDetailDtoRequest);
         Ticket ticket = ticketService.getTicketById(orderDetail.getOrder().getChatBox().getTicket().getId());
-        if(ticket.getQuantity() < orderDetail.getQuantity())
+        if (ticket.getQuantity() < orderDetail.getQuantity())
             return false;
-        else{
+        else {
             int newQuantity = ticket.getQuantity() - orderDetail.getQuantity();
             minusTicketQuantity(newQuantity, ticket);
             orderDetailRepository.save(orderDetail);

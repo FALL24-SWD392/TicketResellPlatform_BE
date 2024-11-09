@@ -7,7 +7,6 @@ import com.swd392.ticket_resell_be.dtos.responses.OrderDetailDtoResponse;
 import com.swd392.ticket_resell_be.entities.OrderDetail;
 import org.springframework.data.domain.Sort;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface OrderDetailService {

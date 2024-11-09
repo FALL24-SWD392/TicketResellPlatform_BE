@@ -2,7 +2,6 @@ package com.swd392.ticket_resell_be.entities;
 
 import com.swd392.ticket_resell_be.enums.Categorize;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

@@ -9,8 +9,6 @@ import com.swd392.ticket_resell_be.exceptions.AppException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class GoogleTokenUtil {
     @Value("${GOOGLE_CLIENT_ID}")

@@ -76,6 +76,7 @@ public class TicketServiceImplement implements TicketService {
         MembershipDtoResponse membershipDtoResponse = mapToDto(membership);
         return apiResponseBuilder.buildResponse(membershipDtoResponse, HttpStatus.OK, "Membership retrieved successfully");
     }
+
     private MembershipDtoResponse mapToDto(Membership membership) {
         User user = membership.getSeller();
         int countTicket = getCountBySellerAndStatus(user, Categorize.APPROVED)
@@ -92,6 +93,7 @@ public class TicketServiceImplement implements TicketService {
                 .endDate(membership.getEndDate())
                 .build();
     }
+
     @Override
     public ApiItemResponse<TicketDtoResponse> updateTicket(UUID id, TicketDtoRequest ticketDtoRequest) {
         Ticket existingTicket = ticketRepository.findTicketWithSellerById(id);

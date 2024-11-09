@@ -5,20 +5,17 @@ import com.swd392.ticket_resell_be.dtos.responses.MembershipDtoResponse;
 import com.swd392.ticket_resell_be.entities.Membership;
 import com.swd392.ticket_resell_be.entities.Subscription;
 import com.swd392.ticket_resell_be.entities.User;
-import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.MembershipRepository;
 import com.swd392.ticket_resell_be.services.MembershipService;
 import com.swd392.ticket_resell_be.services.SubscriptionService;
-import com.swd392.ticket_resell_be.services.TicketService;
 import com.swd392.ticket_resell_be.services.UserService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +32,7 @@ public class MembershipServiceImplement implements MembershipService {
     ApiResponseBuilder apiResponseBuilder;
     UserService userService;
     SubscriptionService subscriptionService;
+
     @Override
     public ApiItemResponse<Membership> updateMembership(User user, Subscription subscription) {
         if (user == null || subscription == null) {
@@ -71,7 +69,6 @@ public class MembershipServiceImplement implements MembershipService {
         Membership savedMembership = membershipRepository.save(membership);
         return apiResponseBuilder.buildResponse(savedMembership, HttpStatus.OK, "Membership updated successfully");
     }
-
 
 
     @Override
@@ -134,7 +131,6 @@ public class MembershipServiceImplement implements MembershipService {
     public Optional<Membership> findMembershipBySeller(User user) {
         return membershipRepository.findMembershipBySeller(user);
     }
-
 
 
     private MembershipDtoResponse mapToDto(Membership membership) {

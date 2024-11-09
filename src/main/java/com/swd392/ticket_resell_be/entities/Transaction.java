@@ -3,7 +3,6 @@ package com.swd392.ticket_resell_be.entities;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;

@@ -7,11 +7,9 @@ import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
 import com.swd392.ticket_resell_be.dtos.responses.OrderDtoResponse;
 import com.swd392.ticket_resell_be.entities.ChatBox;
 import com.swd392.ticket_resell_be.entities.Order;
-import com.swd392.ticket_resell_be.entities.Ticket;
 import com.swd392.ticket_resell_be.enums.Categorize;
 import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
-import com.swd392.ticket_resell_be.repositories.OrderDetailRepository;
 import com.swd392.ticket_resell_be.repositories.OrderRepository;
 import com.swd392.ticket_resell_be.services.ChatBoxService;
 import com.swd392.ticket_resell_be.services.OrderDetailService;
@@ -53,7 +51,7 @@ public class OrderServiceImplement implements OrderService {
 
         OrderDetailDtoRequest orderDetailDtoRequest = new OrderDetailDtoRequest(order.getId(), orderDtoRequest.ticketId(), orderDtoRequest.quantity());
 
-        if(orderDetailService.createOrderDetail(orderDetailDtoRequest)){
+        if (orderDetailService.createOrderDetail(orderDetailDtoRequest)) {
             return apiResponseBuilder.buildResponse(
                     parseToOrderDtoResponse(order),
                     HttpStatus.CREATED,
@@ -157,7 +155,7 @@ public class OrderServiceImplement implements OrderService {
                 .getPageable(Order.class, page, size, direction, properties));
         if (orders.isEmpty())
             throw new AppException(ErrorCode.ORDER_DOES_NOT_EXIST);
-        else{
+        else {
             List<OrderDtoResponse> orderDtoResponses = parseToOrderDtoResponses(orders);
 
             return apiResponseBuilder.buildResponse(
