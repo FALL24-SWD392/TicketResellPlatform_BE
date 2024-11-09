@@ -10,8 +10,11 @@ import com.swd392.ticket_resell_be.services.TransactionService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,14 @@ public class PaymentServiceImplement implements PaymentService {
     TransactionService transactionService;
     MembershipService membershipService;
 
+    @Value("${SUCCESS_REDIRECT_URL}")
+    @NonFinal
+    private String successRedirectUrl;
+
+    @Value("${FAILURE_REDIRECT_URL}")
+    @NonFinal
+    private String failureRedirectUrl;
+
     @Override
     public void handlePaymentCallback(
             String vnpAmount, String vnpBankCode, String vnpBankTranNo, String vnpCardType,
@@ -34,9 +45,6 @@ public class PaymentServiceImplement implements PaymentService {
     ) {
         ApiItemResponse<Transaction> transactionResponse = transactionService.findTransactionByOrderId(vnpTxnRef);
         Transaction transaction = transactionResponse.data();
-
-        String successRedirectUrl = "https://ticketresell.thucnee.studio/success";
-        String failureRedirectUrl = "https://ticketresell.thucnee.studio/fail";
 
         try {
             if ("00".equalsIgnoreCase(responseCode) && "00".equalsIgnoreCase(transactionStatus)) {

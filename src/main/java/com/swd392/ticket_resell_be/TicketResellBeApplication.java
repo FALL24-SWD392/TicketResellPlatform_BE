@@ -22,6 +22,8 @@ public class TicketResellBeApplication {
         System.setProperty("REFRESH_TOKEN_EXP", dotenv.get("REFRESH_TOKEN_EXP"));
         System.setProperty("RESET_PASSWORD_URL", dotenv.get("RESET_PASSWORD_URL"));
         System.setProperty("ISSUER", dotenv.get("ISSUER"));
+        System.setProperty("FAILURE_REDIRECT_URL", dotenv.get("FAILURE_REDIRECT_URL"));
+        System.setProperty("SUCCESS_REDIRECT_URL", dotenv.get("SUCCESS_REDIRECT_URL"));
 
         SpringApplication.run(TicketResellBeApplication.class, args);
     }
