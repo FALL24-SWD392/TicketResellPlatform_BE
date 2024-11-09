@@ -30,6 +30,7 @@ public enum ErrorCode {
     GOOGLE_TOKEN_EMPTY("Google token not empty", HttpStatus.BAD_REQUEST),
     //Ticket's Error
     TICKET_NOT_FOUND("Ticket not found", HttpStatus.NOT_FOUND),
+    RUN_OUT_QUANTITY("Run out quantity", HttpStatus.BAD_REQUEST),
 
     //Feedback error
     FEEDBACK_NOT_FOUND("Feedback not found", HttpStatus.NOT_FOUND),

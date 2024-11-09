@@ -13,8 +13,6 @@ import java.util.UUID;
 public interface OrderService {
     ApiItemResponse<OrderDtoResponse> createOrder(OrderDtoRequest orderDtoRequest);
 
-    ApiItemResponse<OrderDtoResponse> updateOrder(UUID id, OrderDtoRequest orderDtoRequest);
-
     ApiItemResponse<OrderDtoResponse> removeOrder(UUID id);
 
     ApiListResponse<OrderDtoResponse> getAllOrdersForAdmin(int page, int size, Sort.Direction direction, String[] properties);
@@ -24,4 +22,6 @@ public interface OrderService {
     Order findById(UUID id);
 
     Order findByChatBox(ChatBox chatBox);
+
+    ApiListResponse<OrderDtoResponse> getAllOrdersForUser(UUID userId, int page, int size, Sort.Direction direction, String... properties);
 }

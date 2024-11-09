@@ -28,5 +28,4 @@ public interface FeedbackRepository extends JpaRepository<Feedback, UUID> {
             "JOIN c.recipient u " +
             "WHERE u.id = :recipientId")
     Page<Feedback> findByOrderChatBoxRecipient(@Param("recipientId") UUID recipientId, Pageable pageable);
-
 }

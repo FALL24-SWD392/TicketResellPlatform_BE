@@ -1,6 +1,5 @@
 package com.swd392.ticket_resell_be.controllers;
 
-import com.swd392.ticket_resell_be.dtos.requests.OrderDetailDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.OrderDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -33,13 +32,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.createOrder(orderDtoRequest));
     }
 
-    @PutMapping
-    public ResponseEntity<ApiItemResponse<OrderDtoResponse>> updateOrder(
-            @RequestParam UUID id,
-            @RequestBody OrderDtoRequest orderDtoRequest) {
-        return ResponseEntity.ok(orderService.updateOrder(id, orderDtoRequest));
-    }
-
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping
     public ResponseEntity<ApiItemResponse<OrderDtoResponse>> deleteOrder(
             @RequestParam UUID id) {
@@ -62,23 +55,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrderById(id));
     }
 
-    @PostMapping("/details")
-    public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> createOrderDetail(
-            @RequestBody OrderDetailDtoRequest orderDetailDtoRequest) {
-        return ResponseEntity.ok(orderDetailService.createOrderDetail(orderDetailDtoRequest));
-    }
-
-    @PutMapping("/details")
-    public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> updateOrderDetail(
-            @RequestParam UUID id,
-            @RequestBody OrderDetailDtoRequest orderDetailDtoRequest) {
-        return ResponseEntity.ok(orderDetailService.updateOrderDetail(id, orderDetailDtoRequest));
-    }
-
-    @DeleteMapping("/details")
-    public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> deleteOrderDetail(
-            @RequestParam UUID id) {
-        return ResponseEntity.ok(orderDetailService.removeOrderDetail(id));
+    @GetMapping("/user")
+    public ResponseEntity<ApiListResponse<OrderDtoResponse>> getAllOrdersForUser(
+            @RequestParam UUID userId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @RequestParam(defaultValue = "id") String... properties){
+        return ResponseEntity.ok(orderService.getAllOrdersForUser(userId, page - 1, size, direction, properties));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
@@ -95,5 +79,15 @@ public class OrderController {
     public ResponseEntity<ApiItemResponse<OrderDetailDtoResponse>> getOrderDetailById(
             @PathVariable("id") UUID id) {
         return ResponseEntity.ok(orderDetailService.getOrderDetailById(id));
+    }
+
+    @GetMapping("/details/order")
+    public ResponseEntity<ApiListResponse<OrderDetailDtoResponse>> getAllOrderDetailsForOrder(
+            @RequestParam UUID orderId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "ASC") Sort.Direction direction,
+            @RequestParam(defaultValue = "id") String... properties){
+        return ResponseEntity.ok(orderDetailService.getAllOrderDetailsForOrder(orderId, page - 1, size, direction, properties));
     }
 }
