@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.services.impls;
 
+import com.swd392.ticket_resell_be.dtos.requests.OrderDetailDtoRequest;
 import com.swd392.ticket_resell_be.dtos.requests.OrderDtoRequest;
 import com.swd392.ticket_resell_be.dtos.responses.ApiItemResponse;
 import com.swd392.ticket_resell_be.dtos.responses.ApiListResponse;
@@ -11,6 +12,7 @@ import com.swd392.ticket_resell_be.enums.ErrorCode;
 import com.swd392.ticket_resell_be.exceptions.AppException;
 import com.swd392.ticket_resell_be.repositories.OrderRepository;
 import com.swd392.ticket_resell_be.services.ChatBoxService;
+import com.swd392.ticket_resell_be.services.OrderDetailService;
 import com.swd392.ticket_resell_be.services.OrderService;
 import com.swd392.ticket_resell_be.utils.ApiResponseBuilder;
 import com.swd392.ticket_resell_be.utils.PagingUtil;
@@ -30,6 +32,7 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class OrderServiceImplement implements OrderService {
     OrderRepository orderRepository;
+    OrderDetailService orderDetailService;
     ApiResponseBuilder apiResponseBuilder;
     PagingUtil pagingUtil;
     ChatBoxService chatBoxService;
@@ -37,16 +40,26 @@ public class OrderServiceImplement implements OrderService {
 
     @Override
     public ApiItemResponse<OrderDtoResponse> createOrder(OrderDtoRequest orderDtoRequest) {
-        ChatBox chatBox = chatBoxService.createChatBox(orderDtoRequest.chatBoxId(), orderDtoRequest.senderId(), orderDtoRequest.recipientId(), orderDtoRequest.ticketId());
+        chatBoxService.createChatBox(orderDtoRequest.chatBoxId(), orderDtoRequest.senderId(), orderDtoRequest.recipientId(), orderDtoRequest.ticketId());
+
         Order order = new Order();
         mapperHandmade(order, orderDtoRequest);
         order.setStatus(Categorize.COMPLETED);
-
         orderRepository.save(order);
-        return apiResponseBuilder.buildResponse(
-                parseToOrderDtoResponse(order),
-                HttpStatus.CREATED
-        );
+
+        OrderDetailDtoRequest orderDetailDtoRequest = new OrderDetailDtoRequest(order.getId(), orderDtoRequest.ticketId(), orderDtoRequest.quantity());
+
+        if(orderDetailService.createOrderDetail(orderDetailDtoRequest)){
+            return apiResponseBuilder.buildResponse(
+                    parseToOrderDtoResponse(order),
+                    HttpStatus.CREATED
+            );
+        } else {
+            return apiResponseBuilder.buildResponse(
+                    null,
+                    HttpStatus.CONFLICT
+            );
+        }
     }
 
     private void mapperHandmade(Order order, OrderDtoRequest orderDtoRequest) {
@@ -61,21 +74,6 @@ public class OrderServiceImplement implements OrderService {
         orderDtoResponse.setStatus(order.getStatus());
 
         return orderDtoResponse;
-    }
-
-    @Override
-    public ApiItemResponse<OrderDtoResponse> updateOrder(UUID id, OrderDtoRequest orderDtoRequest) {
-        Order existingOrder = orderRepository.findById(id);
-        if (existingOrder == null)
-            throw new AppException(ErrorCode.ORDER_DOES_NOT_EXIST);
-        mapperHandmade(existingOrder, orderDtoRequest);
-        existingOrder.setId(id);
-        orderRepository.save(existingOrder);
-
-        return apiResponseBuilder.buildResponse(
-                parseToOrderDtoResponse(existingOrder),
-                HttpStatus.OK
-        );
     }
 
     @Override
@@ -137,5 +135,24 @@ public class OrderServiceImplement implements OrderService {
     @Override
     public Order findByChatBox(ChatBox chatBox) {
         return orderRepository.findByChatBox(chatBox).orElse(null);
+    }
+
+    @Override
+    public ApiListResponse<OrderDtoResponse> getAllOrdersForUser(UUID userId, int page, int size, Sort.Direction direction, String... properties) {
+
+        Page<Order> orders = orderRepository.findByOrderChatBoxUserId(userId, pagingUtil
+                .getPageable(Order.class, page, size, direction, properties));
+        if (orders.isEmpty())
+            throw new AppException(ErrorCode.ORDER_DOES_NOT_EXIST);
+        else
+            return apiResponseBuilder.buildResponse(
+                    parseToOrderDtoResponses(orders),
+                    orders.getSize(),
+                    orders.getNumber() + 1,
+                    orders.getTotalElements(),
+                    orders.getTotalPages(),
+                    HttpStatus.OK,
+                    null
+            );
     }
 }
