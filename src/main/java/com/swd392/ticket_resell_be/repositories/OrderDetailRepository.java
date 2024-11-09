@@ -9,9 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
+import java.util.List;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, Integer> {
     OrderDetail findById(UUID id);
 
     Page<OrderDetail> findByOrderId(UUID orderId, Pageable pageable);
+
+    OrderDetail findByOrderId(UUID orderId);
 }

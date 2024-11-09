@@ -1,5 +1,6 @@
 package com.swd392.ticket_resell_be.dtos.responses;
 
+import com.swd392.ticket_resell_be.entities.Ticket;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,6 @@ import java.util.UUID;
 public class OrderDetailDtoResponse {
     private UUID id;
     private UUID orderId;
-    private UUID ticketId;
+    private Ticket ticket;
     private int quantity;
 }
