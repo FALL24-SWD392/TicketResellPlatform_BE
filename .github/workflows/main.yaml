@@ -30,6 +30,8 @@ jobs:
           echo "API_URL=${{ secrets.API_URL }}" >> .env
           echo "RESET_PASSWORD_URL=${{ secrets.RESET_PASSWORD_URL }}" >> .env
           echo "ISSUER=${{ secrets.ISSUER }}" >> .env
+          echo "SUCCESS_REDIRECT_URL=${{ secrets.SUCCESS_REDIRECT_URL }}" >> .env
+          echo "FAILURE_REDIRECT_URL=${{ secrets.FAILURE_REDIRECT_URL }}" >> .env
         shell: bash
 
       - name: Run `docker compose`
