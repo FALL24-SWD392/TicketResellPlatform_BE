@@ -84,7 +84,8 @@ public class FeedbackServiceImplement implements FeedbackService {
 
         return apiResponseBuilder.buildResponse(
                 parseToFeedbackDtoResponse(feedback),
-                HttpStatus.CREATED
+                HttpStatus.CREATED,
+                "Create feedback successfully"
         );
     }
 
@@ -172,7 +173,8 @@ public class FeedbackServiceImplement implements FeedbackService {
         feedbackRepository.save(existingFeedback);
         return apiResponseBuilder.buildResponse(
                 parseToFeedbackDtoResponse(existingFeedback),
-                HttpStatus.OK
+                HttpStatus.OK,
+                "Update feedback successfully"
         );
     }
 
@@ -183,7 +185,8 @@ public class FeedbackServiceImplement implements FeedbackService {
         feedbackRepository.save(feedback);
         return apiResponseBuilder.buildResponse(
                 parseToFeedbackDtoResponse(feedback),
-                HttpStatus.OK
+                HttpStatus.OK,
+                "Remove feedback successfully"
         );
     }
 
@@ -201,7 +204,7 @@ public class FeedbackServiceImplement implements FeedbackService {
                     feedbacks.getTotalElements(),
                     feedbacks.getTotalPages(),
                     HttpStatus.OK,
-                    null
+                    "Find feedback successfully"
             );
     }
 }

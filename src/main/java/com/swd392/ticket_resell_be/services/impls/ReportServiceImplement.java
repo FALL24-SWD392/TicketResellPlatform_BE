@@ -49,7 +49,8 @@ public class ReportServiceImplement implements ReportService {
         reportRepository.save(report);
         return apiResponseBuilder.buildResponse(
                 parseToReportDtoResponse(report),
-                HttpStatus.CREATED
+                HttpStatus.CREATED,
+                "Create report successfully"
         );
     }
 
@@ -109,7 +110,7 @@ public class ReportServiceImplement implements ReportService {
         return apiResponseBuilder.buildResponse(
                 parseToReportDtoResponse(reportRepository.findReportByIdIs(id)),
                 HttpStatus.OK,
-                null
+                "Get report by id successfully"
         );
     }
 
@@ -128,7 +129,7 @@ public class ReportServiceImplement implements ReportService {
                 reports.getTotalElements(),
                 reports.getTotalPages(),
                 HttpStatus.OK,
-                null
+                "Get report by User id successfully"
         );
     }
 
@@ -152,7 +153,7 @@ public class ReportServiceImplement implements ReportService {
                 reports.getTotalElements(),
                 reports.getTotalPages(),
                 HttpStatus.OK,
-                null
+                "Get report by Status successfully"
         );
     }
 

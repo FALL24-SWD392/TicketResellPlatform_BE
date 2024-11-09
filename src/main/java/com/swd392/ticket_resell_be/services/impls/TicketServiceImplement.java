@@ -51,7 +51,8 @@ public class TicketServiceImplement implements TicketService {
             ticketRepository.save(ticket);
             return apiResponseBuilder.buildResponse(
                     parseToTicketDtoResponse(ticket),
-                    HttpStatus.CREATED
+                    HttpStatus.CREATED,
+                    "Create ticket successfully"
             );
         }
     }
@@ -102,7 +103,8 @@ public class TicketServiceImplement implements TicketService {
         ticketRepository.save(existingTicket);
         return apiResponseBuilder.buildResponse(
                 parseToTicketDtoResponse(existingTicket),
-                HttpStatus.OK
+                HttpStatus.OK,
+                "Update ticket successfully"
         );
     }
 
@@ -146,7 +148,8 @@ public class TicketServiceImplement implements TicketService {
             ticketRepository.save(ticket);
             return apiResponseBuilder.buildResponse(
                     parseToTicketDtoResponse(ticket),
-                    HttpStatus.OK
+                    HttpStatus.OK,
+                    "Remove ticket successfully"
             );
         }
     }
@@ -190,7 +193,7 @@ public class TicketServiceImplement implements TicketService {
                     tickets.getTotalElements(),
                     tickets.getTotalPages(),
                     HttpStatus.OK,
-                    null
+                    "View tickets for admin successfully"
             );
     }
 
@@ -211,7 +214,8 @@ public class TicketServiceImplement implements TicketService {
                 tickets.getNumber() + 1,
                 tickets.getTotalElements(),
                 tickets.getTotalPages(),
-                HttpStatus.OK
+                HttpStatus.OK,
+                "Search ticket successfully"
         );
     }
 
@@ -223,7 +227,8 @@ public class TicketServiceImplement implements TicketService {
                 1,
                 Categorize.getByCategory("ticket").size(),
                 1,
-                HttpStatus.OK
+                HttpStatus.OK,
+                "Get categories successfully"
         );
     }
 
@@ -233,7 +238,8 @@ public class TicketServiceImplement implements TicketService {
                 .orElseThrow(() -> new AppException(ErrorCode.TICKET_NOT_FOUND));
         return apiResponseBuilder.buildResponse(
                 parseToTicketDtoIdResponse(ticket),
-                HttpStatus.OK
+                HttpStatus.OK,
+                "View ticket by id successfully"
         );
     }
 
@@ -313,7 +319,8 @@ public class TicketServiceImplement implements TicketService {
                 tickets.getNumber() + 1,
                 tickets.getTotalElements(),
                 tickets.getTotalPages(),
-                HttpStatus.OK
+                HttpStatus.OK,
+                "View ticket by User successfully"
         );
     }
 
