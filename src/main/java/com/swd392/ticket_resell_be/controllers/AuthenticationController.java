@@ -28,7 +28,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody @Valid LoginGoogle google)
+    public ResponseEntity<ApiItemResponse<LoginDtoResponse>> login(@RequestBody LoginGoogle google)
             throws JOSEException {
         return ResponseEntity.ok(userService.login(google));
     }
