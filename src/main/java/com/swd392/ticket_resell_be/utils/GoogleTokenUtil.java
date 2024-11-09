@@ -10,11 +10,13 @@ import org.springframework.stereotype.Component;
 public class GoogleTokenUtil {
     @Value("${GOOGLE_CLIENT_ID}")
     private String clientId;
+    @Value("${ISSUER}")
+    private String issuer;
 
     public String getEmail(String token) {
         TokenVerifier verifier = TokenVerifier.newBuilder()
                 .setAudience(clientId)
-                .setIssuer("https://accounts.google.com")
+                .setIssuer(issuer)
                 .build();
         try {
             return verifier.verify(token).getPayload().get("email").toString();

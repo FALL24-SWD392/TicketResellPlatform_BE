@@ -21,6 +21,7 @@ public class TicketResellBeApplication {
         System.setProperty("ACCESS_TOKEN_EXP", dotenv.get("ACCESS_TOKEN_EXP"));
         System.setProperty("REFRESH_TOKEN_EXP", dotenv.get("REFRESH_TOKEN_EXP"));
         System.setProperty("RESET_PASSWORD_URL", dotenv.get("RESET_PASSWORD_URL"));
+        System.setProperty("ISSUER", dotenv.get("ISSUER"));
 
         SpringApplication.run(TicketResellBeApplication.class, args);
     }
