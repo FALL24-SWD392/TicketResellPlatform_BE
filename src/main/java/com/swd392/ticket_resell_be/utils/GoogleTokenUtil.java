@@ -30,14 +30,10 @@ public class GoogleTokenUtil {
         }
     }
 
-    public List<String> getEmailUsernameAvatar(String token) {
+    public String getEmailUsernameAvatar(String token) {
         try {
             FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(token);
-            return List.of(
-                    decodedToken.getEmail(),
-                    decodedToken.getName(),
-                    decodedToken.getPicture()
-            );
+            return decodedToken.getEmail();
         } catch (FirebaseAuthException e) {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }

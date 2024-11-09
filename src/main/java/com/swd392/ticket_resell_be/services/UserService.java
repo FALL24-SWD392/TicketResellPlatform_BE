@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface UserService {
     ApiItemResponse<LoginDtoResponse> login(LoginDtoRequest loginDtoRequest) throws JOSEException;
 
-    ApiItemResponse<LoginDtoResponse> login(String token) throws JOSEException;
+    ApiItemResponse<LoginDtoResponse> login(LoginGoogle google) throws JOSEException;
 
     ApiItemResponse<String> register(RegisterDtoRequest registerDtoRequest)
             throws JOSEException, MessagingException;
